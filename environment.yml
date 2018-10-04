@@ -1,0 +1,6 @@
+name: cpe
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+

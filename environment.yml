@@ -3,6 +3,9 @@ channels:
   - defaults
 dependencies:
   - python=3.7
+  - pandas=0.23.4
+  - jupyter=1.0.0
+  - ipython=7.0.1
   - pip:
     - kaggle==1.4.7
 

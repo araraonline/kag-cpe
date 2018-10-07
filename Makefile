@@ -8,10 +8,10 @@ all: data/flags/raw \
 data/flags/raw: \
 			src/util/download.py
 	kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/raw
-	unzip data/raw/data-science-for-good.zip -d data/raw/cpe-data
+	unzip -n data/raw/data-science-for-good.zip -d data/raw/cpe-data
 
 	python -m src.util.download $(MA_SIMPLIFIED_SHAPEFILE) 'data/raw/ma_simplified.zip'
-	unzip data/raw/ma_simplified.zip -d data/raw/ma_simplified
+	unzip -n data/raw/ma_simplified.zip -d data/raw/ma_simplified
 
 	touch data/flags/raw
 

@@ -11,6 +11,8 @@ dependencies:
   - fiona=1.7.*
   - pyproj=1.9.*
   - shapely=1.6.*
+  - matplotlib=3.0.*
+  - descartes=1.1.*
   - pip:
     - httpie==0.9.*
     - kaggle==1.4.*

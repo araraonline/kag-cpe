@@ -22,6 +22,11 @@ data/flags/raw: \
 	python -m src.util.download $(AUSTIN_CRIMES) 'data/raw/crime_reports_austin.csv'
 	python -m src.util.download $(AUSTIN_OIS) 'data/raw/ois_austin.csv'
 
+	# FIX: Kaggle datasets didn't contain DP05 data for Austin, Texas
+	# This will **replace** the original data with the fixed one
+	# TODO: Remove once Kaggle fixes it
+	unzip -o 'data/keep/ACS_15_5YR_DP05_TRAVISCOUNTY_TX.zip' -d 'data/raw/cpe-data/Dept_37-00027/37-00027_ACS_data/37-00027_ACS_race-sex-age'
+
 	touch data/flags/raw
 
 data/flags/pre: data/flags/raw

@@ -8,3 +8,7 @@ data/**
 !data/**/.gitkeep
 !data/keep/
 !data/keep/*
+
+*.db.bak
+*.db.dat
+*.db.dir

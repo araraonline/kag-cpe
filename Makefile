@@ -9,18 +9,18 @@ all: data/flags/raw \
 		data/flags/output
 
 data/flags/raw: \
-			src/util/download.py
+			cpe_help/util/download.py
 	kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/raw
 	unzip -n data/raw/data-science-for-good.zip -d data/raw/cpe-data
 
-	python -m src.util.download $(MA_SIMPLIFIED_SHAPEFILE) 'data/raw/ma_simplified.zip'
+	python -m cpe_help.util.download $(MA_SIMPLIFIED_SHAPEFILE) 'data/raw/ma_simplified.zip'
 	unzip -n data/raw/ma_simplified.zip -d data/raw/ma_simplified
 
-	python -m src.util.download $(TX_SHAPEFILE) 'data/raw/census_tx.zip'
+	python -m cpe_help.util.download $(TX_SHAPEFILE) 'data/raw/census_tx.zip'
 	unzip -n data/raw/census_tx.zip -d data/raw/census_tx
 
-	python -m src.util.download $(AUSTIN_CRIMES) 'data/raw/crime_reports_austin.csv'
-	python -m src.util.download $(AUSTIN_OIS) 'data/raw/ois_austin.csv'
+	python -m cpe_help.util.download $(AUSTIN_CRIMES) 'data/raw/crime_reports_austin.csv'
+	python -m cpe_help.util.download $(AUSTIN_OIS) 'data/raw/ois_austin.csv'
 
 	# FIX: Kaggle datasets didn't contain DP05 data for Austin, Texas
 	# This will **replace** the original data with the fixed one

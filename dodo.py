@@ -150,15 +150,14 @@ def task_spread_acs_tables():
     for dept_dir in dept_dirs:
         name = dept_dir.name[5:]
         dept = Department(name)
-        # TODO: There are some fixes in the code below
         # NOTE: do not use the next built-in here. doit will catch
         #       and StopIteraction exception in a weird place and
         #       complicate debugging
-        src_dir = list(dept_dir.glob(f"{name}_ACS?data"))[0]  # FIX: glob
+        src_dir = dept_dir / f"{name}_ACS_data"
         dst_dir = dept.dir / 'external' / 'ACS'
         src_files = [list(x.glob('*_with_ann.csv'))[0]
                      for x in src_dir.iterdir()
-                     if x.is_dir() and any(x.iterdir())]  # FIX: iterdir
+                     if x.is_dir()]
         dst_files = [dst_dir / x.name for x in src_files]
 
         yield {

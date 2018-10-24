@@ -9,6 +9,7 @@ from importlib import import_module
 import geopandas as gpd
 
 from cpe_help.util import crs
+from cpe_help.util.io import save_json
 from cpe_help.util.path import DATA_DIR, ensure_path
 
 
@@ -104,6 +105,27 @@ class Department(object):
 
         ensure_path(self.dir / 'preprocessed' / 'shapefiles')
         pre.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
+
+    def guess_state(self):
+        """
+        Guess which state this department is in
+
+        To guess the state, we find states that intersect with the
+        department shape. If there is exactly one state, we're set.
+        """
+        states = gpd.read_file(str(DATA_DIR / 'census' / '2016' / 'state_boundaries'))
+        states = states.set_index('GEOID')
+
+        districts = gpd.read_file(str(self.dir / 'preprocessed' / 'shapefiles'))
+        districts = districts.to_crs(states.crs)
+        districts = districts.unary_union
+
+        intersecting = [s
+                        for s, g in states.geometry.iteritems()
+                        if g.intersects(districts)]
+        assert len(intersecting) == 1
+
+        save_json(intersecting[0], self.dir / 'state.json')
 
 
 def list_departments():

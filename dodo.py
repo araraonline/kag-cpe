@@ -277,8 +277,8 @@ def task_download_extra():
         name='austin_ois',
     )
 
-    yield downloader(
-        'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_path / 'crime_reports.csv',
-        name='austin_crimes',
-    )
+    # yield downloader(
+    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
+    #     Department('37-00027').raw_path / 'crime_reports.csv',
+    #     name='austin_crimes',
+    # )

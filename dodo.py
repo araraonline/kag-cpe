@@ -246,6 +246,13 @@ def task_download_state_boundaries():
     )
 
 
+def task_unzip_state_boundaries():
+    return unzipper(
+        DATA_DIR / 'census' / '2016' / 'state_boundaries.zip',
+        DATA_DIR / 'census' / '2016' / 'state_boundaries',
+    )
+
+
 def task_fetch_census_geography():
     # TODO: automatically retrieve
 

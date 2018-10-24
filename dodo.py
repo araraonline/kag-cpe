@@ -234,7 +234,7 @@ def task_preprocess_shapefiles():
             'file_dep': [x for x in src.iterdir()],
             'targets': [dst],
             'actions': [dept.preprocess_shapefile],
-            'clean': True,
+            'clean': [f'rm -rf {dept.preprocessed_shapefile_path}'],
         }
 
 

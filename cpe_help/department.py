@@ -101,6 +101,8 @@ class Department(object):
             name=self.name,
         )
 
+    # doit actions
+
     def preprocess_shapefile(self):
         """
         Preprocess the raw shapefile for this department
@@ -112,17 +114,28 @@ class Department(object):
         Source: './external/shapefiles'
         Destination: './preprocessed/shapefiles'
         """
-        src = str(self.external_shapefile_path)
-        dst = str(self.preprocessed_shapefile_path)
-
-        raw = gpd.read_file(src)
+        raw = self.load_external_shapefile()
 
         if not raw.crs:
             raise InputError(f"Department {self.name} has no projection defined")
         pre = raw.to_crs(crs.epsg4326)
 
-        ensure_path(dst)
-        pre.to_file(dst)
+        self.save_preprocessed_shapefile(pre)
+
+    # input/ouput
+
+    def load_external_shapefile(self):
+        path = str(self.external_shapefile_path)
+        return gpd.read_file(path)
+
+    def load_preprocessed_shapefile(self):
+        path = str(self.preprocessed_shapefile_path)
+        return gpd.read_file(path)
+
+    def save_preprocessed_shapefile(self, df):
+        path = str(self.preprocessed_shapefile_path)
+        ensure_path(path)
+        df.to_file(path)
 
 
 def list_departments():

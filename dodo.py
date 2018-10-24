@@ -246,6 +246,23 @@ def task_download_state_boundaries():
     )
 
 
+@create_after('spread_shapefiles')
+def task_guess_state():
+    """
+    Guess the state of each department
+    """
+    extensions = ['cpg', 'dbf', 'prj', 'shp', 'shx']
+    for dept in list_departments():
+        shp_dir = dept.dir / 'preprocessed' / 'shapefiles'
+        yield {
+            'name': dept.name,
+            'file_dep': [shp_dir / f"shapefiles.{ext}" for ext in extensions] +
+                        [Census(2016).dir / 'state_boundaries.zip'],
+            'targets': [dept.dir / 'state.json'],
+            'actions': [dept.guess_state],
+        }
+
+
 @create_after('preprocess_shapefiles')
 @create_after('download_state_boundaries')
 def task_download_tract_boundaries():

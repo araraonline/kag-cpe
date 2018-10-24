@@ -1,7 +1,7 @@
 """
 Module for defining Coordinate Reference Systems (CRS)
 
-*Do* import this module. Typing '+init esri:102739' every time isvery
+*Do* import this module. Typing '+init esri:102739' every time is very
 prone to errors.
 """
 

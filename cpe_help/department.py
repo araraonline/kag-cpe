@@ -89,8 +89,9 @@ class Department(object):
         """
         Preprocess the raw shapefile for this department
 
-        The default implementation (Department) copies from the source
-        shapefiles to destination, while setting the CRS to EPSG:4326.
+        The default implementation (Department) copies from source to
+        destination, while setting the Coordinate Reference System to
+        EPSG:4326.
 
         Source: './external/shapefiles'
         Destination: './preprocessed/shapefiles'

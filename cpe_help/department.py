@@ -38,3 +38,10 @@ class Department(object):
             Represents the department name, e.g. '37-00027' for Austin.
         """
         self.name = name
+
+
+def list_departments():
+    """
+    Returns a list with all available Department's
+    """
+    return [Department(x.name) for x in (DATA_DIR / 'departments').iterdir()]

@@ -232,8 +232,7 @@ def task_preprocess_shapefiles():
         yield {
             'name': dept.name,
             'file_dep': [x for x in src.iterdir()],
-            'targets': [dst / f"shapefiles.{ext}" for ext in extensions] +
-                       [dst],
+            'targets': [dst],
             'actions': [dept.preprocess_shapefile],
             'clean': True,
         }

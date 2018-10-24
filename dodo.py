@@ -6,8 +6,7 @@ from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
 
-from cpe_help import list_departments
-from cpe_help.department import Department
+from cpe_help import Department, list_departments
 from cpe_help.util.path import DATA_DIR
 
 

@@ -9,8 +9,7 @@ from importlib import import_module
 import geopandas as gpd
 
 from cpe_help.util import crs
-from cpe_help.util.path import DATA_DIR
-from cpe_help.util.path import ensure_path
+from cpe_help.util.path import DATA_DIR, ensure_path
 
 
 class InputError(Exception):

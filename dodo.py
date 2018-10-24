@@ -6,7 +6,7 @@ from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
 
-from cpe_help.department import Department
+from cpe_help import Department, list_departments
 from cpe_help.util.path import DATA_DIR
 
 
@@ -218,6 +218,23 @@ def task_spread_other():
             'targets': dst_files,
             'actions': [(_copyfile, [src, dst])
                         for src, dst in zip(src_files, dst_files)],
+            'clean': True,
+        }
+
+
+@create_after('spread_shapefiles')
+def task_preprocess_shapefiles():
+    extensions = ['cpg', 'dbf', 'prj', 'shp', 'shx']
+
+    for dept in list_departments():
+        src = dept.dir / 'external' / 'shapefiles'
+        dst = dept.dir / 'preprocessed' / 'shapefiles'
+        yield {
+            'name': dept.name,
+            'file_dep': [x for x in src.iterdir()],
+            'targets': [dst / f"shapefiles.{ext}" for ext in extensions] +
+                       [dst],
+            'actions': [dept.preprocess_shapefile],
             'clean': True,
         }
 

@@ -1,4 +1,3 @@
-
 """
 This is the main file for dealing with departments
 
@@ -7,7 +6,14 @@ Probably will become the main file of the project.
 
 from importlib import import_module
 
-from cpe_help.util.path import DATA_DIR
+import geopandas as gpd
+
+from cpe_help.util import crs
+from cpe_help.util.path import DATA_DIR, ensure_path
+
+
+class InputError(Exception):
+    pass
 
 
 class Department(object):
@@ -78,6 +84,26 @@ class Department(object):
             klass=type(self).__name__,
             name=self.name,
         )
+
+    def preprocess_shapefile(self):
+        """
+        Preprocess the raw shapefile for this department
+
+        The default implementation (Department) copies from source to
+        destination, while setting the Coordinate Reference System to
+        EPSG:4326.
+
+        Source: './external/shapefiles'
+        Destination: './preprocessed/shapefiles'
+        """
+        raw = gpd.read_file(str(self.dir / 'external' / 'shapefiles'))
+
+        if not raw.crs:
+            raise InputError(f"Department {self.name} has no projection defined")
+        pre = raw.to_crs(crs.epsg4326)
+
+        ensure_path(self.dir / 'preprocessed' / 'shapefiles')
+        pre.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
 
 
 def list_departments():

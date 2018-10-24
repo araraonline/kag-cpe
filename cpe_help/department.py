@@ -73,6 +73,12 @@ class Department(object):
         """
         self.name = name
 
+    def __repr__(self):
+        return "{klass}({name!r})".format(
+            klass=type(self).__name__,
+            name=self.name,
+        )
+
 
 def list_departments():
     """

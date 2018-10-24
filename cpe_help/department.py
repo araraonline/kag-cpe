@@ -8,6 +8,7 @@ from importlib import import_module
 
 import geopandas as gpd
 
+from cpe_help.util import crs
 from cpe_help.util.path import DATA_DIR
 from cpe_help.util.path import ensure_path
 
@@ -96,18 +97,13 @@ class Department(object):
         Source: './external/shapefiles'
         Destination: './preprocessed/shapefiles'
         """
-        epsg4326 = {
-            'init': 'epsg:4326',
-            'no_defs': True
-        }
-
         ensure_path(self.dir / 'preprocessed' / 'shapefiles')
         raw = gpd.read_file(str(self.dir / 'external' / 'shapefiles'))
 
         if not raw.crs:
             raise InputError(f"Department {self.name} has no projection defined")
 
-        pre = raw.to_crs(epsg4326)
+        pre = raw.to_crs(crs.epsg4326)
         raw.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
 
 

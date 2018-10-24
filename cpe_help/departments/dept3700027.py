@@ -1,8 +1,8 @@
 """
 Example department file.
 
-For this specific case, we will need to set the projection when loading
-the police shapefiles.
+For this specific case, we will to set the projection when loading the
+police geography.
 """
 
 import geopandas as gpd

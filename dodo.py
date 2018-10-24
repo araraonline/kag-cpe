@@ -6,7 +6,7 @@ from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
 
-from cpe_help import Department, list_departments
+from cpe_help import Census, Department, list_departments
 from cpe_help.util.path import DATA_DIR
 
 
@@ -244,6 +244,23 @@ def task_download_state_boundaries():
         'https://www2.census.gov/geo/tiger/TIGER2016/STATE/tl_2016_us_state.zip',
         DATA_DIR / 'census' / '2016' / 'state_boundaries.zip',
     )
+
+
+@create_after('preprocess_shapefiles')
+@create_after('download_state_boundaries')
+def task_download_tract_boundaries():
+    seen = []
+    depts = list_departments()
+    for dept in depts:
+        state = dept.guess_state()
+        geoid = state.GEOID
+        if geoid not in seen:
+            yield downloader(
+                Census(2016).tract_boundaries_url(geoid),
+                Census(2016).dir / 'states' / geoid / 'census_boundaries.zip',
+                name=geoid,
+            )
+            seen.append(geoid)
 
 
 def task_unzip_state_boundaries():

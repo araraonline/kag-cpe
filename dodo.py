@@ -154,7 +154,7 @@ def task_spread_acs_tables():
         #       and StopIteraction exception in a weird place and
         #       complicate debugging
         src_dir = dept_dir / f"{name}_ACS_data"
-        dst_dir = dept.dir / 'external' / 'ACS'
+        dst_dir = dept.external_acs_path
         src_files = [list(x.glob('*_with_ann.csv'))[0]
                      for x in src_dir.iterdir()
                      if x.is_dir()]
@@ -184,7 +184,7 @@ def task_spread_shapefiles():
         name = dept_dir.name[5:]
         dept = Department(name)
         src_dir = dept_dir / f"{name}_Shapefiles"
-        dst_dir = dept.dir / 'external' / 'shapefiles'
+        dst_dir = dept.external_shapefile_path
         src_files = list(src_dir.iterdir())
         dst_files = [dst_dir / x.name for x in src_files]
 
@@ -210,7 +210,7 @@ def task_spread_other():
         name = dept_dir.name[5:]
         dept = Department(name)
         src_files = [x for x in dept_dir.iterdir() if x.is_file()]
-        dst_files = [dept.dir / 'external' / x.name for x in src_files]
+        dst_files = [dept.external_path / x.name for x in src_files]
 
         yield {
             'name': name,
@@ -227,13 +227,12 @@ def task_preprocess_shapefiles():
     extensions = ['cpg', 'dbf', 'prj', 'shp', 'shx']
 
     for dept in list_departments():
-        src = dept.dir / 'external' / 'shapefiles'
-        dst = dept.dir / 'preprocessed' / 'shapefiles'
+        src = dept.external_shapefile_path
+        dst = dept.preprocessed_shapefile_path
         yield {
             'name': dept.name,
             'file_dep': [x for x in src.iterdir()],
-            'targets': [dst / f"shapefiles.{ext}" for ext in extensions] +
-                       [dst],
+            'targets': [dst],
             'actions': [dept.preprocess_shapefile],
             'clean': True,
         }
@@ -274,12 +273,12 @@ def task_download_extra():
     # just a prototype for other data that may be retrieved
     yield downloader(
         'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').dir / 'raw' / 'OIS.csv',
+        Department('37-00027').raw_path / 'OIS.csv',
         name='austin_ois',
     )
 
     yield downloader(
         'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').dir / 'raw' / 'crime_reports.csv',
+        Department('37-00027').raw_path / 'crime_reports.csv',
         name='austin_crimes',
     )

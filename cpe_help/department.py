@@ -24,16 +24,32 @@ class Department(object):
     """
 
     @property
-    def dir(self):
-        """
-        Return the directory containing the department data
-
-        Returns
-        -------
-        Path
-            A pathlib.Path object representing the directory.
-        """
+    def path(self):
         return DATA_DIR / 'departments' / self.name
+
+    @property
+    def external_path(self):
+        return self.path / 'external'
+
+    @property
+    def raw_path(self):
+        return self.path / 'raw'
+
+    @property
+    def preprocessed_path(self):
+        return self.path / 'preprocessed'
+
+    @property
+    def external_acs_path(self):
+        return self.external_path / 'ACS'
+
+    @property
+    def external_shapefile_path(self):
+        return self.external_path / 'police_districts'
+
+    @property
+    def preprocessed_shapefile_path(self):
+        return self.preprocessed_path / 'police_districts'
 
     def __new__(cls, name):
         """
@@ -96,14 +112,17 @@ class Department(object):
         Source: './external/shapefiles'
         Destination: './preprocessed/shapefiles'
         """
-        raw = gpd.read_file(str(self.dir / 'external' / 'shapefiles'))
+        src = str(self.external_shapefile_path)
+        dst = str(self.preprocessed_shapefile_path)
+
+        raw = gpd.read_file(src)
 
         if not raw.crs:
             raise InputError(f"Department {self.name} has no projection defined")
         pre = raw.to_crs(crs.epsg4326)
 
-        ensure_path(self.dir / 'preprocessed' / 'shapefiles')
-        pre.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
+        ensure_path(dst)
+        pre.to_file(dst)
 
 
 def list_departments():

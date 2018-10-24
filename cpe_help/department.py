@@ -97,14 +97,14 @@ class Department(object):
         Source: './external/shapefiles'
         Destination: './preprocessed/shapefiles'
         """
-        ensure_path(self.dir / 'preprocessed' / 'shapefiles')
         raw = gpd.read_file(str(self.dir / 'external' / 'shapefiles'))
 
         if not raw.crs:
             raise InputError(f"Department {self.name} has no projection defined")
-
         pre = raw.to_crs(crs.epsg4326)
-        raw.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
+
+        ensure_path(self.dir / 'preprocessed' / 'shapefiles')
+        pre.to_file(str(self.dir / 'preprocessed' / 'shapefiles'))
 
 
 def list_departments():

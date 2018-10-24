@@ -24,16 +24,32 @@ class Department(object):
     """
 
     @property
-    def dir(self):
-        """
-        Return the directory containing the department data
-
-        Returns
-        -------
-        Path
-            A pathlib.Path object representing the directory.
-        """
+    def path(self):
         return DATA_DIR / 'departments' / self.name
+
+    @property
+    def external_path(self):
+        return self.path / 'external'
+
+    @property
+    def raw_path(self):
+        return self.path / 'raw'
+
+    @property
+    def preprocessed_path(self):
+        return self.path / 'preprocessed'
+
+    @property
+    def external_acs_path(self):
+        return self.external_path / 'ACS'
+
+    @property
+    def external_shapefile_path(self):
+        return self.external_path / 'police_districts'
+
+    @property
+    def preprocessed_shapefile_path(self):
+        return self.preprocessed_path / 'police_districts'
 
     def __new__(cls, name):
         """

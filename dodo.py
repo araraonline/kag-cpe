@@ -239,6 +239,13 @@ def task_preprocess_shapefiles():
         }
 
 
+def task_download_state_boundaries():
+    return downloader(
+        'https://www2.census.gov/geo/tiger/TIGER2016/STATE/tl_2016_us_state.zip',
+        DATA_DIR / 'census' / '2016' / 'state_boundaries.zip',
+    )
+
+
 def task_fetch_census_geography():
     # TODO: automatically retrieve
 

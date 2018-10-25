@@ -23,7 +23,7 @@ class TaskHelper(object):
         ----------
         url : str
             The url to download from.
-        out : str ot Path
+        out : str or Path
             The output filename.
         overwrite : bool, default False
             If True, overwrite existing files. Otherwise, do not perform
@@ -41,6 +41,41 @@ class TaskHelper(object):
             'targets': [out],
             'actions': [(download, (url, out))],
             'uptodate': [not overwrite],
+        }
+        task.update(kwargs)
+        return task
+
+    @staticmethod
+    def unzip(file, dir, **kwargs):
+        """
+        Generate a task to extract files from a ZIP archive
+
+        Parameters
+        ----------
+        file : str or Path
+            The input ZIP file.
+        dir : str or Path
+            The directory to extract the ZIP contents to.
+        kwargs
+            Keyword arguments are added as items of the resulting dict.
+
+        Returns
+        -------
+        dict
+            The task to be performed.
+
+        Notes
+        -----
+        As we can't know the ZIP archive contents beforehand, this task
+        will only be rerun when the whole output directory goes missing
+        (not its contents).
+        """
+        from cpe_help.util.compression import unzip
+        task = {
+            'file_dep': [file],
+            'targets': [dir],
+            'actions': [(unzip, (file, dir))],
+            'clean': [(rmtree, (dir,))],
         }
         task.update(kwargs)
         return task
@@ -70,45 +105,6 @@ def _copytree(src, dst, **kwargs):
     copytree(src, dst, **kwargs)
 
 
-def unzipper(src, dst, name=None):
-    """
-    Generate a new task to unzip a file to a specific location
-
-    Parameters
-    ----------
-    src : Path
-        Location of the .zip file.
-    dst : Path
-        Directory to extract files to.
-    name : str, default None
-        If specified, the name of the task to be run.
-
-    Returns
-    -------
-    dict
-        The task to be performed.
-    """
-    task = {
-        'file_dep': [src],
-        'targets': [dst],
-        'actions': [
-
-            # XXX: This is a hack... rmtree below needs the file to exist,
-            # XXX: otherwise it will break.
-            # XXX: Need to think of cases where directory is automatically
-            # XXX: created or not better.
-            (dst.mkdir, [], {'parents': True, 'exist_ok': True}),
-            (rmtree, [dst]),
-            f"unzip {src} -d {dst}",
-        ],
-    }
-
-    if name:
-        task['name'] = name
-
-    return task
-
-
 def task_fetch_inputs():
     """
     Retrieve raw departments data from Kaggle
@@ -131,7 +127,7 @@ def task_unzip_inputs():
     """
     Unzip raw departments data from Kaggle
     """
-    return unzipper(
+    return TaskHelper.unzip(
         DATA_DIR / 'inputs' / 'data-science-for-good.zip',
         DATA_DIR / 'inputs' / 'cpe-data',
     )
@@ -255,13 +251,13 @@ def task_fetch_census_geography():
 
 
 def task_unzip_census_geography():
-    yield unzipper(
+    yield TaskHelper.unzip(
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts',
         name='massachusetts',
     )
 
-    yield unzipper(
+    yield TaskHelper.unzip(
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas',
         name='texas',

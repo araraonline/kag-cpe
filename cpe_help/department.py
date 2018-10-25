@@ -8,7 +8,7 @@ from importlib import import_module
 
 import geopandas as gpd
 
-from cpe_help import census
+from cpe_help import Census
 from cpe_help.util import crs
 from cpe_help.util.io import load_json, save_json
 from cpe_help.util.path import DATA_DIR, ensure_path
@@ -129,6 +129,7 @@ class Department(object):
         """
         Guess the state this department is in
         """
+        census = Census()
         states = census.load_state_boundaries()
         states = states.set_index('GEOID')
 

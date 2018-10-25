@@ -23,18 +23,11 @@ class Census(object):
     def state_boundaries_path(self):
         return self.path / 'state_boundaries.zip'
 
-    def __init__(self, year=2016):
+    def __init__(self):
         """
         Initialize a Census object
-
-        Parameters
-        ----------
-        year : int
-            The year of the Census to retrieve information from.
-            Multiple years can be used/stored together if you use
-            different objects.
         """
-        self.year = year
+        self.year = 2016
 
     def download_state_boundaries(self):
         """

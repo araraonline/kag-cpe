@@ -2,6 +2,7 @@
 Module for defining doit tasks
 """
 
+from os import remove as rmfile
 from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
@@ -288,4 +289,6 @@ def task_download_state_boundaries():
         'targets': [census.state_boundaries_path],
         'actions': [census.download_state_boundaries],
         'uptodate': [True],
+        'clean': [(rmfile, (census.state_boundaries_path,)),
+                  (rmtree, (census.state_boundaries_path.with_suffix(''),))],
     }

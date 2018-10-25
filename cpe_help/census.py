@@ -6,6 +6,7 @@ Tasks, directories and loading/saving information will be present here.
 
 import geopandas as gpd
 
+from cpe_help.util.compression import unzip
 from cpe_help.util.download import download
 from cpe_help.util.path import DATA_DIR
 
@@ -36,7 +37,8 @@ class Census(object):
         url = (f'https://www2.census.gov/geo/tiger/TIGER{self.year}/'
                f'STATE/tl_{self.year}_us_state.zip')
         dest = self.state_boundaries_path
-        return download(url, dest)
+        download(url, dest)
+        unzip(dest, dest.with_suffix(''))
 
     def load_state_boundaries(self):
         return gpd.read_file(str(self.state_boundaries_path))

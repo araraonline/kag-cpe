@@ -8,7 +8,9 @@ from importlib import import_module
 
 import geopandas as gpd
 
+from cpe_help import census
 from cpe_help.util import crs
+from cpe_help.util.io import load_json, save_json
 from cpe_help.util.path import DATA_DIR, ensure_path
 
 
@@ -50,6 +52,10 @@ class Department(object):
     @property
     def preprocessed_shapefile_path(self):
         return self.preprocessed_path / 'police_districts'
+
+    @property
+    def guessed_state_path(self):
+        return self.path / 'guessed_state.json'
 
     def __new__(cls, name):
         """
@@ -119,6 +125,23 @@ class Department(object):
 
         self.save_preprocessed_shapefile(pre)
 
+    def guess_state(self):
+        """
+        Guess the state this department is in
+        """
+        states = census.load_state_boundaries()
+        states = states.set_index('GEOID')
+
+        shape = self.load_preprocessed_shapefile()
+        shape = shape.to_crs(states.crs)
+        union = shape.unary_union
+
+        intersecting = [ix for ix, geom in states.geometry.iteritems()
+                        if union.intersects(geom)]
+        assert len(intersecting) == 1
+
+        self.save_guessed_state(intersecting[0])
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -133,6 +156,12 @@ class Department(object):
         path = str(self.preprocessed_shapefile_path)
         ensure_path(path)
         df.to_file(path)
+
+    def save_guessed_state(self, geoid):
+        save_json(geoid, self.guessed_state_path)
+
+    def load_guessed_state(self):
+        return load_json(self.guessed_state_path)
 
 
 def list_departments():

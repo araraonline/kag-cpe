@@ -1,33 +1,48 @@
 import os
-import os.path
 import subprocess
 
-import click
+from cpe_help.util.path import ensure_path
 
 
-@click.command()
-@click.argument('url')
-@click.argument('destination')
-def CLI(url, destination):
-    """Download a file to 'destination', if 'destination' doesn't exist yet
+def download(url, out):
     """
-    if not os.path.exists(destination):
-        cmd = "http --ignore-stdin --check-status --timeout=3.0 --download '{}' --output '{}'".format(url, destination)
-        returncode = subprocess.run(cmd, shell=True).returncode
-        if returncode == 0:
-            click.echo("Downloaded '{}' with success!".format(destination))
-            return 0
-        else:
-            click.echo("Could not download '{}'.".format(destination))
-            try:
-                os.remove(destination)
-            except OSError:
-                pass
-            return returncode
-    else:
-        click.echo("'{}' already exists!".format(destination))
-        return 0
+    Download a file from url to out
+
+    If out already exists, it is replaced.
+
+    Parameters
+    ----------
+    url : str
+        The url to download from.
+    out : str or Path
+        The path to download to.
+
+    Returns
+    -------
+    None
+    """
+    out = str(out)
+
+    # delete file if it already exists
+    try:
+        os.remove(out)
+    except FileNotFoundError:
+        pass
+
+    ensure_path(out)
+    _download(url, out)
 
 
-if __name__ == '__main__':
-    CLI()
+def _download(url, out):
+    """
+    Download a file, no checks
+    """
+    subprocess.run([
+        'http',
+        '--ignore-stdin',
+        '--check-status',
+        '--timeout=2.0',
+        '--print=',
+        '--download', url,
+        '--output', out,
+    ], check=True)

@@ -10,6 +10,42 @@ from cpe_help import Department, list_departments
 from cpe_help.util.path import DATA_DIR
 
 
+class TaskHelper(object):
+    """
+    I help with the creation of tasks
+    """
+    @staticmethod
+    def download(url, out, overwrite=False, **kwargs):
+        """
+        Generate a task to download a file
+
+        Parameters
+        ----------
+        url : str
+            The url to download from.
+        out : str ot Path
+            The output filename.
+        overwrite : bool, default False
+            If True, overwrite existing files. Otherwise, do not perform
+            the download when out exists.
+        kwargs
+            Keyword arguments are added as items of the resulting dict.
+
+        Returns
+        -------
+        dict
+            The task to be performed.
+        """
+        from cpe_help.util.download import download
+        task = {
+            'targets': [out],
+            'actions': [(download, (url, out))],
+            'uptodate': [not overwrite],
+        }
+        task.update(kwargs)
+        return task
+
+
 def _copyfile(src, dst, **kwargs):
     """
     Copy file from src to dst, creting dirs if needed
@@ -32,43 +68,6 @@ def _copytree(src, dst, **kwargs):
 
     # copy directory
     copytree(src, dst, **kwargs)
-
-
-def downloader(url, target, force=False, name=None):
-    """
-    Generate a new task to download a file from url to target
-
-    Create dirs if needed.
-
-    Parameters
-    ----------
-    url : str
-        The url to download from.
-    target : Path
-        The path the file will be saved to.
-    force : bool, default False
-        If True, forces download even if the file is already present
-        (replacing the file).
-    name : str, default None
-        If specified, the name of the task to be run.
-
-    Returns
-    -------
-    dict
-        The task to be performed.
-    """
-    target.parent.mkdir(parents=True, exist_ok=True)
-
-    task = {
-        'targets': [target],
-        'actions': [f"python -m cpe_help.util.download '{url}' '{target}'"],
-        'uptodate': [not force],
-    }
-
-    if name:
-        task['name'] = name
-
-    return task
 
 
 def unzipper(src, dst, name=None):
@@ -242,13 +241,13 @@ def task_fetch_census_geography():
     # TODO: automatically retrieve
 
     # XXX: Shapefile below is simplified
-    yield downloader(
+    yield TaskHelper.download(
         'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_25_tract_500k.zip',
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
         name='massachusetts',
     )
 
-    yield downloader(
+    yield TaskHelper.download(
         'https://www2.census.gov/geo/tiger/TIGER2015/TRACT/tl_2015_48_tract.zip',
         DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
         name='texas',
@@ -271,13 +270,13 @@ def task_unzip_census_geography():
 
 def task_download_extra():
     # just a prototype for other data that may be retrieved
-    yield downloader(
+    yield TaskHelper.download(
         'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
         Department('37-00027').raw_path / 'OIS.csv',
         name='austin_ois',
     )
 
-    # yield downloader(
+    # yield TaskHelper.download(
     #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
     #     Department('37-00027').raw_path / 'crime_reports.csv',
     #     name='austin_crimes',

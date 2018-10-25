@@ -4,6 +4,7 @@ This is the module for dealing with the American Community Survey (ACS)
 Tasks, directories and loading/saving information will be present here.
 """
 
+from cpe_help.util.download import download
 from cpe_help.util.path import DATA_DIR
 
 

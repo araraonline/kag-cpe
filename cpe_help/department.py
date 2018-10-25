@@ -110,9 +110,6 @@ class Department(object):
         The default implementation (Department) copies from source to
         destination, while setting the Coordinate Reference System to
         EPSG:4326.
-
-        Source: './external/shapefiles'
-        Destination: './preprocessed/shapefiles'
         """
         raw = self.load_external_shapefile()
 

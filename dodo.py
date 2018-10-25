@@ -6,7 +6,7 @@ from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
 
-from cpe_help import Department, list_departments
+from cpe_help import census, Department, list_departments
 from cpe_help.util.path import DATA_DIR
 
 
@@ -277,3 +277,14 @@ def task_download_extra():
     #     Department('37-00027').raw_path / 'crime_reports.csv',
     #     name='austin_crimes',
     # )
+
+
+def task_download_state_boundaries():
+    """
+    Download state boundaries from the ACS website
+    """
+    return {
+        'targets': [census.state_boundaries_path],
+        'actions': [census.download_state_boundaries],
+        'uptodate': [True],
+    }

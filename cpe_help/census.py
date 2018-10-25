@@ -4,6 +4,8 @@ This is the module for dealing with the American Community Survey (ACS)
 Tasks, directories and loading/saving information will be present here.
 """
 
+import geopandas as gpd
+
 from cpe_help.util.download import download
 from cpe_help.util.path import DATA_DIR
 
@@ -42,3 +44,6 @@ class Census(object):
                f'STATE/tl_{self.year}_us_state.zip')
         dest = self.state_boundaries_path
         return download(url, dest)
+
+    def load_state_boundaries(self):
+        return gpd.read_file(str(self.state_boundaries_path))

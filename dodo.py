@@ -2,7 +2,7 @@
 Module for defining doit tasks
 """
 
-from shutil import copyfile, copytree, rmtree
+from shutil import copyfile, copytree
 
 from doit import create_after
 
@@ -84,7 +84,7 @@ class TaskHelper(object):
             'file_dep': [file],
             'targets': [dir],
             'actions': [(unzip, (file, dir))],
-            'clean': [(rmtree, (dir,))],
+            'clean': [(maybe_rmtree, (dir,))],
         }
         task.update(kwargs)
         return task
@@ -105,10 +105,7 @@ def _copytree(src, dst, **kwargs):
     If dst already exists, it will be completely removed before copying.
     """
     # remove directory, if it exists
-    try:
-        rmtree(dst)
-    except FileNotFoundError:
-        pass
+    maybe_rmtree(dst)
 
     # copy directory
     copytree(src, dst, **kwargs)

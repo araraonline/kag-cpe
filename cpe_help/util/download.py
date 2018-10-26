@@ -32,6 +32,11 @@ def download(url, out):
 def _download(url, out):
     """
     Download a file, no checks
+
+    Parameters
+    ----------
+    url : str
+    out : str or Path
     """
     subprocess.run([
         'http',
@@ -40,5 +45,5 @@ def _download(url, out):
         '--timeout=2.0',
         '--print=',
         '--download', url,
-        '--output', out,
+        '--output', str(out),
     ], check=True)

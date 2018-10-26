@@ -21,8 +21,12 @@ class Census(object):
         return DATA_DIR / 'census' / f'{self.year}'
 
     @property
-    def state_boundaries_path(self):
-        return self.path / 'state_boundaries.zip'
+    def state_boundaries_shp_path(self):
+        return self.path / 'state_boundaries'
+
+    @property
+    def state_boundaries_zip_path(self):
+        return self.state_boundaries_shp_path.with_suffix('.zip')
 
     def __init__(self):
         """
@@ -36,9 +40,9 @@ class Census(object):
         """
         url = (f'https://www2.census.gov/geo/tiger/TIGER{self.year}/'
                f'STATE/tl_{self.year}_us_state.zip')
-        dest = self.state_boundaries_path
+        dest = self.state_boundaries_zip_path
         download(url, dest)
         unzip(dest, dest.with_suffix(''))
 
     def load_state_boundaries(self):
-        return gpd.read_file(str(self.state_boundaries_path))
+        return gpd.read_file(str(self.state_boundaries_shp_path))

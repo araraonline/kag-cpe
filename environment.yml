@@ -21,6 +21,5 @@ dependencies:
     - httpie==0.9.*
     - pytest==3.9.*
     - kaggle==1.4.*
-    - pylint==2.1.*
     - flake8==3.6.*
 

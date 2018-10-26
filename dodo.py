@@ -6,7 +6,7 @@ from shutil import copyfile, copytree
 
 from doit import create_after
 
-from cpe_help import Census, Department, list_departments
+from cpe_help import Census, Department, DepartmentColl, list_departments
 from cpe_help.util.path import (
     DATA_DIR,
     maybe_mkdir,
@@ -139,30 +139,21 @@ def task_unzip_inputs():
     )
 
 
-@create_after('unzip_inputs')
-def task_create_dirs():
+def task_create_dept_list():
     """
-    Create a dir for each department in the inputs
-
-    Necessary for running list_departments().
+    Create a list of available departments
     """
-    dept_dirs = [x
-                 for x in (DATA_DIR / 'inputs' / 'cpe-data').iterdir()
-                 if x.is_dir()]
-
-    for dept_dir in dept_dirs:
-        name = dept_dir.name[5:]
-        dept = Department(name)
-        yield {
-            'name': name,
-            'file_dep': [DATA_DIR / 'inputs' / 'data-science-for-good.zip'],
-            'targets': [dept.path],
-            'actions': [(maybe_mkdir, (dept.path,))],
-            'clean': [(maybe_rmtree, (dept.path,))],
-        }
+    dept_coll = DepartmentColl()
+    return {
+        'file_dep': [DATA_DIR / 'inputs' / 'data-science-for-good.zip'],
+        'task_dep': ['unzip_inputs'],
+        'targets': [dept_coll.list_of_departments_path],
+        'actions': [dept_coll.create_list_of_departments],
+        'clean': [dept_coll.remove_list_of_departments],
+    }
 
 
-@create_after('create_dirs')
+@create_after('create_dept_list')
 def task_spread_acs_tables():
     """
     Spread American Community Survey tables into departments dirs
@@ -195,7 +186,7 @@ def task_spread_acs_tables():
         }
 
 
-@create_after('create_dirs')
+@create_after('create_dept_list')
 def task_spread_shapefiles():
     """
     Spread district shapefiles into departments directories
@@ -221,7 +212,7 @@ def task_spread_shapefiles():
         }
 
 
-@create_after('create_dirs')
+@create_after('create_dept_list')
 def task_spread_other():
     """
     Spread unattached files into departments directories
@@ -246,7 +237,7 @@ def task_spread_other():
         }
 
 
-@create_after('create_dirs')
+@create_after('create_dept_list')
 def task_guess_states():
     """
     Guess the state for each department

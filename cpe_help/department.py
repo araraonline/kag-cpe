@@ -11,7 +11,7 @@ import geopandas as gpd
 from cpe_help.census import Census
 from cpe_help.util import crs
 from cpe_help.util.io import load_json, save_json
-from cpe_help.util.path import DATA_DIR, ensure_path
+from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
 
 
 class InputError(Exception):
@@ -166,8 +166,43 @@ class Department():
         return load_json(self.guessed_state_path)
 
 
+class DepartmentColl():
+    """
+    Represents a collection of all departments in the data
+    """
+    @property
+    def path(self):
+        return DATA_DIR / 'departments'
+
+    @property
+    def list_of_departments_path(self):
+        return self.path / 'list_of_departments.json'
+
+    def create_list_of_departments(self):
+        cpe_data = DATA_DIR / 'inputs' / 'cpe-data'
+        depts = [Department(d.name[5:])
+                 for d in cpe_data.iterdir()
+                 if d.is_dir()]
+        self.save_list_of_departments(depts)
+
+    def save_list_of_departments(self, lst):
+        names = [dept.name for dept in lst]
+        save_json(names, self.list_of_departments_path)
+
+    def load_list_of_departments(self):
+        names = load_json(self.list_of_departments_path)
+        depts = [Department(name) for name in names]
+        return depts
+
+    def remove_list_of_departments(self):
+        maybe_rmfile(self.list_of_departments_path)
+
+
 def list_departments():
     """
     Returns a list with all available Department's
+
+    This is a shortcut.
     """
-    return [Department(x.name) for x in (DATA_DIR / 'departments').iterdir()]
+    dept_coll = DepartmentColl()
+    return dept_coll.load_list_of_departments()

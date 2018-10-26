@@ -24,6 +24,10 @@ class TaskHelper(object):
         """
         Generate a task to download a file
 
+        Note that, by default, downloads are never cleaned. You can
+        change this behavior by sending clean=True along with the
+        kwargs.
+
         Parameters
         ----------
         url : str

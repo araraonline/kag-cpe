@@ -9,6 +9,16 @@ DATA_DIR = BASE_DIR / 'data'
 
 # Utils
 
+def maybe_mkdir(path):
+    """
+    Create a directory, if it doesn't exist
+    """
+    import os
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        pass
+
 def maybe_rmfile(path):
     """
     Remove a file, if it exsits

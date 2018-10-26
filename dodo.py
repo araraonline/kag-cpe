@@ -8,7 +8,7 @@ from shutil import copyfile, copytree, rmtree
 from doit import create_after
 
 from cpe_help import Census, Department, list_departments
-from cpe_help.util.path import DATA_DIR, maybe_rmfile, maybe_rmtree
+from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmfile, maybe_rmtree
 
 
 class TaskHelper(object):
@@ -135,6 +135,29 @@ def task_unzip_inputs():
 
 
 @create_after('unzip_inputs')
+def task_create_dirs():
+    """
+    Create a dir for each department in the inputs
+
+    Necessary for running list_departments().
+    """
+    dept_dirs = [x
+                 for x in (DATA_DIR / 'inputs' / 'cpe-data').iterdir()
+                 if x.is_dir()]
+
+    for dept_dir in dept_dirs:
+        name = dept_dir.name[5:]
+        dept = Department(name)
+        yield {
+            'name': name,
+            'file_dep': [DATA_DIR / 'inputs' / 'data-science-for-good.zip'],
+            'targets': [dept.path],
+            'actions': [(maybe_mkdir, (dept.path,))],
+            'clean': [(maybe_rmtree, (dept.path,))],
+        }
+
+
+@create_after('create_dirs')
 def task_spread_acs_tables():
     """
     Spread American Community Survey tables into departments dirs
@@ -167,7 +190,7 @@ def task_spread_acs_tables():
         }
 
 
-@create_after('unzip_inputs')
+@create_after('create_dirs')
 def task_spread_shapefiles():
     """
     Spread district shapefiles into departments directories
@@ -193,7 +216,7 @@ def task_spread_shapefiles():
         }
 
 
-@create_after('unzip_inputs')
+@create_after('create_dirs')
 def task_spread_other():
     """
     Spread unattached files into departments directories
@@ -214,6 +237,24 @@ def task_spread_other():
             'targets': dst_files,
             'actions': [(_copyfile, [src, dst])
                         for src, dst in zip(src_files, dst_files)],
+            'clean': True,
+        }
+
+
+@create_after('create_dirs')
+def task_guess_states():
+    """
+    Guess the state for each department
+    """
+    census = Census()
+    for dept in list_departments():
+        yield {
+            'file_dep': [
+                census.state_boundaries_zip_path,
+                dept.preprocessed_shapefile_path,
+            ],
+            'targets': [dept.guessed_state_path],
+            'actions': [dept.guess_state],
             'clean': True,
         }
 

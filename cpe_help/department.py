@@ -192,6 +192,7 @@ class DepartmentColl():
         depts = [Department(d.name[5:])
                  for d in cpe_data.iterdir()
                  if d.is_dir()]
+        depts = sorted(depts, key=lambda x: x.name)
         self.save_list_of_departments(depts)
 
     def save_list_of_departments(self, lst):

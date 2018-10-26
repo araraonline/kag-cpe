@@ -12,6 +12,10 @@ DATA_DIR = BASE_DIR / 'data'
 def maybe_mkdir(path):
     """
     Create a directory, if it doesn't exist
+
+    Parameters
+    ----------
+    path : str or Path
     """
     import os
     try:

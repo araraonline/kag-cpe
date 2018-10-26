@@ -319,12 +319,10 @@ def task_download_state_boundaries():
     Download state boundaries from the ACS website
     """
     census = Census()
-    zipfile = census.state_boundaries_zip_path
-    directory = census.state_boundaries_shp_path
+    file = census.state_boundaries_path
     return {
-        'targets': [zipfile, directory],
+        'targets': [file],
         'actions': [census.download_state_boundaries],
+        'clean': [census.remove_state_boundaries],
         'uptodate': [True],
-        'clean': [(maybe_rmfile, (zipfile,)),
-                  (maybe_rmtree, (directory,))],
     }

@@ -35,8 +35,5 @@ class Census():
                f'STATE/tl_{self.year}_us_state.zip')
         download(url, self.state_boundaries_path)
 
-    def remove_state_boundaries(self):
-        maybe_rmfile(self.state_boundaries_path)
-
     def load_state_boundaries(self):
         return load_zipshp(self.state_boundaries_path)

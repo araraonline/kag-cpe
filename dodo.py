@@ -279,7 +279,6 @@ def task_download_state_boundaries():
     return {
         'targets': [file],
         'actions': [census.download_state_boundaries],
-        'clean': [census.remove_state_boundaries],
         'uptodate': [True],
     }
 

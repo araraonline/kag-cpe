@@ -8,7 +8,7 @@ from shutil import copyfile, copytree, rmtree
 from doit import create_after
 
 from cpe_help import Census, Department, list_departments
-from cpe_help.util.path import DATA_DIR
+from cpe_help.util.path import DATA_DIR, maybe_rmfile, maybe_rmtree
 
 
 class TaskHelper(object):
@@ -285,10 +285,12 @@ def task_download_state_boundaries():
     Download state boundaries from the ACS website
     """
     census = Census()
+    zipfile = census.state_boundaries_path
+    directory = zipfile.with_suffix('')
     return {
-        'targets': [census.state_boundaries_path],
+        'targets': [zipfile, directory],
         'actions': [census.download_state_boundaries],
         'uptodate': [True],
-        'clean': [(rmfile, (census.state_boundaries_path,)),
-                  (rmtree, (census.state_boundaries_path.with_suffix(''),))],
+        'clean': [(maybe_rmfile, (zipfile,)),
+                  (maybe_rmtree, (directory,))],
     }

@@ -249,9 +249,11 @@ def task_guess_states():
     census = Census()
     for dept in list_departments():
         yield {
+            'name': dept.name,
             'file_dep': [
                 census.state_boundaries_zip_path,
-                dept.preprocessed_shapefile_path,
+                # dept.preprocessed_shapefile_path,
+                # XXX
             ],
             'targets': [dept.guessed_state_path],
             'actions': [dept.guess_state],

@@ -15,6 +15,9 @@ from cpe_help.util.path import (
 )
 
 
+KAGGLE_ZIPFILE = DATA_DIR / 'inputs' / 'data-science-for-good.zip'
+
+
 class TaskHelper(object):
     """
     I help with the creation of tasks
@@ -257,14 +260,13 @@ def task_guess_states():
 @create_after('spread_shapefiles')
 def task_preprocess_shapefiles():
     for dept in list_departments():
-        src = dept.external_shapefile_path
-        dst = dept.preprocessed_shapefile_path
         yield {
             'name': dept.name,
-            'file_dep': [x for x in src.iterdir()],
-            'targets': [dst],
+            'file_dep': [KAGGLE_ZIPFILE],
+            'task_dep': ['spread_shapefiles'],
+            'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
-            'clean': [f'rm -rf {dept.preprocessed_shapefile_path}'],
+            'clean': [dept.remove_preprocessed_shapefile],
         }
 
 

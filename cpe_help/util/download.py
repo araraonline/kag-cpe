@@ -38,12 +38,15 @@ def _download(url, out):
     url : str
     out : str or Path
     """
+    USER_AGENT = 'cpe_help (+https://github.com/araraonline/kag-cpe)'
     subprocess.run([
         'http',
         '--ignore-stdin',
         '--check-status',
         '--timeout=2.0',
         '--print=',
-        '--download', url,
         '--output', str(out),
+        '--download',
+        url,
+        'User-Agent:' + USER_AGENT,
     ], check=True)

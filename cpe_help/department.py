@@ -8,7 +8,7 @@ from importlib import import_module
 
 import geopandas as gpd
 
-from cpe_help import Census
+from cpe_help.census import Census
 from cpe_help.util import crs
 from cpe_help.util.io import load_json, save_json
 from cpe_help.util.path import DATA_DIR, ensure_path
@@ -18,7 +18,7 @@ class InputError(Exception):
     pass
 
 
-class Department(object):
+class Department():
     """
     Represents a police department
 
@@ -120,7 +120,8 @@ class Department(object):
         raw = self.load_external_shapefile()
 
         if not raw.crs:
-            raise InputError(f"Department {self.name} has no projection defined")
+            msg = f"Department {self.name} has no projection defined"
+            raise InputError(msg)
         pre = raw.to_crs(crs.epsg4326)
 
         self.save_preprocessed_shapefile(pre)

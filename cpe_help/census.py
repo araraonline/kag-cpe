@@ -11,7 +11,7 @@ from cpe_help.util.download import download
 from cpe_help.util.path import DATA_DIR
 
 
-class Census(object):
+class Census():
     """
     Main class for dealing with the ACS
     """

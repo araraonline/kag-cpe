@@ -19,6 +19,7 @@ def maybe_mkdir(path):
     except FileExistsError:
         pass
 
+
 def maybe_rmfile(path):
     """
     Remove a file, if it exsits
@@ -33,6 +34,7 @@ def maybe_rmfile(path):
     except FileNotFoundError:
         pass
 
+
 def maybe_rmtree(path):
     """
     Remove a directory tree, if it exists
@@ -46,6 +48,7 @@ def maybe_rmtree(path):
         rmtree(path)
     except FileNotFoundError:
         pass
+
 
 def ensure_path(path):
     """

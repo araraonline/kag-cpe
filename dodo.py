@@ -2,13 +2,17 @@
 Module for defining doit tasks
 """
 
-from os import remove as rmfile
 from shutil import copyfile, copytree, rmtree
 
 from doit import create_after
 
 from cpe_help import Census, Department, list_departments
-from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmfile, maybe_rmtree
+from cpe_help.util.path import (
+    DATA_DIR,
+    maybe_mkdir,
+    maybe_rmfile,
+    maybe_rmtree,
+)
 
 
 class TaskHelper(object):
@@ -263,8 +267,6 @@ def task_guess_states():
 
 @create_after('spread_shapefiles')
 def task_preprocess_shapefiles():
-    extensions = ['cpg', 'dbf', 'prj', 'shp', 'shx']
-
     for dept in list_departments():
         src = dept.external_shapefile_path
         dst = dept.preprocessed_shapefile_path

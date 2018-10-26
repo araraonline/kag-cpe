@@ -135,6 +135,9 @@ class Department():
 
         self.save_preprocessed_shapefile(pre)
 
+    def remove_preprocessed_shapefile(self):
+        maybe_rmfile(self.preprocessed_shapefile_path)
+
     def guess_state(self):
         """
         Guess the state this department is in

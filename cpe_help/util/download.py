@@ -1,7 +1,6 @@
-import os
 import subprocess
 
-from cpe_help.util.path import ensure_path
+from cpe_help.util.path import ensure_path, maybe_rmfile
 
 
 def download(url, out):
@@ -24,10 +23,7 @@ def download(url, out):
     out = str(out)
 
     # delete file if it already exists
-    try:
-        os.remove(out)
-    except FileNotFoundError:
-        pass
+    maybe_rmfile(out)
 
     ensure_path(out)
     _download(url, out)

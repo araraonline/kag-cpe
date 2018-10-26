@@ -2,10 +2,9 @@
 Tools for dealing with file compression
 """
 
-import shutil
 import subprocess
 
-from cpe_help.util.path import ensure_path
+from cpe_help.util.path import ensure_path, maybe_rmtree
 
 
 def unzip(file, dir):
@@ -26,10 +25,7 @@ def unzip(file, dir):
     None
     """
     # remove dir tree if it exists
-    try:
-        shutil.rmtree(dir)
-    except FileNotFoundError:
-        pass
+    maybe_rmtree(dir)
 
     ensure_path(dir)
     _unzip(file, dir)

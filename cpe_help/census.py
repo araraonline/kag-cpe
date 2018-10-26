@@ -6,8 +6,8 @@ Tasks, directories and loading/saving information will be present here.
 
 import geopandas as gpd
 
-from cpe_help.util.compression import unzip
 from cpe_help.util.download import download
+from cpe_help.util.io import load_zipshp
 from cpe_help.util.path import DATA_DIR
 
 
@@ -21,12 +21,8 @@ class Census():
         return DATA_DIR / 'census' / f'{self.year}'
 
     @property
-    def state_boundaries_shp_path(self):
-        return self.path / 'state_boundaries'
-
-    @property
-    def state_boundaries_zip_path(self):
-        return self.state_boundaries_shp_path.with_suffix('.zip')
+    def state_boundaries_path(self):
+        return self.path / 'state_boundaries.zip'
 
     def __init__(self):
         """
@@ -35,14 +31,12 @@ class Census():
         self.year = 2016
 
     def download_state_boundaries(self):
-        """
-        Download state boundaries for the US
-        """
         url = (f'https://www2.census.gov/geo/tiger/TIGER{self.year}/'
                f'STATE/tl_{self.year}_us_state.zip')
-        dest = self.state_boundaries_zip_path
-        download(url, dest)
-        unzip(dest, dest.with_suffix(''))
+        download(url, self.state_boundaries_path)
+
+    def remove_state_boundaries(self):
+        maybe_rmfile(self.state_boundaries_path)
 
     def load_state_boundaries(self):
-        return gpd.read_file(str(self.state_boundaries_shp_path))
+        return load_zipshp(self.state_boundaries_path)

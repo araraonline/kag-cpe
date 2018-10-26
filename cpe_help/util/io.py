@@ -38,7 +38,14 @@ def save_zipshp(df, path):
     """
     Save a zipped shapefile
     """
-    ensure_path(path)
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from cpe_help.util.compression import make_zipfile
 
-    vfs = f'zip://{path}'
-    df.to_file('/', vfs=vfs)
+    path = Path(path)
+    name = path.name
+
+    with TemporaryDirectory() as tmpdir:
+        tmpname = (Path(tmpdir) / name).with_suffix('.shp')
+        df.to_file(str(tmpname))
+        make_zipfile(path, tmpdir)

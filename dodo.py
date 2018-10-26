@@ -270,35 +270,18 @@ def task_preprocess_shapefiles():
         }
 
 
-def task_fetch_census_geography():
-    # TODO: automatically retrieve
-
-    # XXX: Shapefile below is simplified
-    yield TaskHelper.download(
-        'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_25_tract_500k.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        name='massachusetts',
-    )
-
-    yield TaskHelper.download(
-        'https://www2.census.gov/geo/tiger/TIGER2015/TRACT/tl_2015_48_tract.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        name='texas',
-    )
-
-
-def task_unzip_census_geography():
-    yield TaskHelper.unzip(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts',
-        name='massachusetts',
-    )
-
-    yield TaskHelper.unzip(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas',
-        name='texas',
-    )
+def task_download_state_boundaries():
+    """
+    Download state boundaries from the ACS website
+    """
+    census = Census()
+    file = census.state_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_state_boundaries],
+        'clean': [census.remove_state_boundaries],
+        'uptodate': [True],
+    }
 
 
 def task_download_extra():
@@ -314,17 +297,3 @@ def task_download_extra():
     #     Department('37-00027').raw_path / 'crime_reports.csv',
     #     name='austin_crimes',
     # )
-
-
-def task_download_state_boundaries():
-    """
-    Download state boundaries from the ACS website
-    """
-    census = Census()
-    file = census.state_boundaries_path
-    return {
-        'targets': [file],
-        'actions': [census.download_state_boundaries],
-        'clean': [census.remove_state_boundaries],
-        'uptodate': [True],
-    }

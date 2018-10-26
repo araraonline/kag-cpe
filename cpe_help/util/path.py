@@ -47,9 +47,9 @@ def maybe_rmtree(path):
     ----------
     path : str or Path
     """
-    from shutil import rmtree
+    import shutil
     try:
-        rmtree(path)
+        shutil.rmtree(path)
     except FileNotFoundError:
         pass
 

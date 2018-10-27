@@ -29,7 +29,7 @@ def load_zipshp(path):
     handling.
     """
     # https://commons.apache.org/proper/commons-vfs/filesystems.html
-    # using the URI directly doesn't seem documented in fiona
+    # using the URI directly doesn't seem documented in fiona, but it works
     uri = f'zip://{path}'
     return gpd.read_file(uri)
 

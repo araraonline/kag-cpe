@@ -9,8 +9,6 @@ from doit import create_after
 from cpe_help import Census, Department, DepartmentColl, list_departments
 from cpe_help.util.path import (
     DATA_DIR,
-    maybe_mkdir,
-    maybe_rmfile,
     maybe_rmtree,
 )
 

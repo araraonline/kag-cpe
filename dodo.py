@@ -122,9 +122,7 @@ def task_fetch_inputs():
         'actions': [
             'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
         ],
-        'targets': [
-            DATA_DIR / 'inputs' / 'data-science-for-good.zip',
-        ],
+        'targets': [KAGGLE_ZIPFILE],
 
         # force doit to always mark the task
         # as up-to-date (unless no targets found)
@@ -137,7 +135,7 @@ def task_unzip_inputs():
     Unzip raw departments data from Kaggle
     """
     return TaskHelper.unzip(
-        DATA_DIR / 'inputs' / 'data-science-for-good.zip',
+        KAGGLE_ZIPFILE,
         DATA_DIR / 'inputs' / 'cpe-data',
     )
 
@@ -148,7 +146,7 @@ def task_create_dept_list():
     """
     dept_coll = DepartmentColl()
     return {
-        'file_dep': [DATA_DIR / 'inputs' / 'data-science-for-good.zip'],
+        'file_dep': [KAGGLE_ZIPFILE],
         'task_dep': ['unzip_inputs'],
         'targets': [dept_coll.list_of_departments_path],
         'actions': [dept_coll.create_list_of_departments],

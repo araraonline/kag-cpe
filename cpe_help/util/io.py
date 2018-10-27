@@ -3,9 +3,12 @@ Module for input/output utils
 """
 
 import json
+import tempfile
+from pathlib import Path
 
 import geopandas as gpd
 
+from cpe_help.util.compression import make_zipfile
 from cpe_help.util.path import ensure_path
 
 
@@ -38,14 +41,10 @@ def save_zipshp(df, path):
     """
     Save a zipped shapefile
     """
-    from pathlib import Path
-    from tempfile import TemporaryDirectory
-    from cpe_help.util.compression import make_zipfile
-
     path = Path(path)
     name = path.name
 
-    with TemporaryDirectory() as tmpdir:
+    with tempfile.TemporaryDirectory() as tmpdir:
         tmpname = (Path(tmpdir) / name).with_suffix('.shp')
         df.to_file(str(tmpname))
         make_zipfile(path, tmpdir)

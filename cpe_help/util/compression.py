@@ -2,6 +2,7 @@
 Tools for dealing with file compression
 """
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -25,12 +26,10 @@ def make_zipfile(filename, root_dir):
     -------
     None
     """
-    from shutil import make_archive
-
     path = Path(filename)
     maybe_rmfile(path)
     ensure_path(path)
-    make_archive(path.with_suffix(''), 'zip', root_dir)
+    shutil.make_archive(path.with_suffix(''), 'zip', root_dir)
 
 
 def unzip(file, dir):

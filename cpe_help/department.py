@@ -14,7 +14,7 @@ from cpe_help.util.io import (
     load_json,
     load_zipshp,
     save_json,
-    save_zipshp
+    save_zipshp,
 )
 from cpe_help.util.path import DATA_DIR, maybe_rmfile
 

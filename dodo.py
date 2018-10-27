@@ -140,6 +140,34 @@ def task_unzip_inputs():
     )
 
 
+def task_download_state_boundaries():
+    """
+    Download state boundaries from the ACS website
+    """
+    census = Census()
+    file = census.state_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_state_boundaries],
+        'uptodate': [True],
+    }
+
+
+def task_download_extra():
+    # just a prototype for other data that may be retrieved
+    yield TaskHelper.download(
+        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
+        Department('37-00027').raw_path / 'OIS.csv',
+        name='austin_ois',
+    )
+
+    # yield TaskHelper.download(
+    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
+    #     Department('37-00027').raw_path / 'crime_reports.csv',
+    #     name='austin_crimes',
+    # )
+
+
 def task_create_dept_list():
     """
     Create a list of available departments
@@ -257,7 +285,7 @@ def task_guess_states():
         }
 
 
-@create_after('spread_shapefiles')
+@create_after('create_dept_list')
 def task_preprocess_shapefiles():
     for dept in list_departments():
         yield {
@@ -268,31 +296,3 @@ def task_preprocess_shapefiles():
             'actions': [dept.preprocess_shapefile],
             'clean': [dept.remove_preprocessed_shapefile],
         }
-
-
-def task_download_state_boundaries():
-    """
-    Download state boundaries from the ACS website
-    """
-    census = Census()
-    file = census.state_boundaries_path
-    return {
-        'targets': [file],
-        'actions': [census.download_state_boundaries],
-        'uptodate': [True],
-    }
-
-
-def task_download_extra():
-    # just a prototype for other data that may be retrieved
-    yield TaskHelper.download(
-        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_path / 'OIS.csv',
-        name='austin_ois',
-    )
-
-    # yield TaskHelper.download(
-    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-    #     Department('37-00027').raw_path / 'crime_reports.csv',
-    #     name='austin_crimes',
-    # )

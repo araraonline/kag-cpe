@@ -1,3 +1,5 @@
+import os
+import shutil
 from pathlib import Path
 
 
@@ -17,7 +19,6 @@ def maybe_mkdir(path):
     ----------
     path : str or Path
     """
-    import os
     try:
         os.mkdir(path)
     except FileExistsError:
@@ -32,7 +33,6 @@ def maybe_rmfile(path):
     ----------
     path : str or Path
     """
-    import os
     try:
         os.remove(path)
     except FileNotFoundError:
@@ -47,7 +47,6 @@ def maybe_rmtree(path):
     ----------
     path : str or Path
     """
-    import shutil
     try:
         shutil.rmtree(path)
     except FileNotFoundError:

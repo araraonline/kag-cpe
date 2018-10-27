@@ -10,8 +10,13 @@ import geopandas as gpd
 
 from cpe_help.census import Census
 from cpe_help.util import crs
-from cpe_help.util.io import load_json, save_json
-from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
+from cpe_help.util.io import (
+    load_json,
+    load_zipshp,
+    save_json,
+    save_zipshp,
+)
+from cpe_help.util.path import DATA_DIR, maybe_rmfile
 
 
 class InputError(Exception):
@@ -51,7 +56,7 @@ class Department():
 
     @property
     def preprocessed_shapefile_path(self):
-        return self.preprocessed_path / 'police_districts'
+        return self.preprocessed_path / 'police_districts.zip'
 
     @property
     def guessed_state_path(self):
@@ -116,6 +121,10 @@ class Department():
         The default implementation (Department) copies from source to
         destination, while setting the Coordinate Reference System to
         EPSG:4326.
+
+        Note that the source is a usual shapefile, while the destination
+        is a shapefile in a zip archive (a single file facilitates
+        pipelining).
         """
         raw = self.load_external_shapefile()
 
@@ -125,6 +134,9 @@ class Department():
         pre = raw.to_crs(crs.epsg4326)
 
         self.save_preprocessed_shapefile(pre)
+
+    def remove_preprocessed_shapefile(self):
+        maybe_rmfile(self.preprocessed_shapefile_path)
 
     def guess_state(self):
         """
@@ -151,13 +163,10 @@ class Department():
         return gpd.read_file(path)
 
     def load_preprocessed_shapefile(self):
-        path = str(self.preprocessed_shapefile_path)
-        return gpd.read_file(path)
+        return load_zipshp(self.preprocessed_shapefile_path)
 
     def save_preprocessed_shapefile(self, df):
-        path = str(self.preprocessed_shapefile_path)
-        ensure_path(path)
-        df.to_file(path)
+        save_zipshp(df, self.preprocessed_shapefile_path)
 
     def save_guessed_state(self, geoid):
         save_json(geoid, self.guessed_state_path)
@@ -183,6 +192,7 @@ class DepartmentColl():
         depts = [Department(d.name[5:])
                  for d in cpe_data.iterdir()
                  if d.is_dir()]
+        depts = sorted(depts, key=lambda x: x.name)
         self.save_list_of_departments(depts)
 
     def save_list_of_departments(self, lst):

@@ -9,10 +9,11 @@ from doit import create_after
 from cpe_help import Census, Department, DepartmentColl, list_departments
 from cpe_help.util.path import (
     DATA_DIR,
-    maybe_mkdir,
-    maybe_rmfile,
     maybe_rmtree,
 )
+
+
+KAGGLE_ZIPFILE = DATA_DIR / 'inputs' / 'data-science-for-good.zip'
 
 
 class TaskHelper(object):
@@ -79,11 +80,11 @@ class TaskHelper(object):
         will only be rerun when the whole output directory goes missing
         (not its contents).
         """
-        from cpe_help.util.compression import unzip
+        from cpe_help.util.compression import extract_zipfile
         task = {
             'file_dep': [file],
             'targets': [dir],
-            'actions': [(unzip, (file, dir))],
+            'actions': [(extract_zipfile, (file, dir))],
             'clean': [(maybe_rmtree, (dir,))],
         }
         task.update(kwargs)
@@ -119,9 +120,7 @@ def task_fetch_inputs():
         'actions': [
             'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
         ],
-        'targets': [
-            DATA_DIR / 'inputs' / 'data-science-for-good.zip',
-        ],
+        'targets': [KAGGLE_ZIPFILE],
 
         # force doit to always mark the task
         # as up-to-date (unless no targets found)
@@ -134,9 +133,37 @@ def task_unzip_inputs():
     Unzip raw departments data from Kaggle
     """
     return TaskHelper.unzip(
-        DATA_DIR / 'inputs' / 'data-science-for-good.zip',
+        KAGGLE_ZIPFILE,
         DATA_DIR / 'inputs' / 'cpe-data',
     )
+
+
+def task_download_state_boundaries():
+    """
+    Download state boundaries from the ACS website
+    """
+    census = Census()
+    file = census.state_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_state_boundaries],
+        'uptodate': [True],
+    }
+
+
+def task_download_extra():
+    # just a prototype for other data that may be retrieved
+    yield TaskHelper.download(
+        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
+        Department('37-00027').raw_path / 'OIS.csv',
+        name='austin_ois',
+    )
+
+    # yield TaskHelper.download(
+    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
+    #     Department('37-00027').raw_path / 'crime_reports.csv',
+    #     name='austin_crimes',
+    # )
 
 
 def task_create_dept_list():
@@ -145,7 +172,7 @@ def task_create_dept_list():
     """
     dept_coll = DepartmentColl()
     return {
-        'file_dep': [DATA_DIR / 'inputs' / 'data-science-for-good.zip'],
+        'file_dep': [KAGGLE_ZIPFILE],
         'task_dep': ['unzip_inputs'],
         'targets': [dept_coll.list_of_departments_path],
         'actions': [dept_coll.create_list_of_departments],
@@ -246,85 +273,24 @@ def task_guess_states():
     for dept in list_departments():
         yield {
             'name': dept.name,
-            'file_dep': [census.state_boundaries_zip_path],
-            'task_dep': ['preprocess_shapefiles'],
+            'file_dep': [
+                census.state_boundaries_path,
+                dept.preprocessed_shapefile_path,
+            ],
             'targets': [dept.guessed_state_path],
             'actions': [dept.guess_state],
             'clean': True,
         }
 
 
-@create_after('spread_shapefiles')
+@create_after('create_dept_list')
 def task_preprocess_shapefiles():
     for dept in list_departments():
-        src = dept.external_shapefile_path
-        dst = dept.preprocessed_shapefile_path
         yield {
             'name': dept.name,
-            'file_dep': [x for x in src.iterdir()],
-            'targets': [dst],
+            'file_dep': [KAGGLE_ZIPFILE],
+            'task_dep': ['spread_shapefiles'],
+            'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
-            'clean': [f'rm -rf {dept.preprocessed_shapefile_path}'],
+            'clean': [dept.remove_preprocessed_shapefile],
         }
-
-
-def task_fetch_census_geography():
-    # TODO: automatically retrieve
-
-    # XXX: Shapefile below is simplified
-    yield TaskHelper.download(
-        'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_25_tract_500k.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        name='massachusetts',
-    )
-
-    yield TaskHelper.download(
-        'https://www2.census.gov/geo/tiger/TIGER2015/TRACT/tl_2015_48_tract.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        name='texas',
-    )
-
-
-def task_unzip_census_geography():
-    yield TaskHelper.unzip(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts',
-        name='massachusetts',
-    )
-
-    yield TaskHelper.unzip(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas',
-        name='texas',
-    )
-
-
-def task_download_extra():
-    # just a prototype for other data that may be retrieved
-    yield TaskHelper.download(
-        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_path / 'OIS.csv',
-        name='austin_ois',
-    )
-
-    # yield TaskHelper.download(
-    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-    #     Department('37-00027').raw_path / 'crime_reports.csv',
-    #     name='austin_crimes',
-    # )
-
-
-def task_download_state_boundaries():
-    """
-    Download state boundaries from the ACS website
-    """
-    census = Census()
-    zipfile = census.state_boundaries_zip_path
-    directory = census.state_boundaries_shp_path
-    return {
-        'targets': [zipfile, directory],
-        'actions': [census.download_state_boundaries],
-        'uptodate': [True],
-        'clean': [(maybe_rmfile, (zipfile,)),
-                  (maybe_rmtree, (directory,))],
-    }

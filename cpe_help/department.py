@@ -16,7 +16,7 @@ from cpe_help.util.io import (
     save_json,
     save_zipshp
 )
-from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
+from cpe_help.util.path import DATA_DIR, maybe_rmfile
 
 
 class InputError(Exception):

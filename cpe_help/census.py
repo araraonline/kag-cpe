@@ -4,8 +4,6 @@ This is the module for dealing with the American Community Survey (ACS)
 Tasks, directories and loading/saving information will be present here.
 """
 
-import geopandas as gpd
-
 from cpe_help.util.download import download
 from cpe_help.util.io import load_zipshp
 from cpe_help.util.path import DATA_DIR

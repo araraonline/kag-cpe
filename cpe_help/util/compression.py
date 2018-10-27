@@ -4,7 +4,6 @@ Tools for dealing with file compression
 
 import pathlib
 import shutil
-import subprocess
 
 from cpe_help.util.path import (
     ensure_path,

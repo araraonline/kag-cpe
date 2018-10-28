@@ -28,6 +28,8 @@ class Census():
         """
         self.year = 2016
 
+    # doit actions
+
     def download_state_boundaries(self):
         """
         Download state boundaries for the US
@@ -35,6 +37,8 @@ class Census():
         url = (f'https://www2.census.gov/geo/tiger/TIGER{self.year}/'
                f'STATE/tl_{self.year}_us_state.zip')
         download(url, self.state_boundaries_path)
+
+    # input/output
 
     def load_state_boundaries(self):
         """

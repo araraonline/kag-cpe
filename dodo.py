@@ -2,12 +2,93 @@
 Module for defining doit tasks
 """
 
-from shutil import copyfile, copytree, rmtree
+from shutil import copyfile, copytree
 
 from doit import create_after
 
-from cpe_help import Department, list_departments
-from cpe_help.util.path import DATA_DIR
+from cpe_help import Census, Department, DepartmentColl, list_departments
+from cpe_help.util.path import (
+    DATA_DIR,
+    maybe_rmtree,
+)
+
+
+KAGGLE_ZIPFILE = DATA_DIR / 'inputs' / 'data-science-for-good.zip'
+
+
+class TaskHelper(object):
+    """
+    I help with the creation of tasks
+    """
+    @staticmethod
+    def download(url, out, overwrite=False, **kwargs):
+        """
+        Generate a task to download a file
+
+        Note that, by default, downloads are never cleaned. You can
+        change this behavior by sending clean=True along with the
+        kwargs.
+
+        Parameters
+        ----------
+        url : str
+            The url to download from.
+        out : str or Path
+            The output filename.
+        overwrite : bool, default False
+            If True, overwrite existing files. Otherwise, do not perform
+            the download when out exists.
+        kwargs
+            Keyword arguments are added as items of the resulting dict.
+
+        Returns
+        -------
+        dict
+            The task to be performed.
+        """
+        from cpe_help.util.download import download
+        task = {
+            'targets': [out],
+            'actions': [(download, (url, out))],
+            'uptodate': [not overwrite],
+        }
+        task.update(kwargs)
+        return task
+
+    @staticmethod
+    def unzip(file, dir, **kwargs):
+        """
+        Generate a task to extract files from a ZIP archive
+
+        Parameters
+        ----------
+        file : str or Path
+            The input ZIP file.
+        dir : str or Path
+            The directory to extract the ZIP contents to.
+        kwargs
+            Keyword arguments are added as items of the resulting dict.
+
+        Returns
+        -------
+        dict
+            The task to be performed.
+
+        Notes
+        -----
+        As we can't know the ZIP archive contents beforehand, this task
+        will only be rerun when the whole output directory goes missing
+        (not its contents).
+        """
+        from cpe_help.util.compression import extract_zipfile
+        task = {
+            'file_dep': [file],
+            'targets': [dir],
+            'actions': [(extract_zipfile, (file, dir))],
+            'clean': [(maybe_rmtree, (dir,))],
+        }
+        task.update(kwargs)
+        return task
 
 
 def _copyfile(src, dst, **kwargs):
@@ -25,92 +106,13 @@ def _copytree(src, dst, **kwargs):
     If dst already exists, it will be completely removed before copying.
     """
     # remove directory, if it exists
-    try:
-        rmtree(dst)
-    except FileNotFoundError:
-        pass
+    maybe_rmtree(dst)
 
     # copy directory
     copytree(src, dst, **kwargs)
 
 
-def downloader(url, target, force=False, name=None):
-    """
-    Generate a new task to download a file from url to target
-
-    Create dirs if needed.
-
-    Parameters
-    ----------
-    url : str
-        The url to download from.
-    target : Path
-        The path the file will be saved to.
-    force : bool, default False
-        If True, forces download even if the file is already present
-        (replacing the file).
-    name : str, default None
-        If specified, the name of the task to be run.
-
-    Returns
-    -------
-    dict
-        The task to be performed.
-    """
-    target.parent.mkdir(parents=True, exist_ok=True)
-
-    task = {
-        'targets': [target],
-        'actions': [f"python -m cpe_help.util.download '{url}' '{target}'"],
-        'uptodate': [not force],
-    }
-
-    if name:
-        task['name'] = name
-
-    return task
-
-
-def unzipper(src, dst, name=None):
-    """
-    Generate a new task to unzip a file to a specific location
-
-    Parameters
-    ----------
-    src : Path
-        Location of the .zip file.
-    dst : Path
-        Directory to extract files to.
-    name : str, default None
-        If specified, the name of the task to be run.
-
-    Returns
-    -------
-    dict
-        The task to be performed.
-    """
-    task = {
-        'file_dep': [src],
-        'targets': [dst],
-        'actions': [
-
-            # XXX: This is a hack... rmtree below needs the file to exist,
-            # XXX: otherwise it will break.
-            # XXX: Need to think of cases where directory is automatically
-            # XXX: created or not better.
-            (dst.mkdir, [], {'parents': True, 'exist_ok': True}),
-            (rmtree, [dst]),
-            f"unzip {src} -d {dst}",
-        ],
-    }
-
-    if name:
-        task['name'] = name
-
-    return task
-
-
-def task_fetch_inputs():
+def task_download_inputs():
     """
     Retrieve raw departments data from Kaggle
     """
@@ -118,9 +120,7 @@ def task_fetch_inputs():
         'actions': [
             'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
         ],
-        'targets': [
-            DATA_DIR / 'inputs' / 'data-science-for-good.zip',
-        ],
+        'targets': [KAGGLE_ZIPFILE],
 
         # force doit to always mark the task
         # as up-to-date (unless no targets found)
@@ -132,13 +132,55 @@ def task_unzip_inputs():
     """
     Unzip raw departments data from Kaggle
     """
-    return unzipper(
-        DATA_DIR / 'inputs' / 'data-science-for-good.zip',
+    return TaskHelper.unzip(
+        KAGGLE_ZIPFILE,
         DATA_DIR / 'inputs' / 'cpe-data',
     )
 
 
-@create_after('unzip_inputs')
+def task_download_state_boundaries():
+    """
+    Download state boundaries from the ACS website
+    """
+    census = Census()
+    file = census.state_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_state_boundaries],
+        'uptodate': [True],
+    }
+
+
+def task_download_extra():
+    # just a prototype for other data that may be retrieved
+    yield TaskHelper.download(
+        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
+        Department('37-00027').raw_path / 'OIS.csv',
+        name='austin_ois',
+    )
+
+    # yield TaskHelper.download(
+    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
+    #     Department('37-00027').raw_path / 'crime_reports.csv',
+    #     name='austin_crimes',
+    # )
+
+
+def task_create_dept_list():
+    """
+    Create a list of available departments
+    """
+    dept_coll = DepartmentColl()
+    return {
+        'file_dep': [KAGGLE_ZIPFILE],
+        'task_dep': ['unzip_inputs'],
+        'targets': [dept_coll.list_of_departments_path],
+        'actions': [dept_coll.create_list_of_departments],
+        'clean': [dept_coll.remove_list_of_departments],
+    }
+
+
+@create_after('create_dept_list')
 def task_spread_acs_tables():
     """
     Spread American Community Survey tables into departments dirs
@@ -171,7 +213,7 @@ def task_spread_acs_tables():
         }
 
 
-@create_after('unzip_inputs')
+@create_after('create_dept_list')
 def task_spread_shapefiles():
     """
     Spread district shapefiles into departments directories
@@ -197,7 +239,7 @@ def task_spread_shapefiles():
         }
 
 
-@create_after('unzip_inputs')
+@create_after('create_dept_list')
 def task_spread_other():
     """
     Spread unattached files into departments directories
@@ -222,63 +264,33 @@ def task_spread_other():
         }
 
 
-@create_after('spread_shapefiles')
-def task_preprocess_shapefiles():
-    extensions = ['cpg', 'dbf', 'prj', 'shp', 'shx']
-
+@create_after('create_dept_list')
+def task_guess_states():
+    """
+    Guess the state for each department
+    """
+    census = Census()
     for dept in list_departments():
-        src = dept.external_shapefile_path
-        dst = dept.preprocessed_shapefile_path
         yield {
             'name': dept.name,
-            'file_dep': [x for x in src.iterdir()],
-            'targets': [dst],
-            'actions': [dept.preprocess_shapefile],
-            'clean': [f'rm -rf {dept.preprocessed_shapefile_path}'],
+            'file_dep': [
+                census.state_boundaries_path,
+                dept.preprocessed_shapefile_path,
+            ],
+            'targets': [dept.guessed_state_path],
+            'actions': [dept.guess_state],
+            'clean': [dept.remove_guessed_state],
         }
 
 
-def task_fetch_census_geography():
-    # TODO: automatically retrieve
-
-    # XXX: Shapefile below is simplified
-    yield downloader(
-        'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_25_tract_500k.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        name='massachusetts',
-    )
-
-    yield downloader(
-        'https://www2.census.gov/geo/tiger/TIGER2015/TRACT/tl_2015_48_tract.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        name='texas',
-    )
-
-
-def task_unzip_census_geography():
-    yield unzipper(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'massachusetts',
-        name='massachusetts',
-    )
-
-    yield unzipper(
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas.zip',
-        DATA_DIR / 'census' / '2015' / 'shapefiles' / 'texas',
-        name='texas',
-    )
-
-
-def task_download_extra():
-    # just a prototype for other data that may be retrieved
-    yield downloader(
-        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_path / 'OIS.csv',
-        name='austin_ois',
-    )
-
-    # yield downloader(
-    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-    #     Department('37-00027').raw_path / 'crime_reports.csv',
-    #     name='austin_crimes',
-    # )
+@create_after('create_dept_list')
+def task_preprocess_shapefiles():
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [KAGGLE_ZIPFILE],
+            'task_dep': ['spread_shapefiles'],
+            'targets': [dept.preprocessed_shapefile_path],
+            'actions': [dept.preprocess_shapefile],
+            'clean': [dept.remove_preprocessed_shapefile],
+        }

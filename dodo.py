@@ -112,7 +112,7 @@ def _copytree(src, dst, **kwargs):
     copytree(src, dst, **kwargs)
 
 
-def task_fetch_inputs():
+def task_download_inputs():
     """
     Retrieve raw departments data from Kaggle
     """

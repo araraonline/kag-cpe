@@ -156,6 +156,9 @@ class Department():
 
         self.save_guessed_state(intersecting[0])
 
+    def remove_guessed_state(self):
+        maybe_rmfile(self.guessed_state_path)
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -168,11 +171,11 @@ class Department():
     def save_preprocessed_shapefile(self, df):
         save_zipshp(df, self.preprocessed_shapefile_path)
 
-    def save_guessed_state(self, geoid):
-        save_json(geoid, self.guessed_state_path)
-
     def load_guessed_state(self):
         return load_json(self.guessed_state_path)
+
+    def save_guessed_state(self, geoid):
+        save_json(geoid, self.guessed_state_path)
 
 
 class DepartmentColl():
@@ -187,6 +190,8 @@ class DepartmentColl():
     def list_of_departments_path(self):
         return self.path / 'list_of_departments.json'
 
+    # doit actions
+
     def create_list_of_departments(self):
         cpe_data = DATA_DIR / 'inputs' / 'cpe-data'
         depts = [Department(d.name[5:])
@@ -195,17 +200,19 @@ class DepartmentColl():
         depts = sorted(depts, key=lambda x: x.name)
         self.save_list_of_departments(depts)
 
-    def save_list_of_departments(self, lst):
-        names = [dept.name for dept in lst]
-        save_json(names, self.list_of_departments_path)
+    def remove_list_of_departments(self):
+        maybe_rmfile(self.list_of_departments_path)
+
+    # input/output
 
     def load_list_of_departments(self):
         names = load_json(self.list_of_departments_path)
         depts = [Department(name) for name in names]
         return depts
 
-    def remove_list_of_departments(self):
-        maybe_rmfile(self.list_of_departments_path)
+    def save_list_of_departments(self, lst):
+        names = [dept.name for dept in lst]
+        save_json(names, self.list_of_departments_path)
 
 
 def list_departments():

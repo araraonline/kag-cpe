@@ -279,7 +279,7 @@ def task_guess_states():
             ],
             'targets': [dept.guessed_state_path],
             'actions': [dept.guess_state],
-            'clean': True,
+            'clean': [dept.remove_guessed_state],
         }
 
 

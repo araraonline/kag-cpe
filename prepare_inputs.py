@@ -12,8 +12,6 @@ Run this by:
 >>> doit -f prepare_inputs.py
 """
 
-from shutil import copyfile, copytree
-
 from cpe_help import DepartmentColl
 from cpe_help.util.path import (
     DATA_DIR,
@@ -97,27 +95,6 @@ class TaskHelper(object):
         }
         task.update(kwargs)
         return task
-
-
-def _copyfile(src, dst, **kwargs):
-    """
-    Copy file from src to dst, creting dirs if needed
-    """
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    copyfile(src, dst, **kwargs)
-
-
-def _copytree(src, dst, **kwargs):
-    """
-    Recursively copy an entire directory tree rooted at src
-
-    If dst already exists, it will be completely removed before copying.
-    """
-    # remove directory, if it exists
-    maybe_rmtree(dst)
-
-    # copy directory
-    copytree(src, dst, **kwargs)
 
 
 def task_download_inputs():

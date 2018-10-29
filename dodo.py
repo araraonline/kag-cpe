@@ -70,6 +70,12 @@ def task_download_extra():
         name='austin_ois',
     )
 
+    yield TaskHelper.download(
+        'https://www2.census.gov/programs-surveys/acs/replicate_estimates/2016/data/5-year/140/B01001_25.csv.gz',
+        Census().path / 'sample_vrt.csv.gz',
+        name='variance_rep_table',
+    )
+
     # yield TaskHelper.download(
     #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
     #     Department('37-00027').raw_path / 'crime_reports.csv',

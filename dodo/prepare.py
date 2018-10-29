@@ -16,10 +16,7 @@ import doit.tools
 
 from cpe_help import DepartmentColl
 from cpe_help.util.doit_tasks import TaskHelper
-from cpe_help.util.path import (
-    DATA_DIR,
-    maybe_rmtree,
-)
+from cpe_help.util.path import DATA_DIR
 
 
 KAGGLE_ZIPFILE = DATA_DIR / 'inputs' / 'data-science-for-good.zip'

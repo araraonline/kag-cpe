@@ -4,9 +4,7 @@ Module for defining doit tasks
 
 from shutil import copyfile, copytree
 
-from doit import create_after
-
-from cpe_help import Census, Department, DepartmentColl, list_departments
+from cpe_help import Census, Department, list_departments
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,

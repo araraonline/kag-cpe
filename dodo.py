@@ -112,32 +112,6 @@ def _copytree(src, dst, **kwargs):
     copytree(src, dst, **kwargs)
 
 
-def task_download_inputs():
-    """
-    Retrieve raw departments data from Kaggle
-    """
-    return {
-        'actions': [
-            'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
-        ],
-        'targets': [KAGGLE_ZIPFILE],
-
-        # force doit to always mark the task
-        # as up-to-date (unless no targets found)
-        'uptodate': [True],
-    }
-
-
-def task_unzip_inputs():
-    """
-    Unzip raw departments data from Kaggle
-    """
-    return TaskHelper.unzip(
-        KAGGLE_ZIPFILE,
-        DATA_DIR / 'inputs' / 'cpe-data',
-    )
-
-
 def task_download_state_boundaries():
     """
     Download state boundaries from the ACS website
@@ -166,21 +140,6 @@ def task_download_extra():
     # )
 
 
-def task_create_dept_list():
-    """
-    Create a list of available departments
-    """
-    dept_coll = DepartmentColl()
-    return {
-        'file_dep': [KAGGLE_ZIPFILE],
-        'task_dep': ['unzip_inputs'],
-        'targets': [dept_coll.list_of_departments_path],
-        'actions': [dept_coll.create_list_of_departments],
-        'clean': [dept_coll.remove_list_of_departments],
-    }
-
-
-@create_after('create_dept_list')
 def task_spread_acs_tables():
     """
     Spread American Community Survey tables into departments dirs
@@ -213,7 +172,6 @@ def task_spread_acs_tables():
         }
 
 
-@create_after('create_dept_list')
 def task_spread_shapefiles():
     """
     Spread district shapefiles into departments directories
@@ -239,7 +197,6 @@ def task_spread_shapefiles():
         }
 
 
-@create_after('create_dept_list')
 def task_spread_other():
     """
     Spread unattached files into departments directories
@@ -264,7 +221,6 @@ def task_spread_other():
         }
 
 
-@create_after('create_dept_list')
 def task_guess_states():
     """
     Guess the state for each department
@@ -283,7 +239,6 @@ def task_guess_states():
         }
 
 
-@create_after('create_dept_list')
 def task_preprocess_shapefiles():
     for dept in list_departments():
         yield {

@@ -17,11 +17,11 @@ if __name__ == "__main__":
     task2 = DoitMain(ModuleTaskLoader(dodo.main))
 
     status1 = task1.run(cmd_args)
-    if status1 != 0:
+    if status1 not in (None, 0):
         sys.exit(status1)
 
     status2 = task2.run(cmd_args)
-    if status2 != 0:
+    if status2 not in (None, 0):
         sys.exit(status2)
 
     sys.exit(0)  # needed?

@@ -9,7 +9,7 @@ matching targets to dependencies.
 
 Run this by:
 
->>> doit -f prepare_inputs.py
+>>> doit -f prepare.py
 """
 
 import doit.tools

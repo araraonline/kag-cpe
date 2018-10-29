@@ -62,6 +62,10 @@ class Department():
     def guessed_state_path(self):
         return self.path / 'guessed_state.json'
 
+    @property
+    def guessed_census_tracts_path(self):
+        return self.path / 'guessed_census_tracts.json'
+
     def __new__(cls, name):
         """
         Create a new department object
@@ -159,6 +163,34 @@ class Department():
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)
 
+    def guess_census_tracts(self):
+        """
+        Find relevants census tracts for this department
+        """
+        census = Census()
+
+        state = self.load_guessed_state()
+        police_districts = self.load_preprocessed_shapefile()
+        tracts = census.load_tract_boundaries(state)
+
+        police_districts = police_districts.to_crs(tracts.crs)
+        unary_union = police_districts.unary_union
+        relevant_geoids = [geoid
+                           for geoid, geom in zip(
+                               tracts['GEOID'],
+                               tracts.geometry
+                           ) if geom.intersects(unary_union)]
+
+        if len(relevant_geoids) == 0:
+            raise RuntimeError(f"Found no intersecting census tracts for Dept."
+                               f" {self.name}. Please doule check the"
+                               f" Coordinate Reference System.")
+
+        self.save_guessed_census_tracts(relevant_geoids)
+
+    def remove_guessed_census_tracts(self):
+        maybe_rmfile(self.guessed_census_tracts_path)
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -176,6 +208,12 @@ class Department():
 
     def save_guessed_state(self, geoid):
         save_json(geoid, self.guessed_state_path)
+
+    def load_guessed_census_tracts(self):
+        return load_json(self.guessed_census_tracts_path)
+
+    def save_guessed_census_tracts(self, lst):
+        save_json(lst, self.guessed_census_tracts_path)
 
 
 class DepartmentColl():

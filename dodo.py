@@ -11,7 +11,13 @@ from shutil import copyfile, copytree
 import doit
 import doit.tools
 
-from cpe_help import Census, Department, DepartmentColl, list_departments, list_states
+from cpe_help import (
+    Census,
+    Department,
+    DepartmentColl,
+    list_departments,
+    list_states,
+)
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
@@ -207,4 +213,25 @@ def task_download_tract_boundaries():
             'actions': [(census.download_tract_boundaries, (state,))],
             'targets': [census.tract_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
+        }
+
+
+@doit.create_after('guess_states')
+def task_guess_census_tracts():
+    """
+    Find relevant census tracts for each department
+    """
+    census = Census()
+    for dept in list_departments():
+        state = dept.load_guessed_state()
+        yield {
+            'name': dept.name,
+            'actions': [dept.guess_census_tracts],
+            'clean': [dept.remove_guessed_census_tracts],
+            'file_dep': [
+                dept.preprocessed_shapefile_path,
+                census.tract_boundaries_path(state),
+            ],
+            'task_dep': [f'download_tract_boundaries'],
+            'targets': [dept.guessed_census_tracts_path],
         }

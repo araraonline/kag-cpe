@@ -12,6 +12,8 @@ Run this by:
 >>> doit -f prepare_inputs.py
 """
 
+import doit.tools
+
 from cpe_help import DepartmentColl
 from cpe_help.util.path import (
     DATA_DIR,
@@ -106,10 +108,7 @@ def task_download_inputs():
             'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
         ],
         'targets': [KAGGLE_ZIPFILE],
-
-        # force doit to always mark the task
-        # as up-to-date (unless no targets found)
-        'uptodate': [True],
+        'uptodate': [doit.tools.run_once],
     }
 
 

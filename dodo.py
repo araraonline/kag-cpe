@@ -8,7 +8,10 @@ Before running this, make sure to run the preparation tasks before:
 
 from shutil import copyfile, copytree
 
-from cpe_help import Census, Department, DepartmentColl, list_departments
+import doit
+import doit.tools
+
+from cpe_help import Census, Department, DepartmentColl, list_departments, list_states
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
@@ -189,4 +192,19 @@ def task_preprocess_shapefiles():
             'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
             'clean': [dept.remove_preprocessed_shapefile],
+        }
+
+
+@doit.create_after('create_list_of_states')
+def task_download_tract_boundaries():
+    """
+    Download census tract boundaries for each state
+    """
+    census = Census()
+    for state in list_states():
+        yield {
+            'name': state,
+            'actions': [(census.download_tract_boundaries, (state,))],
+            'targets': [census.tract_boundaries_path(state)],
+            'uptodate': [doit.tools.run_once],
         }

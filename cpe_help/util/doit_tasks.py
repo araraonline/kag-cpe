@@ -2,6 +2,7 @@
 Task creators for doit
 """
 
+
 class TaskHelper(object):
     """
     I help with the creation of tasks

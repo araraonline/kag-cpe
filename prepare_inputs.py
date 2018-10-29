@@ -14,7 +14,7 @@ Run this by:
 
 from shutil import copyfile, copytree
 
-from cpe_help import Census, Department, DepartmentColl, list_departments
+from cpe_help import DepartmentColl
 from cpe_help.util.path import (
     DATA_DIR,
     maybe_rmtree,

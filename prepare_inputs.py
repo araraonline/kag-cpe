@@ -104,9 +104,15 @@ def task_download_inputs():
     Retrieve raw departments data from Kaggle
     """
     return {
-        'actions': [
-            'kaggle datasets download -d center-for-policing-equity/data-science-for-good -p data/inputs',
-        ],
+        'actions': [[
+            'kaggle',
+            'datasets',
+            'download',
+            '-d',
+            'center-for-policing-equity/data-science-for-good',
+            '-p',
+            'data/inputs'
+        ]],
         'targets': [KAGGLE_ZIPFILE],
         'uptodate': [doit.tools.run_once],
     }

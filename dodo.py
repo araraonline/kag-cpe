@@ -1,5 +1,9 @@
 """
 Module for defining doit tasks
+
+Before running this, make sure to run the preparation tasks before:
+
+>>> doit -f prepare.py
 """
 
 from shutil import copyfile, copytree

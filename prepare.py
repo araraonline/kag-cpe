@@ -1,15 +1,8 @@
 """
-This is a doit script for preparing for the next doit.
+Preparation tasks for doit
 
-While creating tasks for this project, lots (close to all) tasks depend
-on the listing of departments. However, this list is just created after
-the Kaggle inputs are prepared (may be created manually by CPE later),
-so, we separate the preparation here so that doit can do its job in
-matching targets to dependencies.
-
-Run this by:
-
->>> doit -f prepare.py
+The tasks present here are required for the creation of tasks in the
+main dodo.py file.
 """
 
 import doit.tools

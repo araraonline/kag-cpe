@@ -190,6 +190,10 @@ class DepartmentColl():
     def list_of_departments_path(self):
         return self.path / 'list_of_departments.json'
 
+    @property
+    def list_of_states_path(self):
+        return self.path / 'list_of_states.json'
+
     # doit actions
 
     def create_list_of_departments(self):
@@ -203,6 +207,24 @@ class DepartmentColl():
     def remove_list_of_departments(self):
         maybe_rmfile(self.list_of_departments_path)
 
+    def create_list_of_states(self):
+        """
+        Create a list of states where the departments are
+
+        (to later retrieve census tracts from those)
+        """
+        states = [dept.load_guessed_state()
+                  for dept in self.load_list_of_departments()]
+        states = set(states)
+        states = sorted(states)
+        self.save_list_of_states(states)
+
+    def remove_list_of_states(self):
+        """
+        Remove the list of states
+        """
+        maybe_rmfile(self.list_of_states_path)
+
     # input/output
 
     def load_list_of_departments(self):
@@ -214,6 +236,12 @@ class DepartmentColl():
         names = [dept.name for dept in lst]
         save_json(names, self.list_of_departments_path)
 
+    def load_list_of_states(self):
+        return load_json(self.list_of_states_path)
+
+    def save_list_of_states(self, lst):
+        save_json(lst, self.list_of_states_path)
+
 
 def list_departments():
     """
@@ -223,3 +251,11 @@ def list_departments():
     """
     dept_coll = DepartmentColl()
     return dept_coll.load_list_of_departments()
+
+
+def list_states():
+    """
+    Returns a list with all states where the departments are
+    """
+    dept_coll = DepartmentColl()
+    return dept_coll.load_list_of_states()

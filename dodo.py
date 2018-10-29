@@ -8,7 +8,7 @@ Before running this, make sure to run the preparation tasks before:
 
 from shutil import copyfile, copytree
 
-from cpe_help import Census, Department, list_departments
+from cpe_help import Census, Department, DepartmentColl, list_departments
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
@@ -165,6 +165,19 @@ def task_guess_states():
             'actions': [dept.guess_state],
             'clean': [dept.remove_guessed_state],
         }
+
+
+def task_create_list_of_states():
+    """
+    Unite the guessed states for each department
+    """
+    dept_coll = DepartmentColl()
+    return {
+        'file_dep': [dept.guessed_state_path for dept in list_departments()],
+        'targets': [dept_coll.list_of_states_path],
+        'actions': [dept_coll.create_list_of_states],
+        'clean': [dept_coll.remove_list_of_states],
+    }
 
 
 def task_preprocess_shapefiles():

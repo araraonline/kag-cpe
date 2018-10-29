@@ -61,3 +61,14 @@ class Census():
         Load state boundaries for the US
         """
         return load_zipshp(self.state_boundaries_path)
+
+    def load_tract_boundaries(self, state):
+        """
+        Load tract boundaries for a given state
+
+        Parameters
+        ----------
+        state : str
+            GEOID representing the state.
+        """
+        return load_zipshp(self.tract_boundaries_path(state))

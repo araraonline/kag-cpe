@@ -1,5 +1,6 @@
 import subprocess
 
+from cpe_help.util.configuration import get_configuration
 from cpe_help.util.path import ensure_path, maybe_rmfile
 
 
@@ -38,7 +39,7 @@ def _download(url, out):
     url : str
     out : str or Path
     """
-    USER_AGENT = 'cpe_help (+https://github.com/araraonline/kag-cpe)'
+    ua = get_configuration()['Downloads']['UserAgent']
     subprocess.run([
         'http',
         '--ignore-stdin',
@@ -48,5 +49,5 @@ def _download(url, out):
         '--output', str(out),
         '--download',
         url,
-        'User-Agent:' + USER_AGENT,
+        'User-Agent:' + ua,
     ], check=True)

@@ -62,6 +62,19 @@ def task_download_state_boundaries():
     }
 
 
+def task_download_county_boundaries():
+    """
+    Download county boundaries from the TIGER shapefiles
+    """
+    census = Census()
+    file = census.county_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_county_boundaries],
+        'uptodate': [doit.tools.run_once],
+    }
+
+
 def task_download_extra():
     # just a prototype for other data that may be retrieved
     yield TaskHelper.download(

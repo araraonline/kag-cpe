@@ -7,7 +7,9 @@ Probably will become the main file of the project.
 from importlib import import_module
 
 import geopandas as gpd
+import pandas as pd
 
+from cpe_help.acs import get_acs
 from cpe_help.census import Census
 from cpe_help.util import crs
 from cpe_help.util.io import (
@@ -16,6 +18,7 @@ from cpe_help.util.io import (
     save_json,
     save_zipshp,
 )
+from cpe_help.util.configuration import get_acs_variables
 from cpe_help.util.path import DATA_DIR, maybe_rmfile
 
 
@@ -69,6 +72,10 @@ class Department():
     @property
     def guessed_census_tracts_path(self):
         return self.path / 'guessed_census_tracts.json'
+
+    @property
+    def block_group_values_path(self):
+        return self.preprocessed_path / 'block_group_values.pkl'
 
     def __new__(cls, name):
         """
@@ -214,6 +221,33 @@ class Department():
     def remove_guessed_census_tracts(self):
         maybe_rmfile(self.guessed_census_tracts_path)
 
+    def download_block_group_values(self):
+        """
+        Download ACS values for relevant block groups
+
+        Relevant block groups are those inside counties that compose
+        this department.
+        """
+        acs = get_acs()
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+        variables = get_acs_variables()
+
+        # must make 1 request per county
+        frames = []
+        for county in counties:
+            df = acs.data(
+                variables,
+                geography='block group',
+                inside='state:{} county:{}'.format(state, county)
+            )
+            frames.append(df)
+        frame = pd.concat(frames)
+        self.save_block_group_values(frame)
+
+    def remove_block_group_values(self):
+        maybe_rmfile(self.block_group_values_path)
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -243,6 +277,12 @@ class Department():
 
     def save_guessed_census_tracts(self, lst):
         save_json(lst, self.guessed_census_tracts_path)
+
+    def save_block_group_values(self, df):
+        df.to_pickle(self.block_group_values_path)
+
+    def load_block_group_values(self):
+        return pd.read_pickle(self.block_group_values_path)
 
 
 class DepartmentColl():

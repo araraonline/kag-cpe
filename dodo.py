@@ -238,6 +238,20 @@ def task_preprocess_shapefiles():
         }
 
 
+def task_download_block_group_values():
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_state_path,
+                dept.guessed_counties_path,
+            ],
+            'targets': [dept.block_group_values_path],
+            'actions': [dept.download_block_group_values],
+            'clean': [dept.remove_block_group_values],
+        }
+
+
 @doit.create_after('create_list_of_states')
 def task_download_tract_boundaries():
     """

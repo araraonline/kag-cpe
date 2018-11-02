@@ -10,7 +10,7 @@ import geopandas as gpd
 import pandas as pd
 
 from cpe_help.acs import get_acs
-from cpe_help.tiger import TIGER
+from cpe_help.tiger import get_tiger
 from cpe_help.util import crs
 from cpe_help.util.io import (
     load_json,
@@ -165,7 +165,7 @@ class Department():
         """
         Guess the state this department is in
         """
-        tiger = TIGER()
+        tiger = get_tiger()
         states = tiger.load_state_boundaries()
         states = states.set_index('GEOID')
 
@@ -186,7 +186,7 @@ class Department():
         """
         Guess the counties that make part of this department
         """
-        tiger = TIGER()
+        tiger = get_tiger()
         counties = tiger.load_county_boundaries()
         counties = counties.set_index('COUNTYFP')
 
@@ -205,7 +205,7 @@ class Department():
         """
         Find relevants census tracts for this department
         """
-        tiger = TIGER()
+        tiger = get_tiger()
 
         state = self.load_guessed_state()
         police_districts = self.load_preprocessed_shapefile()
@@ -260,7 +260,7 @@ class Department():
         """
         Merge block group values with geography (intersecting counties)
         """
-        tiger = TIGER()
+        tiger = get_tiger()
 
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()

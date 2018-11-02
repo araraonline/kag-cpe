@@ -12,12 +12,12 @@ import doit
 import doit.tools
 
 from cpe_help import (
-    TIGER,
     Department,
     DepartmentColl,
     list_departments,
     list_states,
 )
+from cpe_help.tiger import get_tiger
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
@@ -53,7 +53,7 @@ def task_download_state_boundaries():
     """
     Download state boundaries from the ACS website
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     file = tiger.state_boundaries_path
     return {
         'targets': [file],
@@ -66,7 +66,7 @@ def task_download_county_boundaries():
     """
     Download county boundaries from the TIGER shapefiles
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     file = tiger.county_boundaries_path
     return {
         'targets': [file],
@@ -85,7 +85,7 @@ def task_download_extra():
 
     yield TaskHelper.download(
         'https://www2.census.gov/programs-surveys/acs/replicate_estimates/2016/data/5-year/140/B01001_25.csv.gz',
-        TIGER().path / 'sample_vrt.csv.gz',
+        get_tiger().path / 'sample_vrt.csv.gz',
         name='variance_rep_table',
     )
 
@@ -181,7 +181,7 @@ def task_guess_states():
     """
     Guess the state for each department
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     for dept in list_departments():
         yield {
             'name': dept.name,
@@ -199,7 +199,7 @@ def task_guess_counties():
     """
     Guess the counties that compose each police department
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     for dept in list_departments():
         yield {
             'name': dept.name,
@@ -257,7 +257,7 @@ def task_download_tract_boundaries():
     """
     Download census tract boundaries for each state
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     for state in list_states():
         yield {
             'name': state,
@@ -272,7 +272,7 @@ def task_download_bg_boundaries():
     """
     Download block group boundaries for each relevant state
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     for state in list_states():
         yield {
             'name': state,
@@ -305,7 +305,7 @@ def task_guess_census_tracts():
     """
     Find relevant census tracts for each department
     """
-    tiger = TIGER()
+    tiger = get_tiger()
     for dept in list_departments():
         state = dept.load_guessed_state()
         yield {

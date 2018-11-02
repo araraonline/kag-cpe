@@ -1,5 +1,4 @@
 from cpe_help.acs import get_acs
-from cpe_help.tiger import TIGER
 from cpe_help.department import (
     Department,
     DepartmentColl,

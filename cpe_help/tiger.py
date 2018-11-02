@@ -9,6 +9,7 @@ Ref:
 https://www.census.gov/geo/maps-data/data/tiger.html
 """
 
+from cpe_help.util.configuration import get_configuration
 from cpe_help.util.download import download
 from cpe_help.util.io import load_zipshp
 from cpe_help.util.path import DATA_DIR
@@ -37,7 +38,7 @@ class TIGER():
     def bg_boundaries_path(self, state):
         return self.path / 'states' / state / 'bg_boundaries.zip'
 
-    def __init__(self):
+    def __init__(self, year):
         """
         Initialize a TIGER object
 
@@ -46,7 +47,7 @@ class TIGER():
         year : int
             Year to retrieve geographies from.
         """
-        self.year = 2016
+        self.year = year
 
     def __repr__(self):
         """
@@ -149,3 +150,12 @@ class TIGER():
         geopandas.GeoDataFrame
         """
         return load_zipshp(self.bg_boundaries_path(state))
+
+
+def get_tiger():
+    """
+    Return a default TIGER instance (based on configuration)
+    """
+    config = get_configuration()
+    year = config['Census'].getint('Year')
+    return TIGER(year)

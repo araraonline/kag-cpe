@@ -1,7 +1,12 @@
 """
-This is the module for dealing with the American Community Survey (ACS)
+This is the module for dealing with the TIGER files
 
-Tasks, directories and loading/saving information will be present here.
+More pragmatically, use this module for retrieving shapefiles based on
+different statistical and political divisions!
+
+Ref:
+
+https://www.census.gov/geo/maps-data/data/tiger.html
 """
 
 from cpe_help.util.download import download
@@ -9,14 +14,14 @@ from cpe_help.util.io import load_zipshp
 from cpe_help.util.path import DATA_DIR
 
 
-class Census():
+class TIGER():
     """
-    Main class for dealing with the ACS
+    Main class for dealing with the TIGER files
     """
 
     @property
     def path(self):
-        return DATA_DIR / 'census' / f'{self.year}'
+        return DATA_DIR / 'TIGER' / f'{self.year}'
 
     @property
     def state_boundaries_path(self):
@@ -34,7 +39,12 @@ class Census():
 
     def __init__(self):
         """
-        Initialize a Census object
+        Initialize a TIGER object
+
+        Parameters
+        ----------
+        year : int
+            Year to retrieve geographies from.
         """
         self.year = 2016
 
@@ -87,12 +97,20 @@ class Census():
     def load_state_boundaries(self):
         """
         Load state boundaries for the US
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
         """
         return load_zipshp(self.state_boundaries_path)
 
     def load_county_boundaries(self):
         """
         Load county boundaries for the US
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
         """
         return load_zipshp(self.county_boundaries_path)
 
@@ -104,6 +122,10 @@ class Census():
         ----------
         state : str
             GEOID representing the state.
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
         """
         return load_zipshp(self.tract_boundaries_path(state))
 
@@ -115,5 +137,9 @@ class Census():
         ----------
         state : str
             GEOID representing the state.
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
         """
         return load_zipshp(self.bg_boundaries_path(state))

@@ -12,7 +12,7 @@ import doit
 import doit.tools
 
 from cpe_help import (
-    Census,
+    TIGER,
     Department,
     DepartmentColl,
     list_departments,
@@ -53,11 +53,11 @@ def task_download_state_boundaries():
     """
     Download state boundaries from the ACS website
     """
-    census = Census()
-    file = census.state_boundaries_path
+    tiger = TIGER()
+    file = tiger.state_boundaries_path
     return {
         'targets': [file],
-        'actions': [census.download_state_boundaries],
+        'actions': [tiger.download_state_boundaries],
         'uptodate': [True],
     }
 
@@ -66,11 +66,11 @@ def task_download_county_boundaries():
     """
     Download county boundaries from the TIGER shapefiles
     """
-    census = Census()
-    file = census.county_boundaries_path
+    tiger = TIGER()
+    file = tiger.county_boundaries_path
     return {
         'targets': [file],
-        'actions': [census.download_county_boundaries],
+        'actions': [tiger.download_county_boundaries],
         'uptodate': [doit.tools.run_once],
     }
 
@@ -85,7 +85,7 @@ def task_download_extra():
 
     yield TaskHelper.download(
         'https://www2.census.gov/programs-surveys/acs/replicate_estimates/2016/data/5-year/140/B01001_25.csv.gz',
-        Census().path / 'sample_vrt.csv.gz',
+        TIGER().path / 'sample_vrt.csv.gz',
         name='variance_rep_table',
     )
 
@@ -181,12 +181,12 @@ def task_guess_states():
     """
     Guess the state for each department
     """
-    census = Census()
+    tiger = TIGER()
     for dept in list_departments():
         yield {
             'name': dept.name,
             'file_dep': [
-                census.state_boundaries_path,
+                tiger.state_boundaries_path,
                 dept.preprocessed_shapefile_path,
             ],
             'targets': [dept.guessed_state_path],
@@ -199,12 +199,12 @@ def task_guess_counties():
     """
     Guess the counties that compose each police department
     """
-    census = Census()
+    tiger = TIGER()
     for dept in list_departments():
         yield {
             'name': dept.name,
             'file_dep': [
-                census.county_boundaries_path,
+                tiger.county_boundaries_path,
                 dept.preprocessed_shapefile_path,
             ],
             'targets': [dept.guessed_counties_path],
@@ -257,12 +257,12 @@ def task_download_tract_boundaries():
     """
     Download census tract boundaries for each state
     """
-    census = Census()
+    tiger = TIGER()
     for state in list_states():
         yield {
             'name': state,
-            'actions': [(census.download_tract_boundaries, (state,))],
-            'targets': [census.tract_boundaries_path(state)],
+            'actions': [(tiger.download_tract_boundaries, (state,))],
+            'targets': [tiger.tract_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
         }
 
@@ -272,12 +272,12 @@ def task_download_bg_boundaries():
     """
     Download block group boundaries for each relevant state
     """
-    census = Census()
+    tiger = TIGER()
     for state in list_states():
         yield {
             'name': state,
-            'actions': [(census.download_bg_boundaries, (state,))],
-            'targets': [census.bg_boundaries_path(state)],
+            'actions': [(tiger.download_bg_boundaries, (state,))],
+            'targets': [tiger.bg_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
         }
 
@@ -305,7 +305,7 @@ def task_guess_census_tracts():
     """
     Find relevant census tracts for each department
     """
-    census = Census()
+    tiger = TIGER()
     for dept in list_departments():
         state = dept.load_guessed_state()
         yield {
@@ -314,7 +314,7 @@ def task_guess_census_tracts():
             'clean': [dept.remove_guessed_census_tracts],
             'file_dep': [
                 dept.preprocessed_shapefile_path,
-                census.tract_boundaries_path(state),
+                tiger.tract_boundaries_path(state),
             ],
             'task_dep': [f'download_tract_boundaries'],
             'targets': [dept.guessed_census_tracts_path],

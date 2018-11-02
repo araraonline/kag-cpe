@@ -10,7 +10,7 @@ import geopandas as gpd
 import pandas as pd
 
 from cpe_help.acs import get_acs
-from cpe_help.census import Census
+from cpe_help.tiger import TIGER
 from cpe_help.util import crs
 from cpe_help.util.io import (
     load_json,
@@ -165,8 +165,8 @@ class Department():
         """
         Guess the state this department is in
         """
-        census = Census()
-        states = census.load_state_boundaries()
+        tiger = TIGER()
+        states = tiger.load_state_boundaries()
         states = states.set_index('GEOID')
 
         shape = self.load_preprocessed_shapefile()
@@ -186,8 +186,8 @@ class Department():
         """
         Guess the counties that make part of this department
         """
-        census = Census()
-        counties = census.load_county_boundaries()
+        tiger = TIGER()
+        counties = tiger.load_county_boundaries()
         counties = counties.set_index('COUNTYFP')
 
         shape = self.load_preprocessed_shapefile()
@@ -205,11 +205,11 @@ class Department():
         """
         Find relevants census tracts for this department
         """
-        census = Census()
+        tiger = TIGER()
 
         state = self.load_guessed_state()
         police_districts = self.load_preprocessed_shapefile()
-        tracts = census.load_tract_boundaries(state)
+        tracts = tiger.load_tract_boundaries(state)
 
         police_districts = police_districts.to_crs(tracts.crs)
         unary_union = police_districts.unary_union

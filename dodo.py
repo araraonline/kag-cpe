@@ -267,6 +267,21 @@ def task_download_tract_boundaries():
         }
 
 
+@doit.create_after('create_list_of_states')
+def task_download_block_group_boundaries():
+    """
+    Download block group boundaries for each relevant state
+    """
+    census = Census()
+    for state in list_states():
+        yield {
+            'name': state,
+            'actions': [(census.download_bg_boundaries, (state,))],
+            'targets': [census.bg_boundaries_path(state)],
+            'uptodate': [doit.tools.run_once],
+        }
+
+
 @doit.create_after('guess_states')
 def task_guess_census_tracts():
     """

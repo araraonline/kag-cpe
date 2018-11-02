@@ -195,6 +195,24 @@ def task_guess_states():
         }
 
 
+def task_guess_counties():
+    """
+    Guess the counties that compose each police department
+    """
+    census = Census()
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                census.county_boundaries_path,
+                dept.preprocessed_shapefile_path,
+            ],
+            'targets': [dept.guessed_counties_path],
+            'actions': [dept.guess_counties],
+            'clean': [dept.remove_guessed_counties],
+        }
+
+
 def task_create_list_of_states():
     """
     Unite the guessed states for each department

@@ -63,6 +63,10 @@ class Department():
         return self.path / 'guessed_state.json'
 
     @property
+    def guessed_counties_path(self):
+        return self.path / 'guessed_counties.json'
+
+    @property
     def guessed_census_tracts_path(self):
         return self.path / 'guessed_census_tracts.json'
 
@@ -163,6 +167,25 @@ class Department():
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)
 
+    def guess_counties(self):
+        """
+        Guess the counties that make part of this department
+        """
+        census = Census()
+        counties = census.load_county_boundaries()
+        counties = counties.set_index('COUNTYFP')
+
+        shape = self.load_preprocessed_shapefile()
+        shape = shape.to_crs(counties.crs)
+        union = shape.unary_union
+
+        intersecting = [ix for ix, geom in counties.geometry.iteritems()
+                        if union.intersects(geom)]
+        self.save_guessed_counties(intersecting)
+
+    def remove_guessed_counties(self):
+        maybe_rmfile(self.guessed_counties_path)
+
     def guess_census_tracts(self):
         """
         Find relevants census tracts for this department
@@ -208,6 +231,12 @@ class Department():
 
     def save_guessed_state(self, geoid):
         save_json(geoid, self.guessed_state_path)
+
+    def load_guessed_counties(self):
+        return load_json(self.guessed_counties_path)
+
+    def save_guessed_counties(self, lst):
+        save_json(lst, self.guessed_counties_path)
 
     def load_guessed_census_tracts(self):
         return load_json(self.guessed_census_tracts_path)

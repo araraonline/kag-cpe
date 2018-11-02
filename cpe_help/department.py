@@ -50,6 +50,10 @@ class Department():
         return self.path / 'preprocessed'
 
     @property
+    def processed_path(self):
+        return self.path / 'processed'
+
+    @property
     def external_acs_path(self):
         return self.external_path / 'ACS'
 
@@ -76,6 +80,10 @@ class Department():
     @property
     def block_group_values_path(self):
         return self.preprocessed_path / 'block_group_values.pkl'
+
+    @property
+    def merged_block_groups_path(self):
+        return self.processed_path / 'block_groups.zip'
 
     def __new__(cls, name):
         """
@@ -248,6 +256,42 @@ class Department():
     def remove_block_group_values(self):
         maybe_rmfile(self.block_group_values_path)
 
+    def merge_block_groups(self):
+        """
+        Merge block group values with geography (intersecting counties)
+        """
+        tiger = TIGER()
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+
+        boundaries = tiger.load_bg_boundaries(state)
+        boundaries = boundaries[
+            (boundaries['STATEFP'] == state) &
+            (boundaries['COUNTYFP'].isin(counties))
+        ]
+        values = self.load_block_group_values()
+        assert boundaries.shape[0] == values.shape[0]
+
+        index1 = ['STATEFP', 'COUNTYFP', 'TRACTCE', 'BLKGRPCE']
+        to_join1 = boundaries.set_index(index1)
+        to_join1 = to_join1[['geometry']]
+
+        index2 = ['state', 'county', 'tract', 'block group']
+        to_join2 = values.set_index(index2)
+
+        to_join1.index.names = to_join2.index.names
+        joined = to_join1.join(to_join2, how='outer')
+        assert joined.shape[0] == boundaries.shape[0]
+
+        # move geometry column to end
+        geometry = joined.pop('geometry')
+        joined['geometry'] = geometry
+
+        self.save_merged_block_groups(joined)
+
+    def remove_merged_block_groups(self):
+        maybe_rmfile(self.merged_block_groups_path)
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -283,6 +327,13 @@ class Department():
 
     def load_block_group_values(self):
         return pd.read_pickle(self.block_group_values_path)
+
+    def save_merged_block_groups(self, df):
+        df = df.reset_index()
+        save_zipshp(df, self.merged_block_groups_path)
+
+    def load_merged_block_groups(self):
+        return load_zipshp(self.merged_block_groups_path)
 
 
 class DepartmentColl():

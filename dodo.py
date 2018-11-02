@@ -282,6 +282,24 @@ def task_download_block_group_boundaries():
         }
 
 
+def task_merge_block_groups():
+    """
+    Merge block group values with block group boundaries
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_counties_path,
+                dept.block_group_values_path,
+            ],
+            'task_dep': ['download_block_group_boundaries'],
+            'targets': [dept.merged_block_groups_path],
+            'actions': [dept.merge_block_groups],
+            'clean': [dept.remove_merged_block_groups],
+        }
+
+
 @doit.create_after('guess_states')
 def task_guess_census_tracts():
     """

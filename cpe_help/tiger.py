@@ -48,6 +48,12 @@ class TIGER():
         """
         self.year = 2016
 
+    def __repr__(self):
+        """
+        Represent a TIGER object
+        """
+        return f'TIGER(year={self.year})'
+
     # doit actions
 
     def download_state_boundaries(self):

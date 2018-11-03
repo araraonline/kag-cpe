@@ -7,7 +7,9 @@ Probably will become the main file of the project.
 from importlib import import_module
 
 import geopandas as gpd
+import pandas as pd
 
+from cpe_help.acs import get_acs
 from cpe_help.census import Census
 from cpe_help.util import crs
 from cpe_help.util.io import (
@@ -16,7 +18,8 @@ from cpe_help.util.io import (
     save_json,
     save_zipshp,
 )
-from cpe_help.util.path import DATA_DIR, maybe_rmfile
+from cpe_help.util.configuration import get_acs_variables
+from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
 
 
 class InputError(Exception):
@@ -47,6 +50,10 @@ class Department():
         return self.path / 'preprocessed'
 
     @property
+    def processed_path(self):
+        return self.path / 'processed'
+
+    @property
     def external_acs_path(self):
         return self.external_path / 'ACS'
 
@@ -63,8 +70,20 @@ class Department():
         return self.path / 'guessed_state.json'
 
     @property
+    def guessed_counties_path(self):
+        return self.path / 'guessed_counties.json'
+
+    @property
     def guessed_census_tracts_path(self):
         return self.path / 'guessed_census_tracts.json'
+
+    @property
+    def bg_values_path(self):
+        return self.raw_path / 'bg_values.pkl'
+
+    @property
+    def block_groups_path(self):
+        return self.processed_path / 'block_groups.zip'
 
     def __new__(cls, name):
         """
@@ -163,6 +182,25 @@ class Department():
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)
 
+    def guess_counties(self):
+        """
+        Guess the counties that make part of this department
+        """
+        census = Census()
+        counties = census.load_county_boundaries()
+        counties = counties.set_index('COUNTYFP')
+
+        shape = self.load_preprocessed_shapefile()
+        shape = shape.to_crs(counties.crs)
+        union = shape.unary_union
+
+        intersecting = [ix for ix, geom in counties.geometry.iteritems()
+                        if union.intersects(geom)]
+        self.save_guessed_counties(intersecting)
+
+    def remove_guessed_counties(self):
+        maybe_rmfile(self.guessed_counties_path)
+
     def guess_census_tracts(self):
         """
         Find relevants census tracts for this department
@@ -191,6 +229,73 @@ class Department():
     def remove_guessed_census_tracts(self):
         maybe_rmfile(self.guessed_census_tracts_path)
 
+    def download_bg_values(self):
+        """
+        Download ACS values for relevant block groups
+
+        Relevant block groups are those inside counties that compose
+        this department.
+        """
+        acs = get_acs()
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+        variables = get_acs_variables()
+
+        # must make 1 request per county
+        frames = []
+        for county in counties:
+            df = acs.data(
+                variables,
+                geography='block group',
+                inside='state:{} county:{}'.format(state, county),
+            )
+            frames.append(df)
+        frame = pd.concat(frames)
+        self.save_bg_values(frame)
+
+    def remove_bg_values(self):
+        maybe_rmfile(self.bg_values_path)
+
+    def process_block_groups(self):
+        """
+        Merge block group values with geography (intersecting counties)
+        """
+        tiger = TIGER()
+
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+
+        boundaries = tiger.load_bg_boundaries(state)
+        boundaries = boundaries[
+            (boundaries['STATEFP'] == state) &
+            (boundaries['COUNTYFP'].isin(counties))
+        ]
+        values = self.load_bg_values()
+        assert boundaries.shape[0] == values.shape[0]
+
+        index1 = ['STATEFP', 'COUNTYFP', 'TRACTCE', 'BLKGRPCE']
+        to_join1 = boundaries.set_index(index1)
+        to_join1 = to_join1[['geometry']]
+
+        index2 = ['state', 'county', 'tract', 'block group']
+        to_join2 = values.set_index(index2)
+
+        to_join1.index.names = to_join2.index.names
+        joined = to_join1.join(to_join2)
+        assert joined.shape[0] == boundaries.shape[0]
+
+        # move geometry column to end
+        geometry = joined.pop('geometry')
+        joined['geometry'] = geometry
+
+        # GeoDataFrame.to_file() ignores indexes
+        joined = joined.reset_index()
+
+        self.save_block_groups(joined)
+
+    def remove_block_groups(self):
+        maybe_rmfile(self.block_groups_path)
+
     # input/ouput
 
     def load_external_shapefile(self):
@@ -209,11 +314,30 @@ class Department():
     def save_guessed_state(self, geoid):
         save_json(geoid, self.guessed_state_path)
 
+    def load_guessed_counties(self):
+        return load_json(self.guessed_counties_path)
+
+    def save_guessed_counties(self, lst):
+        save_json(lst, self.guessed_counties_path)
+
     def load_guessed_census_tracts(self):
         return load_json(self.guessed_census_tracts_path)
 
     def save_guessed_census_tracts(self, lst):
         save_json(lst, self.guessed_census_tracts_path)
+
+    def save_bg_values(self, df):
+        ensure_path(self.bg_values_path)
+        df.to_pickle(self.bg_values_path)
+
+    def load_bg_values(self):
+        return pd.read_pickle(self.bg_values_path)
+
+    def save_block_groups(self, df):
+        save_zipshp(df, self.block_groups_path)
+
+    def load_block_groups(self):
+        return load_zipshp(self.block_groups_path)
 
 
 class DepartmentColl():

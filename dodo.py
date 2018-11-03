@@ -62,6 +62,19 @@ def task_download_state_boundaries():
     }
 
 
+def task_download_county_boundaries():
+    """
+    Download county boundaries from the TIGER shapefiles
+    """
+    census = Census()
+    file = census.county_boundaries_path
+    return {
+        'targets': [file],
+        'actions': [census.download_county_boundaries],
+        'uptodate': [doit.tools.run_once],
+    }
+
+
 def task_download_extra():
     # just a prototype for other data that may be retrieved
     yield TaskHelper.download(
@@ -182,6 +195,24 @@ def task_guess_states():
         }
 
 
+def task_guess_counties():
+    """
+    Guess the counties that compose each police department
+    """
+    census = Census()
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                census.county_boundaries_path,
+                dept.preprocessed_shapefile_path,
+            ],
+            'targets': [dept.guessed_counties_path],
+            'actions': [dept.guess_counties],
+            'clean': [dept.remove_guessed_counties],
+        }
+
+
 def task_create_list_of_states():
     """
     Unite the guessed states for each department
@@ -207,6 +238,20 @@ def task_preprocess_shapefiles():
         }
 
 
+def task_download_bg_values():
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_state_path,
+                dept.guessed_counties_path,
+            ],
+            'targets': [dept.bg_values_path],
+            'actions': [dept.download_bg_values],
+            'clean': [dept.remove_bg_values],
+        }
+
+
 @doit.create_after('create_list_of_states')
 def task_download_tract_boundaries():
     """
@@ -219,6 +264,39 @@ def task_download_tract_boundaries():
             'actions': [(census.download_tract_boundaries, (state,))],
             'targets': [census.tract_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
+        }
+
+
+@doit.create_after('create_list_of_states')
+def task_download_bg_boundaries():
+    """
+    Download block group boundaries for each relevant state
+    """
+    census = Census()
+    for state in list_states():
+        yield {
+            'name': state,
+            'actions': [(census.download_bg_boundaries, (state,))],
+            'targets': [census.bg_boundaries_path(state)],
+            'uptodate': [doit.tools.run_once],
+        }
+
+
+def task_process_block_groups():
+    """
+    Merge block group values with block group boundaries
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_counties_path,
+                dept.bg_values_path,
+            ],
+            'task_dep': ['download_bg_boundaries'],
+            'targets': [dept.block_groups_path],
+            'actions': [dept.process_block_groups],
+            'clean': [dept.remove_block_groups],
         }
 
 

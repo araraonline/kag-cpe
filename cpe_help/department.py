@@ -281,7 +281,7 @@ class Department():
         to_join2 = values.set_index(index2)
 
         to_join1.index.names = to_join2.index.names
-        joined = to_join1.join(to_join2, how='outer')
+        joined = to_join1.join(to_join2)
         assert joined.shape[0] == boundaries.shape[0]
 
         # move geometry column to end

@@ -114,7 +114,7 @@ class ACS(object):
             The values represent how the variables should be named
             locally.
 
-            See examples section.
+            Check the examples section!
         geography : str, default 'us'
             The unit to retrieve statistics from. For example, if you
             want to retrieve statistics for census tracts, set

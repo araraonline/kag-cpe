@@ -19,7 +19,7 @@ from cpe_help.util.io import (
     save_zipshp,
 )
 from cpe_help.util.configuration import get_acs_variables
-from cpe_help.util.path import DATA_DIR, maybe_rmfile
+from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
 
 
 class InputError(Exception):
@@ -327,6 +327,7 @@ class Department():
         save_json(lst, self.guessed_census_tracts_path)
 
     def save_bg_values(self, df):
+        ensure_path(self.bg_values_path)
         df.to_pickle(self.bg_values_path)
 
     def load_bg_values(self):

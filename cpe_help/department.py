@@ -261,6 +261,7 @@ class Department():
         Merge block group values with geography (intersecting counties)
         """
         tiger = TIGER()
+
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
 

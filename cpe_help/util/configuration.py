@@ -10,11 +10,13 @@ def get_configuration():
 
 
 def get_acs_variables():
-    result = []
+    """
+    Return a dictionary mapping variable names to be queried into how
+    these variables should be named locally.
+    """
     config = get_configuration()
     default_keys = list(config['DEFAULT'])
-    for key in config['ACS Variables'].keys():
-        if key not in default_keys:
-            result.append(key)
-    result = [x.upper() for x in result]
+    result = {k.upper(): v
+              for k, v in config['ACS Variables'].items()
+              if k not in default_keys}
     return result

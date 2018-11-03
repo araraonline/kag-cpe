@@ -67,3 +67,21 @@ def test_hierarchic_inside():
     result_cols = set(result.columns)
     expected_cols = set(variables) | set(['tract', 'state', 'county'])
     assert result_cols == expected_cols
+
+
+def test_simple_data_dictvariables():
+    acs = get_acs()
+
+    variables = {
+        'NAME': 'Geography Name',
+        'B01001_002E': 'Male Population',
+        'B01001_026E': 'Female Population',
+    }
+    geography = 'county'
+    inside = 'state:01'
+
+    result = acs.data(variables, geography, inside)
+
+    result_cols = set(result.columns)
+    expected_cols = set(variables.values()) | {'state', 'county'}
+    assert result_cols == expected_cols

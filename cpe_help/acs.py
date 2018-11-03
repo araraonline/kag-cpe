@@ -107,12 +107,14 @@ class ACS(object):
 
         Parameters
         ----------
-        variables : list of str
-            A list of variable names to query for.
+        variables : list or dict
+            If a list, represents variable names to query for.
 
-            Example:
+            If a dict, the keys represent variable names to query for.
+            The values represent how the variables should be named
+            locally.
 
-            ["B01001_002E", "B01001_026E"]
+            See examples section.
         geography : str, default 'us'
             The unit to retrieve statistics from. For example, if you
             want to retrieve statistics for census tracts, set
@@ -139,11 +141,41 @@ class ACS(object):
         Returns
         -------
         pandas.DataFrame
-        """
-        dframes = []
 
+        Examples
+        --------
+        To retrieve the total population in the USA:
+
+        >>> acs = get_acs()
+        >>> variables = ['B01001_001E']
+        >>> df = acs.data(variables)
+
+        Same case, but renaming 'B01001_001E' to 'Total Population':
+
+        >>> acs = get_acs()
+        >>> variables = {'B01001_001E': 'Total Population'}
+        >>> df = acs.data(variables)
+
+        Retrieve variable for all tracts inside Autauga County, Alabama:
+
+        >>> acs = get_acs()
+        >>> variables = ['B01001_001E']
+        >>> geography = 'tract'
+        >>> inside = 'state:01 county:001'
+        >>> df = acs.data(variables, geography, inside)
+        """
+        if isinstance(variables, list):
+            query_vars = variables
+            rename_vars = None
+        elif isinstance(variables, dict):
+            query_vars = list(variables.keys())
+            rename_vars = variables
+        else:
+            raise TypeError("wrong type for argument 'variables'")
+
+        dframes = []
         # split variables into chunks of 50
-        for chunk in grouper(variables, 50):
+        for chunk in grouper(query_vars, 50):
             json_result = self._query(chunk, geography, inside)
 
             # generate DataFrame from chunk result
@@ -155,6 +187,8 @@ class ACS(object):
         result = pandas.concat(dframes, axis=1)
         # remove duplicate columns (caused by split requests)
         result = result.loc[:, ~result.columns.duplicated(keep='last')]
+        if rename_vars is not None:
+            result = result.rename(columns=rename_vars)
 
         return result
 

@@ -282,7 +282,7 @@ def task_download_bg_boundaries():
         }
 
 
-def task_merge_block_groups():
+def task_process_block_groups():
     """
     Merge block group values with block group boundaries
     """
@@ -294,9 +294,9 @@ def task_merge_block_groups():
                 dept.bg_values_path,
             ],
             'task_dep': ['download_bg_boundaries'],
-            'targets': [dept.merged_block_groups_path],
-            'actions': [dept.merge_block_groups],
-            'clean': [dept.remove_merged_block_groups],
+            'targets': [dept.block_groups_path],
+            'actions': [dept.process_block_groups],
+            'clean': [dept.remove_block_groups],
         }
 
 

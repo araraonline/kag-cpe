@@ -82,7 +82,7 @@ class Department():
         return self.raw_path / 'bg_values.pkl'
 
     @property
-    def merged_block_groups_path(self):
+    def block_groups_path(self):
         return self.processed_path / 'block_groups.zip'
 
     def __new__(cls, name):
@@ -256,7 +256,7 @@ class Department():
     def remove_bg_values(self):
         maybe_rmfile(self.bg_values_path)
 
-    def merge_block_groups(self):
+    def process_block_groups(self):
         """
         Merge block group values with geography (intersecting counties)
         """
@@ -291,10 +291,10 @@ class Department():
         # GeoDataFrame.to_file() ignores indexes
         joined = joined.reset_index()
 
-        self.save_merged_block_groups(joined)
+        self.save_block_groups(joined)
 
-    def remove_merged_block_groups(self):
-        maybe_rmfile(self.merged_block_groups_path)
+    def remove_block_groups(self):
+        maybe_rmfile(self.block_groups_path)
 
     # input/ouput
 
@@ -332,11 +332,11 @@ class Department():
     def load_bg_values(self):
         return pd.read_pickle(self.bg_values_path)
 
-    def save_merged_block_groups(self, df):
-        save_zipshp(df, self.merged_block_groups_path)
+    def save_block_groups(self, df):
+        save_zipshp(df, self.block_groups_path)
 
-    def load_merged_block_groups(self):
-        return load_zipshp(self.merged_block_groups_path)
+    def load_block_groups(self):
+        return load_zipshp(self.block_groups_path)
 
 
 class DepartmentColl():

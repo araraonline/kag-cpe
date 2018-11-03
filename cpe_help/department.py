@@ -287,6 +287,9 @@ class Department():
         geometry = joined.pop('geometry')
         joined['geometry'] = geometry
 
+        # GeoDataFrame.to_file() ignores indexes
+        joined = joined.reset_index()
+
         self.save_merged_block_groups(joined)
 
     def remove_merged_block_groups(self):
@@ -329,7 +332,6 @@ class Department():
         return pd.read_pickle(self.block_group_values_path)
 
     def save_merged_block_groups(self, df):
-        df = df.reset_index()
         save_zipshp(df, self.merged_block_groups_path)
 
     def load_merged_block_groups(self):

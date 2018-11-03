@@ -247,7 +247,7 @@ class Department():
             df = acs.data(
                 variables,
                 geography='block group',
-                inside='state:{} county:{}'.format(state, county)
+                inside='state:{} county:{}'.format(state, county),
             )
             frames.append(df)
         frame = pd.concat(frames)

@@ -238,7 +238,7 @@ def task_preprocess_shapefiles():
         }
 
 
-def task_download_block_group_values():
+def task_download_bg_values():
     for dept in list_departments():
         yield {
             'name': dept.name,
@@ -246,9 +246,9 @@ def task_download_block_group_values():
                 dept.guessed_state_path,
                 dept.guessed_counties_path,
             ],
-            'targets': [dept.block_group_values_path],
-            'actions': [dept.download_block_group_values],
-            'clean': [dept.remove_block_group_values],
+            'targets': [dept.bg_values_path],
+            'actions': [dept.download_bg_values],
+            'clean': [dept.remove_bg_values],
         }
 
 
@@ -268,7 +268,7 @@ def task_download_tract_boundaries():
 
 
 @doit.create_after('create_list_of_states')
-def task_download_block_group_boundaries():
+def task_download_bg_boundaries():
     """
     Download block group boundaries for each relevant state
     """
@@ -291,9 +291,9 @@ def task_merge_block_groups():
             'name': dept.name,
             'file_dep': [
                 dept.guessed_counties_path,
-                dept.block_group_values_path,
+                dept.bg_values_path,
             ],
-            'task_dep': ['download_block_group_boundaries'],
+            'task_dep': ['download_bg_boundaries'],
             'targets': [dept.merged_block_groups_path],
             'actions': [dept.merge_block_groups],
             'clean': [dept.remove_merged_block_groups],

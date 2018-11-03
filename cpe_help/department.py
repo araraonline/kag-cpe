@@ -78,8 +78,8 @@ class Department():
         return self.path / 'guessed_census_tracts.json'
 
     @property
-    def block_group_values_path(self):
-        return self.raw_path / 'block_group_values.pkl'
+    def bg_values_path(self):
+        return self.raw_path / 'bg_values.pkl'
 
     @property
     def merged_block_groups_path(self):
@@ -229,7 +229,7 @@ class Department():
     def remove_guessed_census_tracts(self):
         maybe_rmfile(self.guessed_census_tracts_path)
 
-    def download_block_group_values(self):
+    def download_bg_values(self):
         """
         Download ACS values for relevant block groups
 
@@ -251,10 +251,10 @@ class Department():
             )
             frames.append(df)
         frame = pd.concat(frames)
-        self.save_block_group_values(frame)
+        self.save_bg_values(frame)
 
-    def remove_block_group_values(self):
-        maybe_rmfile(self.block_group_values_path)
+    def remove_bg_values(self):
+        maybe_rmfile(self.bg_values_path)
 
     def merge_block_groups(self):
         """
@@ -270,7 +270,7 @@ class Department():
             (boundaries['STATEFP'] == state) &
             (boundaries['COUNTYFP'].isin(counties))
         ]
-        values = self.load_block_group_values()
+        values = self.load_bg_values()
         assert boundaries.shape[0] == values.shape[0]
 
         index1 = ['STATEFP', 'COUNTYFP', 'TRACTCE', 'BLKGRPCE']
@@ -326,11 +326,11 @@ class Department():
     def save_guessed_census_tracts(self, lst):
         save_json(lst, self.guessed_census_tracts_path)
 
-    def save_block_group_values(self, df):
-        df.to_pickle(self.block_group_values_path)
+    def save_bg_values(self, df):
+        df.to_pickle(self.bg_values_path)
 
-    def load_block_group_values(self):
-        return pd.read_pickle(self.block_group_values_path)
+    def load_bg_values(self):
+        return pd.read_pickle(self.bg_values_path)
 
     def save_merged_block_groups(self, df):
         save_zipshp(df, self.merged_block_groups_path)

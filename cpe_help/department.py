@@ -79,7 +79,7 @@ class Department():
 
     @property
     def block_group_values_path(self):
-        return self.preprocessed_path / 'block_group_values.pkl'
+        return self.raw_path / 'block_group_values.pkl'
 
     @property
     def merged_block_groups_path(self):

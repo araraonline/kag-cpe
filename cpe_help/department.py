@@ -83,7 +83,7 @@ class Department():
 
     @property
     def block_groups_path(self):
-        return self.processed_path / 'block_groups.zip'
+        return self.processed_path / 'block_groups.geojson'
 
     def __new__(cls, name):
         """
@@ -334,10 +334,13 @@ class Department():
         return pd.read_pickle(self.bg_values_path)
 
     def save_block_groups(self, df):
-        save_zipshp(df, self.block_groups_path)
+        df.to_file(self.block_groups_path, driver='GeoJSON')
 
     def load_block_groups(self):
-        return load_zipshp(self.block_groups_path)
+        return gpd.read_file(
+            str(self.block_groups_path),
+            driver='GeoJSON',
+        )
 
 
 class DepartmentColl():

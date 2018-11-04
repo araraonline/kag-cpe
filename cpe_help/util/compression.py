@@ -6,7 +6,6 @@ import pathlib
 import shutil
 
 from cpe_help.util.path import (
-    ensure_path,
     maybe_rmfile,
     maybe_rmtree,
 )
@@ -31,7 +30,6 @@ def make_zipfile(filename, root_dir):
     """
     path = pathlib.Path(filename)
     maybe_rmfile(path)
-    ensure_path(path)
     shutil.make_archive(path.with_suffix(''), 'zip', root_dir)
 
 
@@ -54,5 +52,4 @@ def extract_zipfile(filename, extract_dir):
     None
     """
     maybe_rmtree(extract_dir)
-    ensure_path(extract_dir)
     shutil.unpack_archive(filename, extract_dir, 'zip')

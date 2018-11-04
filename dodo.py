@@ -79,7 +79,7 @@ def task_download_extra():
     # just a prototype for other data that may be retrieved
     yield TaskHelper.download(
         'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_path / 'OIS.csv',
+        Department('37-00027').raw_dir / 'OIS.csv',
         name='austin_ois',
     )
 
@@ -91,7 +91,7 @@ def task_download_extra():
 
     # yield TaskHelper.download(
     #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-    #     Department('37-00027').raw_path / 'crime_reports.csv',
+    #     Department('37-00027').raw_dir / 'crime_reports.csv',
     #     name='austin_crimes',
     # )
 
@@ -165,7 +165,7 @@ def task_spread_other():
         name = dept_dir.name[5:]
         dept = Department(name)
         src_files = [x for x in dept_dir.iterdir() if x.is_file()]
-        dst_files = [dept.external_path / x.name for x in src_files]
+        dst_files = [dept.external_dir / x.name for x in src_files]
 
         yield {
             'name': name,

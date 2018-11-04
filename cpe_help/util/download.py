@@ -1,7 +1,7 @@
 import subprocess
 
 from cpe_help.util.configuration import get_configuration
-from cpe_help.util.path import ensure_path, maybe_rmfile
+from cpe_help.util.path import maybe_rmfile
 
 
 def download(url, out):
@@ -22,11 +22,8 @@ def download(url, out):
     None
     """
     out = str(out)
-
     # delete file if it already exists
     maybe_rmfile(out)
-
-    ensure_path(out)
     _download(url, out)
 
 

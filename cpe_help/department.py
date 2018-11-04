@@ -19,7 +19,7 @@ from cpe_help.util.io import (
     save_zipshp,
 )
 from cpe_help.util.configuration import get_acs_variables
-from cpe_help.util.path import DATA_DIR, ensure_path, maybe_rmfile
+from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmfile
 
 
 class InputError(Exception):
@@ -38,32 +38,42 @@ class Department():
         return DATA_DIR / 'departments' / self.name
 
     @property
-    def external_path(self):
+    def directories(self):
+        return [
+            self.path,
+            self.external_dir,
+            self.raw_dir,
+            self.preprocessed_dir,
+            self.processed_dir,
+        ]
+
+    @property
+    def external_dir(self):
         return self.path / 'external'
 
     @property
-    def raw_path(self):
+    def raw_dir(self):
         return self.path / 'raw'
 
     @property
-    def preprocessed_path(self):
+    def preprocessed_dir(self):
         return self.path / 'preprocessed'
 
     @property
-    def processed_path(self):
+    def processed_dir(self):
         return self.path / 'processed'
 
     @property
     def external_acs_path(self):
-        return self.external_path / 'ACS'
+        return self.external_dir / 'ACS'
 
     @property
     def external_shapefile_path(self):
-        return self.external_path / 'police_districts'
+        return self.external_dir / 'police_districts'
 
     @property
     def preprocessed_shapefile_path(self):
-        return self.preprocessed_path / 'police_districts.zip'
+        return self.preprocessed_dir / 'police_districts.zip'
 
     @property
     def guessed_state_path(self):
@@ -79,11 +89,11 @@ class Department():
 
     @property
     def bg_values_path(self):
-        return self.raw_path / 'bg_values.pkl'
+        return self.raw_dir / 'bg_values.pkl'
 
     @property
     def block_groups_path(self):
-        return self.processed_path / 'block_groups.geojson'
+        return self.processed_dir / 'block_groups.geojson'
 
     def __new__(cls, name):
         """
@@ -136,6 +146,13 @@ class Department():
         )
 
     # doit actions
+
+    def create_directories(self):
+        """
+        Create the directories where files will be saved
+        """
+        for dir in self.directories:
+            maybe_mkdir(dir)
 
     def preprocess_shapefile(self):
         """
@@ -327,7 +344,6 @@ class Department():
         save_json(lst, self.guessed_census_tracts_path)
 
     def save_bg_values(self, df):
-        ensure_path(self.bg_values_path)
         df.to_pickle(self.bg_values_path)
 
     def load_bg_values(self):
@@ -352,25 +368,16 @@ class DepartmentColl():
         return DATA_DIR / 'departments'
 
     @property
-    def list_of_departments_path(self):
-        return self.path / 'list_of_departments.json'
-
-    @property
     def list_of_states_path(self):
         return self.path / 'list_of_states.json'
 
+    # util
+
+    def list(self):
+        names = [x.name for x in self.path.iterdir() if x.is_dir()]
+        return [Department(name) for name in sorted(names)]
+
     # doit actions
-
-    def create_list_of_departments(self):
-        cpe_data = DATA_DIR / 'inputs' / 'cpe-data'
-        depts = [Department(d.name[5:])
-                 for d in cpe_data.iterdir()
-                 if d.is_dir()]
-        depts = sorted(depts, key=lambda x: x.name)
-        self.save_list_of_departments(depts)
-
-    def remove_list_of_departments(self):
-        maybe_rmfile(self.list_of_departments_path)
 
     def create_list_of_states(self):
         """
@@ -378,8 +385,7 @@ class DepartmentColl():
 
         (to later retrieve census tracts from those)
         """
-        states = [dept.load_guessed_state()
-                  for dept in self.load_list_of_departments()]
+        states = [dept.load_guessed_state() for dept in self.list()]
         states = set(states)
         states = sorted(states)
         self.save_list_of_states(states)
@@ -391,15 +397,6 @@ class DepartmentColl():
         maybe_rmfile(self.list_of_states_path)
 
     # input/output
-
-    def load_list_of_departments(self):
-        names = load_json(self.list_of_departments_path)
-        depts = [Department(name) for name in names]
-        return depts
-
-    def save_list_of_departments(self, lst):
-        names = [dept.name for dept in lst]
-        save_json(names, self.list_of_departments_path)
 
     def load_list_of_states(self):
         return load_json(self.list_of_states_path)
@@ -414,8 +411,7 @@ def list_departments():
 
     This is a shortcut.
     """
-    dept_coll = DepartmentColl()
-    return dept_coll.load_list_of_departments()
+    return DepartmentColl().list()
 
 
 def list_states():

@@ -9,11 +9,9 @@ from pathlib import Path
 import geopandas as gpd
 
 from cpe_help.util.compression import make_zipfile
-from cpe_help.util.path import ensure_path
 
 
 def save_json(obj, filename):
-    ensure_path(filename)
     with open(filename, mode='w') as f:
         json.dump(obj, f)
 

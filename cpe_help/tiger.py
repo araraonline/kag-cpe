@@ -12,7 +12,7 @@ https://www.census.gov/geo/maps-data/data/tiger.html
 from cpe_help.util.configuration import get_configuration
 from cpe_help.util.download import download
 from cpe_help.util.io import load_zipshp
-from cpe_help.util.path import DATA_DIR
+from cpe_help.util.path import DATA_DIR, maybe_mkdir
 
 
 class TIGER():
@@ -22,21 +22,31 @@ class TIGER():
 
     @property
     def path(self):
-        return DATA_DIR / 'TIGER' / f'{self.year}'
+        return DATA_DIR / 'tiger' / f'{self.year}'
+
+    @property
+    def directories(self):
+        return [
+            self.path,
+            self.path / 'STATE',
+            self.path / 'COUNTY',
+            self.path / 'TRACT',
+            self.path / 'BG',
+        ]
 
     @property
     def state_boundaries_path(self):
-        return self.path / 'state_boundaries.zip'
+        return self.path / 'STATE' / 'us.zip'
 
     @property
     def county_boundaries_path(self):
-        return self.path / 'county_boundaries.zip'
+        return self.path / 'COUNTY' / 'us.zip'
 
     def tract_boundaries_path(self, state):
-        return self.path / 'states' / state / 'tract_boundaries.zip'
+        return self.path / 'TRACT' / f'{state}.zip'
 
     def bg_boundaries_path(self, state):
-        return self.path / 'states' / state / 'bg_boundaries.zip'
+        return self.path / 'BG' / f'{state}.zip'
 
     def __init__(self, year):
         """
@@ -56,6 +66,13 @@ class TIGER():
         return f'TIGER(year={self.year})'
 
     # doit actions
+
+    def create_directories(self):
+        """
+        Create the directories where files will be saved
+        """
+        for dir in self.directories:
+            maybe_mkdir(dir)
 
     def download_state_boundaries(self):
         """

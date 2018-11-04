@@ -1,7 +1,7 @@
 from cpe_help.acs import get_acs
 from cpe_help.department import (
     Department,
-    DepartmentColl,
+    DepartmentCollection,
     list_departments,
     list_states,
 )

@@ -359,7 +359,7 @@ class Department():
         )
 
 
-class DepartmentColl():
+class DepartmentCollection():
     """
     Represents a collection of all departments in the data
     """
@@ -411,12 +411,12 @@ def list_departments():
 
     This is a shortcut.
     """
-    return DepartmentColl().list()
+    return DepartmentCollection().list()
 
 
 def list_states():
     """
     Returns a list with all states where the departments are
     """
-    dept_coll = DepartmentColl()
+    dept_coll = DepartmentCollection()
     return dept_coll.load_list_of_states()

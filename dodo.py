@@ -13,7 +13,7 @@ import doit.tools
 
 from cpe_help import (
     Department,
-    DepartmentColl,
+    DepartmentCollection,
     list_departments,
     list_states,
 )
@@ -217,7 +217,7 @@ def task_create_list_of_states():
     """
     Unite the guessed states for each department
     """
-    dept_coll = DepartmentColl()
+    dept_coll = DepartmentCollection()
     return {
         'file_dep': [dept.guessed_state_path for dept in list_departments()],
         'targets': [dept_coll.list_of_states_path],

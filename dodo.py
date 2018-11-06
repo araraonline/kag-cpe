@@ -326,6 +326,7 @@ def task_process_block_groups():
         yield {
             'name': dept.name,
             'file_dep': [
+                dept.guessed_state_path,
                 dept.guessed_counties_path,
                 dept.bg_values_path,
             ],

@@ -84,10 +84,6 @@ class Department():
         return self.path / 'guessed_counties.json'
 
     @property
-    def guessed_census_tracts_path(self):
-        return self.path / 'guessed_census_tracts.json'
-
-    @property
     def bg_values_path(self):
         return self.raw_dir / 'bg_values.pkl'
 
@@ -218,34 +214,6 @@ class Department():
     def remove_guessed_counties(self):
         maybe_rmfile(self.guessed_counties_path)
 
-    def guess_census_tracts(self):
-        """
-        Find relevants census tracts for this department
-        """
-        tiger = get_tiger()
-
-        state = self.load_guessed_state()
-        police_districts = self.load_preprocessed_shapefile()
-        tracts = tiger.load_tract_boundaries(state)
-
-        police_districts = police_districts.to_crs(tracts.crs)
-        unary_union = police_districts.unary_union
-        relevant_geoids = [geoid
-                           for geoid, geom in zip(
-                               tracts['GEOID'],
-                               tracts.geometry
-                           ) if geom.intersects(unary_union)]
-
-        if len(relevant_geoids) == 0:
-            raise RuntimeError(f"Found no intersecting census tracts for Dept."
-                               f" {self.name}. Please doule check the"
-                               f" Coordinate Reference System.")
-
-        self.save_guessed_census_tracts(relevant_geoids)
-
-    def remove_guessed_census_tracts(self):
-        maybe_rmfile(self.guessed_census_tracts_path)
-
     def download_bg_values(self):
         """
         Download ACS values for relevant block groups
@@ -336,12 +304,6 @@ class Department():
 
     def save_guessed_counties(self, lst):
         save_json(lst, self.guessed_counties_path)
-
-    def load_guessed_census_tracts(self):
-        return load_json(self.guessed_census_tracts_path)
-
-    def save_guessed_census_tracts(self, lst):
-        save_json(lst, self.guessed_census_tracts_path)
 
     def save_bg_values(self, df):
         df.to_pickle(self.bg_values_path)

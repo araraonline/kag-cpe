@@ -298,24 +298,3 @@ def task_process_block_groups():
             'actions': [dept.process_block_groups],
             'clean': [dept.remove_block_groups],
         }
-
-
-@doit.create_after('guess_states')
-def task_guess_census_tracts():
-    """
-    Find relevant census tracts for each department
-    """
-    tiger = get_tiger()
-    for dept in list_departments():
-        state = dept.load_guessed_state()
-        yield {
-            'name': dept.name,
-            'actions': [dept.guess_census_tracts],
-            'clean': [dept.remove_guessed_census_tracts],
-            'file_dep': [
-                dept.preprocessed_shapefile_path,
-                tiger.tract_boundaries_path(state),
-            ],
-            'task_dep': [f'download_tract_boundaries'],
-            'targets': [dept.guessed_census_tracts_path],
-        }

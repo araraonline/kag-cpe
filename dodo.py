@@ -299,6 +299,25 @@ def task_download_bg_boundaries():
         }
 
 
+def task_process_census_tracts():
+    """
+    Merge census tract values with census tract boundaries
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_state_path,
+                dept.guessed_counties_path,
+                dept.tract_values_path,
+            ],
+            'task_dep': ['download_tract_boundaries'],
+            'targets': [dept.census_tracts_path],
+            'actions': [dept.process_census_tracts],
+            'clean': [dept.remove_census_tracts],
+        }
+
+
 def task_process_block_groups():
     """
     Merge block group values with block group boundaries

@@ -92,6 +92,10 @@ class Department():
         return self.raw_dir / 'bg_values.pkl'
 
     @property
+    def census_tracts_path(self):
+        return self.processed_dir / 'census_tracts.geojson'
+
+    @property
     def block_groups_path(self):
         return self.processed_dir / 'block_groups.geojson'
 
@@ -272,6 +276,47 @@ class Department():
     def remove_bg_values(self):
         maybe_rmfile(self.bg_values_path)
 
+    def process_census_tracts(self):
+        """
+        Merge census tract values with geography (for intersecting
+        counties)
+        """
+        tiger = get_tiger()
+
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+
+        boundaries = tiger.load_tract_boundaries(state)
+        boundaries = boundaries[
+            (boundaries['STATEFP'] == state) &
+            (boundaries['COUNTYFP'].isin(counties))
+        ]
+        values = self.load_tract_values()
+        assert boundaries.shape[0] == values.shape[0]
+
+        index1 = ['STATEFP', 'COUNTYFP', 'TRACTCE']
+        to_join1 = boundaries.set_index(index1)
+        to_join1 = to_join1[['geometry']]
+
+        index2 = ['state', 'county', 'tract']
+        to_join2 = values.set_index(index2)
+
+        to_join1.index.names = to_join2.index.names
+        joined = to_join1.join(to_join2)
+        assert joined.shape[0] == to_join1.shape[0]
+
+        # move geometry column to end
+        geometry = joined.pop('geometry')
+        joined['geometry'] = geometry
+
+        # GeoDataFrame.to_file() ignores indexes
+        joined = joined.reset_index()
+
+        self.save_census_tracts(joined)
+
+    def remove_census_tracts(self):
+        maybe_rmfile(self.census_tracts_path)
+
     def process_block_groups(self):
         """
         Merge block group values with geography (intersecting counties)
@@ -354,6 +399,15 @@ class Department():
     def load_block_groups(self):
         return gpd.read_file(
             str(self.block_groups_path),
+            driver='GeoJSON',
+        )
+
+    def save_census_tracts(self, df):
+        df.to_file(self.census_tracts_path, driver='GeoJSON')
+
+    def load_census_tracts(self):
+        return gpd.read_file(
+            str(self.census_tracts_path),
             driver='GeoJSON',
         )
 

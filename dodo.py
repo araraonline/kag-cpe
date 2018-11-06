@@ -238,6 +238,23 @@ def task_preprocess_shapefiles():
         }
 
 
+def task_download_tract_values():
+    """
+    Download census tract values for each department
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_state_path,
+                dept.guessed_counties_path,
+            ],
+            'targets': [dept.tract_values_path],
+            'actions': [dept.download_tract_values],
+            'clean': [dept.remove_tract_values],
+        }
+
+
 def task_download_bg_values():
     for dept in list_departments():
         yield {

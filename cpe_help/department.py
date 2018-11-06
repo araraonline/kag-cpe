@@ -84,6 +84,10 @@ class Department():
         return self.path / 'guessed_counties.json'
 
     @property
+    def tract_values_path(self):
+        return self.raw_dir / 'tract_values.pkl'
+
+    @property
     def bg_values_path(self):
         return self.raw_dir / 'bg_values.pkl'
 
@@ -214,6 +218,33 @@ class Department():
     def remove_guessed_counties(self):
         maybe_rmfile(self.guessed_counties_path)
 
+    def download_tract_values(self):
+        """
+        Download ACS values for relevant census tracts
+
+        Relevant census tracts are those inside counties that compose
+        this department.
+        """
+        acs = get_acs()
+        state = self.load_guessed_state()
+        counties = self.load_guessed_counties()
+        variables = get_acs_variables()
+
+        # must make 1 request per county
+        frames = []
+        for county in counties:
+            df = acs.data(
+                variables,
+                geography='tract',
+                inside='state:{} county:{}'.format(state, county),
+            )
+            frames.append(df)
+        frame = pd.concat(frames)
+        self.save_tract_values(frame)
+
+    def remove_tract_values(self):
+        maybe_rmfile(self.tract_values_path)
+
     def download_bg_values(self):
         """
         Download ACS values for relevant block groups
@@ -304,6 +335,12 @@ class Department():
 
     def save_guessed_counties(self, lst):
         save_json(lst, self.guessed_counties_path)
+
+    def save_tract_values(self, df):
+        df.to_pickle(self.tract_values_path)
+
+    def load_tract_values(self):
+        return pd.read_pickle(self.tract_values_path)
 
     def save_bg_values(self, df):
         df.to_pickle(self.bg_values_path)

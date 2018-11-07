@@ -5,6 +5,13 @@ from cpe_help.util.configuration import get_configuration
 from cpe_help.util.misc import grouper
 
 
+# ACS variables that should not be converted to numbers
+_NONNUMERIC_VARS = [
+    'NAME',
+
+]
+
+
 class ACS(object):
     """
     I will help with the retrieval of data from the ACS web API
@@ -185,8 +192,14 @@ class ACS(object):
             dframes.append(dframe_result)
 
         result = pandas.concat(dframes, axis=1)
+
         # remove duplicate columns (caused by split requests)
         result = result.loc[:, ~result.columns.duplicated(keep='last')]
+
+        # convert column values to numbers
+        numeric_vars = [x for x in query_vars if x not in _NONNUMERIC_VARS]
+        result[numeric_vars] = result[numeric_vars].apply(pandas.to_numeric)
+
         if rename_vars is not None:
             result = result.rename(columns=rename_vars)
 

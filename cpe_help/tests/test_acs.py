@@ -85,3 +85,22 @@ def test_simple_data_dictvariables():
     result_cols = set(result.columns)
     expected_cols = set(variables.values()) | {'state', 'county'}
     assert result_cols == expected_cols
+
+
+def test_dtypes():
+    acs = get_acs()
+
+    variables = ["NAME", "B01001_002E", "B01001_026E"]
+    geography = 'county'
+    inside = 'state:01'
+    df = acs.data(variables, geography, inside)
+
+    # numeric columns
+    result = set(c for c in df.select_dtypes('number').columns)
+    expected = {'B01001_002E', 'B01001_026E'}
+    assert result == expected
+
+    # object columns (string)
+    result = set(c for c in df.select_dtypes('object').columns)
+    expected = {'NAME', 'county', 'state'}
+    assert result == expected

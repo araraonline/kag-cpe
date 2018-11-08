@@ -8,6 +8,7 @@ from importlib import import_module
 
 import geopandas as gpd
 import pandas as pd
+import us
 
 # TODO clean imports
 
@@ -154,6 +155,24 @@ class Department():
         return "{klass}({name!r})".format(
             klass=type(self).__name__,
             name=self.name,
+        )
+
+    # util
+
+    @property
+    def city(self):
+        raise NotImplementedError
+
+    @property
+    def state(self):
+        fips = self.load_guessed_state()
+        return us.states.lookup(fips)
+
+    @property
+    def location(self):
+        return '{} - {}'.format(
+            self.city,
+            self.state.abbr
         )
 
     # doit actions

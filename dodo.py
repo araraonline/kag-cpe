@@ -335,3 +335,20 @@ def task_process_block_groups():
             'actions': [dept.process_block_groups],
             'clean': [dept.remove_block_groups],
         }
+
+
+def task_process_police_precincts():
+    """
+    Process police precincts data
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.block_groups_path,
+                dept.preprocessed_shapefile_path,
+            ],
+            'targets': [dept.police_precincts_path],
+            'actions': [dept.process_police_precincts],
+            'clean': [dept.remove_police_precincts],
+        }

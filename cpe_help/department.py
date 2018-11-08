@@ -9,6 +9,8 @@ from importlib import import_module
 import geopandas as gpd
 import pandas as pd
 
+# TODO clean imports
+
 from cpe_help.acs import get_acs
 from cpe_help.tiger import get_tiger
 from cpe_help.util import crs
@@ -19,6 +21,7 @@ from cpe_help.util.io import (
     save_zipshp,
 )
 from cpe_help.util.configuration import get_acs_variables
+from cpe_help.util.interpolation import weighted_areas
 from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmfile
 
 
@@ -98,6 +101,10 @@ class Department():
     @property
     def block_groups_path(self):
         return self.processed_dir / 'block_groups.geojson'
+
+    @property
+    def police_precincts_path(self):
+        return self.processed_dir / 'police_precincts.geojson'
 
     def __new__(cls, name):
         """
@@ -357,6 +364,23 @@ class Department():
     def remove_block_groups(self):
         maybe_rmfile(self.block_groups_path)
 
+    def process_police_precincts(self):
+        """
+        Generate police precincts file
+
+        This currently made as a join between the externally provided
+        shapefiles (proprocessed_shapefile) data and data that comes
+        from the Census interpolated into the relevant regions.
+        """
+        police = self.load_preprocessed_shapefile()
+        bgs = self.load_block_groups()
+        new_police = weighted_areas(bgs, police.geometry)
+        joined = police.join(new_police.drop('geometry', axis=1))
+        self.save_police_precincts(joined)
+
+    def remove_police_precincts(self):
+        maybe_rmfile(self.police_precincts_path)
+
     # input
 
     def load_external_shapefile(self):
@@ -390,6 +414,12 @@ class Department():
             driver='GeoJSON',
         )
 
+    def load_police_precincts(self):
+        return gpd.read_file(
+            str(self.police_precincts_path),
+            driver='GeoJSON',
+        )
+
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -412,6 +442,9 @@ class Department():
 
     def save_census_tracts(self, df):
         df.to_file(self.census_tracts_path, driver='GeoJSON')
+
+    def save_police_precincts(self, df):
+        df.to_file(self.police_precincts_path, driver='GeoJSON')
 
 
 class DepartmentCollection():

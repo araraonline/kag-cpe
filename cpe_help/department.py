@@ -357,7 +357,7 @@ class Department():
     def remove_block_groups(self):
         maybe_rmfile(self.block_groups_path)
 
-    # input/ouput
+    # input
 
     def load_external_shapefile(self):
         path = str(self.external_shapefile_path)
@@ -366,35 +366,17 @@ class Department():
     def load_preprocessed_shapefile(self):
         return load_zipshp(self.preprocessed_shapefile_path)
 
-    def save_preprocessed_shapefile(self, df):
-        save_zipshp(df, self.preprocessed_shapefile_path)
-
     def load_guessed_state(self):
         return load_json(self.guessed_state_path)
-
-    def save_guessed_state(self, geoid):
-        save_json(geoid, self.guessed_state_path)
 
     def load_guessed_counties(self):
         return load_json(self.guessed_counties_path)
 
-    def save_guessed_counties(self, lst):
-        save_json(lst, self.guessed_counties_path)
-
-    def save_tract_values(self, df):
-        df.to_pickle(self.tract_values_path)
-
     def load_tract_values(self):
         return pd.read_pickle(self.tract_values_path)
 
-    def save_bg_values(self, df):
-        df.to_pickle(self.bg_values_path)
-
     def load_bg_values(self):
         return pd.read_pickle(self.bg_values_path)
-
-    def save_block_groups(self, df):
-        df.to_file(self.block_groups_path, driver='GeoJSON')
 
     def load_block_groups(self):
         return gpd.read_file(
@@ -402,14 +384,34 @@ class Department():
             driver='GeoJSON',
         )
 
-    def save_census_tracts(self, df):
-        df.to_file(self.census_tracts_path, driver='GeoJSON')
-
     def load_census_tracts(self):
         return gpd.read_file(
             str(self.census_tracts_path),
             driver='GeoJSON',
         )
+
+    # output
+
+    def save_preprocessed_shapefile(self, df):
+        save_zipshp(df, self.preprocessed_shapefile_path)
+
+    def save_guessed_state(self, geoid):
+        save_json(geoid, self.guessed_state_path)
+
+    def save_guessed_counties(self, lst):
+        save_json(lst, self.guessed_counties_path)
+
+    def save_tract_values(self, df):
+        df.to_pickle(self.tract_values_path)
+
+    def save_bg_values(self, df):
+        df.to_pickle(self.bg_values_path)
+
+    def save_block_groups(self, df):
+        df.to_file(self.block_groups_path, driver='GeoJSON')
+
+    def save_census_tracts(self, df):
+        df.to_file(self.census_tracts_path, driver='GeoJSON')
 
 
 class DepartmentCollection():

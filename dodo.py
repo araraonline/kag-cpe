@@ -195,21 +195,6 @@ def task_guess_states():
         }
 
 
-def task_guess_cities():
-    """
-    Guess the city of ech department
-    """
-    for dept in list_departments():
-        yield {
-            'name': dept.name,
-            'file_dep': [dept.preprocessed_shapefile_path],
-            'task_dep': ['download_place_boundaries'],
-            'targets': [dept.guessed_city_path],
-            'actions': [dept.guess_city],
-            'clean': [dept.remove_guessed_city],
-        }
-
-
 def task_guess_counties():
     """
     Guess the counties that compose each police department
@@ -225,6 +210,24 @@ def task_guess_counties():
             'targets': [dept.guessed_counties_path],
             'actions': [dept.guess_counties],
             'clean': [dept.remove_guessed_counties],
+        }
+
+
+def task_guess_cities():
+    """
+    Guess the city of each department
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.preprocessed_shapefile_path,
+                dept.guessed_state_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.guessed_city_path],
+            'actions': [dept.guess_city],
+            'clean': [dept.remove_guessed_city],
         }
 
 

@@ -165,18 +165,65 @@ class Department():
 
     @property
     def city(self):
+        """
+        Return a string representing my city
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.city
+        'Boston'
+        """
         return self.load_guessed_city()
 
     @property
     def state(self):
+        """
+        Return a us.states.State object representing my state
+
+        Reference:
+
+        https://github.com/unitedstates/python-us
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.state
+        <State:Massachusetts>
+        """
         fips = self.load_guessed_state()
         return us.states.lookup(fips)
 
     @property
     def location(self):
-        return '{} - {}'.format(
+        """
+        Return a string representing my location
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.location
+        'Boston, MA'
+        """
+        return '{}, {}'.format(
             self.city,
-            self.state.abbr
+            self.state.abbr,
+        )
+
+    @property
+    def full_name(self):
+        """
+        Return a string representing my name and location
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.full_name
+        '11-00091 (Boston, MA)'
+        """
+        return '{} ({})'.format(
+            self.name,
+            self.location,
         )
 
     # doit actions

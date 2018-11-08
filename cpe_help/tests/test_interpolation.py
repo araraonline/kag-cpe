@@ -2,10 +2,14 @@
 Module for (mainly areal) interpolation tests
 """
 
+import functools
+
 import geopandas as gpd
 import numpy as np
 import pytest
 from pandas.util.testing import assert_frame_equal
+
+from cpe_help.util.testing import assert_geoframe_almost_equal
 
 
 class TestWeightedAreas():
@@ -33,7 +37,7 @@ class TestWeightedAreas():
         point1 = Point(1, 1)
         self.empty_target = gpd.GeoDataFrame(geometry=[point1])
 
-        self.interpolate = weighted_areas
+        self.interpolate = functools.partial(weighted_areas, ignore_crs=True)
 
     # cases where the interpolation should WORK
 
@@ -65,7 +69,7 @@ class TestWeightedAreas():
             index=target.index,
             columns=['values'],
             geometry=target,
-            crs=target.crs
+            crs=target.crs,
         )
         assert_frame_equal(result, expected)
 
@@ -101,7 +105,7 @@ class TestWeightedAreas():
             index=target.index,
             columns=['values'],
             geometry=target,
-            crs=target.crs
+            crs=target.crs,
         )
         assert_frame_equal(result, expected)
 
@@ -122,7 +126,7 @@ class TestWeightedAreas():
             index=[2, 1, 0],
             columns=['values'],
             geometry=target,
-            crs=target.crs
+            crs=target.crs,
         )
         assert_frame_equal(result, expected)
 
@@ -158,7 +162,7 @@ class TestWeightedAreas():
             index=target.index,
             columns=['values1', 'values2'],
             geometry=target,
-            crs=target.crs
+            crs=target.crs,
         )
         assert_frame_equal(result, expected)
 
@@ -195,7 +199,7 @@ class TestWeightedAreas():
             index=target.index,
             columns=['values1'],
             geometry=target,
-            crs=target.crs
+            crs=target.crs,
         )
         assert_frame_equal(result, expected)
 
@@ -231,33 +235,6 @@ class TestWeightedAreas():
         with pytest.raises(TypeError):
             fn(source, target)
 
-    def test_missing_crs(self):
-        # or both source and target have CRS's, or both don't
-
-        from cpe_help.util import crs
-
-        source = self.source
-        target = self.target.geometry
-        fn = self.interpolate
-
-        source.crs = crs.epsg4326
-        with pytest.raises(ValueError):
-            fn(source, target)
-
-    def test_different_crs(self):
-        # source and target CRS's must be the same
-
-        from cpe_help.util import crs
-
-        source = self.source
-        target = self.target.geometry
-        fn = self.interpolate
-
-        source.crs = crs.epsg4326
-        target.crs = crs.esri102739
-        with pytest.raises(ValueError):
-            fn(source, target)
-
     def test_null_in_source(self):
         # source cannot have null values
 
@@ -268,3 +245,246 @@ class TestWeightedAreas():
         source['values'] = [1, np.nan]
         with pytest.raises(ValueError):
             fn(source, target)
+
+
+class TestWeightedAreasNoIgnoreCRS():
+    """
+    Tests for weighted areal interpolation when ignore_crs=False
+    """
+
+    def setup_method(self):
+        # TODO: check fixtures
+        # https://docs.pytest.org/en/latest/fixture.html#fixture-finalization-executing-teardown-code
+        from shapely.geometry import Polygon
+        from cpe_help.util import crs
+        from cpe_help.util.interpolation import weighted_areas
+
+        self.crs1 = crs.epsg4326
+        self.crs2 = crs.esri102739  # equal area
+
+        sq1 = Polygon([(0, 0), (0, 2), (2, 2), (2, 0)])
+        sq2 = Polygon([(2, 0), (2, 2), (4, 2), (4, 0)])
+        self.source = gpd.GeoDataFrame(geometry=[sq1, sq2])
+
+        sq1 = Polygon([(0, 0), (0, 2), (1, 2), (1, 0)])
+        sq2 = Polygon([(1, 0), (1, 2), (3, 2), (3, 0)])
+        sq3 = Polygon([(3, 0), (3, 2), (4, 2), (4, 0)])
+        self.target = gpd.GeoDataFrame(geometry=[sq1, sq2, sq3])
+
+        self.interpolate = functools.partial(weighted_areas, ignore_crs=False)
+
+    # cases where interpolation should WORK
+
+    def test_same_crs(self):
+        # both source and target share the same CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs2
+        target.crs = self.crs2
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+            crs=target.crs,
+        )
+        assert_geoframe_almost_equal(result, expected)
+
+    def test_different_crs(self):
+        # source and target have different CRS's
+        # result should preserve target's CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs2
+        target.crs = self.crs2
+        target = target.to_crs(self.crs1)
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+            crs=target.crs,
+        )
+        assert_geoframe_almost_equal(result, expected)
+
+    # cases where interpolation should FAIL
+
+    def test_missing_source_crs(self):
+        # both source and target must have a CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        target.crs = self.crs1
+
+        with pytest.raises(ValueError):
+            fn(source, target)
+
+    def test_missing_target_crs(self):
+        # both source and target must have a CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs1
+
+        with pytest.raises(ValueError):
+            fn(source, target)
+
+    def test_missing_both_crs(self):
+        # both source and target must have a CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        with pytest.raises(ValueError):
+            fn(source, target)
+
+
+class TestWeightedAreasIgnoreCRS():
+    """
+    Tests for weighted areal interpolation when ignore_crs=True
+    """
+
+    def setup_method(self):
+        # TODO: check fixtures
+        # https://docs.pytest.org/en/latest/fixture.html#fixture-finalization-executing-teardown-code
+        from shapely.geometry import Polygon
+        from cpe_help.util import crs
+        from cpe_help.util.interpolation import weighted_areas
+
+        self.crs1 = crs.epsg4326
+        self.crs2 = crs.esri102739  # equal area
+
+        sq1 = Polygon([(0, 0), (0, 2), (2, 2), (2, 0)])
+        sq2 = Polygon([(2, 0), (2, 2), (4, 2), (4, 0)])
+        self.source = gpd.GeoDataFrame(geometry=[sq1, sq2])
+
+        sq1 = Polygon([(0, 0), (0, 2), (1, 2), (1, 0)])
+        sq2 = Polygon([(1, 0), (1, 2), (3, 2), (3, 0)])
+        sq3 = Polygon([(3, 0), (3, 2), (4, 2), (4, 0)])
+        self.target = gpd.GeoDataFrame(geometry=[sq1, sq2, sq3])
+
+        self.interpolate = functools.partial(weighted_areas, ignore_crs=True)
+
+    # cases where interpolation should WORK (all below)
+
+    def test_same_crs(self):
+        # both source and target share the same CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs1
+        target.crs = self.crs1
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+            crs=target.crs,
+        )
+        assert_frame_equal(result, expected)
+
+    def test_different_crs(self):
+        # source and target have different CRS's
+        # result should preserve target's CRS and ignore CRS's in the
+        # calculations
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs1
+        target.crs = self.crs2
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+            crs=target.crs,
+        )
+        assert_frame_equal(result, expected)
+
+    def test_missing_source_crs(self):
+        # source is missing the CRS
+        # should preseve target CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        target.crs = self.crs1
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+            crs=target.crs,
+        )
+        assert_frame_equal(result, expected)
+
+    def test_missing_target_crs(self):
+        # target is missing the CRS
+        # result should have no CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source.crs = self.crs1
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+        )
+        expected.crs = None
+        assert_frame_equal(result, expected)
+
+    def test_missing_both_crs(self):
+        # source and target are missing the CRS
+        # result should have no CRS
+
+        source = self.source
+        target = self.target.geometry
+        fn = self.interpolate
+
+        source['values'] = [1, 2]
+        result = fn(source, target)
+        expected = gpd.GeoDataFrame(
+            [[0.5], [1.5], [1]],
+            index=target.index,
+            columns=['values'],
+            geometry=target,
+        )
+        expected.crs = None
+        assert_frame_equal(result, expected)

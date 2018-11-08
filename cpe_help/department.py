@@ -161,7 +161,7 @@ class Department():
             name=self.name,
         )
 
-    # util
+    # utils
 
     @property
     def city(self):
@@ -225,6 +225,13 @@ class Department():
             self.name,
             self.location,
         )
+
+    @classmethod
+    def sample(cls):
+        """
+        Return one department from the list
+        """
+        return list_departments()[0]
 
     # doit actions
 

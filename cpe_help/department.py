@@ -84,6 +84,10 @@ class Department():
         return self.path / 'guessed_state.json'
 
     @property
+    def guessed_city_path(self):
+        return self.path / 'guessed_city.json'
+
+    @property
     def guessed_counties_path(self):
         return self.path / 'guessed_counties.json'
 
@@ -161,7 +165,7 @@ class Department():
 
     @property
     def city(self):
-        raise NotImplementedError
+        return self.load_guessed_city()
 
     @property
     def state(self):
@@ -228,6 +232,35 @@ class Department():
 
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)
+
+    def guess_city(self):
+        """
+        Guess the city this department is in
+        """
+        tiger = get_tiger()
+
+        places = tiger.load_place_boundaries(self.state.fips)
+        police = self.load_preprocessed_shapefile()
+        police = police.to_crs(places.crs)
+
+        # we want to avoid statistical entities
+        # ref: https://www.census.gov/geo/reference/funcstat.html
+        places = places[places['FUNCSTAT'] == 'A']
+
+        # speeding things up
+        places = places[places.intersects(police.unary_union)]
+
+        proj = crs.equal_area_from_geodf(places)
+        places = places.to_crs(proj)
+        police = police.to_crs(proj)
+
+        idx = places.intersection(police.unary_union).area.idxmax()
+        city_name = places.loc[idx, 'NAME']
+
+        self.save_guessed_city(city_name)
+
+    def remove_guessed_city(self):
+        maybe_rmfile(self.guessed_city_path)
 
     def guess_counties(self):
         """
@@ -412,6 +445,9 @@ class Department():
     def load_guessed_state(self):
         return load_json(self.guessed_state_path)
 
+    def load_guessed_city(self):
+        return load_json(self.guessed_city_path)
+
     def load_guessed_counties(self):
         return load_json(self.guessed_counties_path)
 
@@ -446,6 +482,9 @@ class Department():
 
     def save_guessed_state(self, geoid):
         save_json(geoid, self.guessed_state_path)
+
+    def save_guessed_city(self, city_name):
+        save_json(city_name, self.guessed_city_path)
 
     def save_guessed_counties(self, lst):
         save_json(lst, self.guessed_counties_path)

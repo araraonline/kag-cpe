@@ -299,6 +299,21 @@ def task_download_bg_boundaries():
         }
 
 
+@doit.create_after('create_list_of_states')
+def task_download_place_boundaries():
+    """
+    Download place boundaries for each relevant state
+    """
+    tiger = get_tiger()
+    for state in list_states():
+        yield {
+            'name': state,
+            'actions': [(tiger.download_place_boundaries, (state,))],
+            'targets': [tiger.place_boundaries_path(state)],
+            'uptodate': [doit.tools.run_once],
+        }
+
+
 def task_process_census_tracts():
     """
     Merge census tract values with census tract boundaries

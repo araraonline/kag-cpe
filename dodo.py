@@ -213,6 +213,24 @@ def task_guess_counties():
         }
 
 
+def task_guess_cities():
+    """
+    Guess the city of each department
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.preprocessed_shapefile_path,
+                dept.guessed_state_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.guessed_city_path],
+            'actions': [dept.guess_city],
+            'clean': [dept.remove_guessed_city],
+        }
+
+
 def task_create_list_of_states():
     """
     Unite the guessed states for each department
@@ -295,6 +313,21 @@ def task_download_bg_boundaries():
             'name': state,
             'actions': [(tiger.download_bg_boundaries, (state,))],
             'targets': [tiger.bg_boundaries_path(state)],
+            'uptodate': [doit.tools.run_once],
+        }
+
+
+@doit.create_after('create_list_of_states')
+def task_download_place_boundaries():
+    """
+    Download place boundaries for each relevant state
+    """
+    tiger = get_tiger()
+    for state in list_states():
+        yield {
+            'name': state,
+            'actions': [(tiger.download_place_boundaries, (state,))],
+            'targets': [tiger.place_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
         }
 

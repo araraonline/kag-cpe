@@ -23,4 +23,5 @@ dependencies:
     - pytest==3.9.*
     - kaggle==1.4.*
     - flake8==3.6.*
+    - us==1.0.*
 

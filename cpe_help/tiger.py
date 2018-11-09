@@ -32,6 +32,7 @@ class TIGER():
             self.path / 'COUNTY',
             self.path / 'TRACT',
             self.path / 'BG',
+            self.path / 'PLACE',
         ]
 
     @property
@@ -47,6 +48,9 @@ class TIGER():
 
     def bg_boundaries_path(self, state):
         return self.path / 'BG' / f'{state}.zip'
+
+    def place_boundaries_path(self, state):
+        return self.path / 'PLACE' / f'{state}.zip'
 
     def __init__(self, year):
         """
@@ -116,6 +120,14 @@ class TIGER():
                f'BG/tl_{self.year}_{state}_bg.zip')
         download(url, self.bg_boundaries_path(state))
 
+    def download_place_boundaries(self, state):
+        """
+        Download place boundaries for the US
+        """
+        url = (f'https://www2.census.gov/geo/tiger/TIGER{self.year}'
+               f'/PLACE/tl_{self.year}_{state}_place.zip')
+        download(url, self.place_boundaries_path(state))
+
     # input/output
 
     def load_state_boundaries(self):
@@ -167,6 +179,23 @@ class TIGER():
         geopandas.GeoDataFrame
         """
         return load_zipshp(self.bg_boundaries_path(state))
+
+    def load_place_boundaries(self, state):
+        """
+        Load place boundaries for a given state
+
+        Cities are in here.
+
+        Parameters
+        ----------
+        state : str
+            GEOID representing the state.
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+        """
+        return load_zipshp(self.place_boundaries_path(state))
 
 
 def get_tiger():

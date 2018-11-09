@@ -8,6 +8,7 @@ from importlib import import_module
 
 import geopandas as gpd
 import pandas as pd
+import us
 
 # TODO clean imports
 
@@ -87,6 +88,10 @@ class Department():
         return self.path / 'guessed_counties.json'
 
     @property
+    def guessed_city_path(self):
+        return self.path / 'guessed_city.json'
+
+    @property
     def tract_values_path(self):
         return self.raw_dir / 'tract_values.pkl'
 
@@ -155,6 +160,78 @@ class Department():
             klass=type(self).__name__,
             name=self.name,
         )
+
+    # utils
+
+    @property
+    def city(self):
+        """
+        Return a string representing my city's name
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.city
+        'Boston'
+        """
+        return self.load_guessed_city()
+
+    @property
+    def state(self):
+        """
+        Return a us.states.State object representing my state
+
+        Reference:
+
+        https://github.com/unitedstates/python-us
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.state
+        <State:Massachusetts>
+        """
+        fips = self.load_guessed_state()
+        return us.states.lookup(fips)
+
+    @property
+    def location(self):
+        """
+        Return a string representing my location
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.location
+        'Boston, MA'
+        """
+        return '{}, {}'.format(
+            self.city,
+            self.state.abbr,
+        )
+
+    @property
+    def full_name(self):
+        """
+        Return a string representing my name and location
+
+        Examples
+        --------
+        >>> dept = Department('11-00091')
+        >>> dept.full_name
+        '11-00091 (Boston, MA)'
+        """
+        return '{} ({})'.format(
+            self.name,
+            self.location,
+        )
+
+    @classmethod
+    def sample(cls):
+        """
+        Return one sample department from the list
+        """
+        return list_departments()[0]
 
     # doit actions
 
@@ -228,6 +305,35 @@ class Department():
 
     def remove_guessed_counties(self):
         maybe_rmfile(self.guessed_counties_path)
+
+    def guess_city(self):
+        """
+        Guess the city this department is in
+        """
+        tiger = get_tiger()
+
+        places = tiger.load_place_boundaries(self.state.fips)
+        police = self.load_preprocessed_shapefile()
+        police = police.to_crs(places.crs)
+
+        # we want to avoid statistical entities
+        # ref: https://www.census.gov/geo/reference/funcstat.html
+        places = places[places['FUNCSTAT'] == 'A']
+
+        # speeding things up
+        places = places[places.intersects(police.unary_union)]
+
+        proj = crs.equal_area_from_geodf(places)
+        places = places.to_crs(proj)
+        police = police.to_crs(proj)
+
+        idx = places.intersection(police.unary_union).area.idxmax()
+        city_name = places.loc[idx, 'NAME']
+
+        self.save_guessed_city(city_name)
+
+    def remove_guessed_city(self):
+        maybe_rmfile(self.guessed_city_path)
 
     def download_tract_values(self):
         """
@@ -396,6 +502,9 @@ class Department():
     def load_guessed_counties(self):
         return load_json(self.guessed_counties_path)
 
+    def load_guessed_city(self):
+        return load_json(self.guessed_city_path)
+
     def load_tract_values(self):
         return pd.read_pickle(self.tract_values_path)
 
@@ -430,6 +539,9 @@ class Department():
 
     def save_guessed_counties(self, lst):
         save_json(lst, self.guessed_counties_path)
+
+    def save_guessed_city(self, city_name):
+        save_json(city_name, self.guessed_city_path)
 
     def save_tract_values(self, df):
         df.to_pickle(self.tract_values_path)

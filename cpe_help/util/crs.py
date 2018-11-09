@@ -62,3 +62,13 @@ def equal_area_from_geodf(df):
         'units': 'm',
         'no_defs': True,
     }
+
+
+DEFAULT = epsg4269
+"""
+Default projection for storing files
+
+EPSG:4269 (NAD83) is a good choice because it is the one used by the
+Census. By storing our files in the same projection as the Census, we
+can skip some reprojections.
+"""

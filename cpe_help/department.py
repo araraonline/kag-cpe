@@ -249,7 +249,7 @@ class Department():
 
         The default implementation (Department) copies from source to
         destination, while setting the Coordinate Reference System to
-        EPSG:4326.
+        the default (defined at util.crs.DEFAULT).
 
         Note that the source is a usual shapefile, while the destination
         is a shapefile in a zip archive (a single file facilitates
@@ -260,7 +260,7 @@ class Department():
         if not raw.crs:
             msg = f"Department {self.name} has no projection defined"
             raise InputError(msg)
-        pre = raw.to_crs(crs.epsg4326)
+        pre = raw.to_crs(crs.DEFAULT)
 
         self.save_preprocessed_shapefile(pre)
 

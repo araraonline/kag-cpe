@@ -12,6 +12,7 @@ import us
 
 # TODO clean imports
 
+from cpe_help import util
 from cpe_help.acs import get_acs
 from cpe_help.tiger import get_tiger
 from cpe_help.util import crs
@@ -491,7 +492,7 @@ class Department():
 
     def load_external_shapefile(self):
         path = str(self.external_shapefile_path)
-        return gpd.read_file(path)
+        return util.io.load_shp(path)
 
     def load_preprocessed_shapefile(self):
         return load_zipshp(self.preprocessed_shapefile_path)
@@ -512,22 +513,13 @@ class Department():
         return pd.read_pickle(self.bg_values_path)
 
     def load_block_groups(self):
-        return gpd.read_file(
-            str(self.block_groups_path),
-            driver='GeoJSON',
-        )
+        return util.io.load_geojson(self.block_groups_path)
 
     def load_census_tracts(self):
-        return gpd.read_file(
-            str(self.census_tracts_path),
-            driver='GeoJSON',
-        )
+        return util.io.load_geojson(self.census_tracts_path)
 
     def load_police_precincts(self):
-        return gpd.read_file(
-            str(self.police_precincts_path),
-            driver='GeoJSON',
-        )
+        return util.io.load_geojson(self.police_precincts_path)
 
     # output
 
@@ -550,13 +542,13 @@ class Department():
         df.to_pickle(self.bg_values_path)
 
     def save_block_groups(self, df):
-        df.to_file(self.block_groups_path, driver='GeoJSON')
+        util.io.save_geojson(df, self.block_groups_path)
 
     def save_census_tracts(self, df):
-        df.to_file(self.census_tracts_path, driver='GeoJSON')
+        util.io.save_geojson(df, self.census_tracts_path)
 
     def save_police_precincts(self, df):
-        df.to_file(self.police_precincts_path, driver='GeoJSON')
+        util.io.save_geojson(df, self.police_precincts_path)
 
 
 class DepartmentCollection():

@@ -11,7 +11,12 @@ import doit.tools
 from cpe_help import Department
 from cpe_help.tiger import get_tiger
 from cpe_help.util.doit_tasks import TaskHelper
-from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmtree
+from cpe_help.util.path import (
+    DATA_DIR,
+    maybe_mkdir,
+    maybe_rmfile,
+    maybe_rmtree,
+)
 
 
 BASE_DIRECTORIES = [
@@ -89,6 +94,9 @@ def preprocess_inputs():
 
     dept2 = InputDepartment('11-00091')
     maybe_rmtree(dept2.acs_path / '11-00091_ACS_race-age-sex')
+
+    dept3 = InputDepartment('49-00009')
+    maybe_rmfile(dept3.path / '49-0009_UOF.csv')
 
 
 # basic tasks

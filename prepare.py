@@ -5,10 +5,12 @@ The tasks present here are required for the creation of tasks in the
 main dodo.py file.
 """
 
+import shutil
+
 import doit
 import doit.tools
 
-from cpe_help import Department
+from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
 from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
@@ -65,6 +67,29 @@ class InputDepartment():
 
     def to_department(self):
         return Department(self.name)
+
+    def spread_files(self):
+        """
+        Spread my files to the (department) working directory
+
+        ACS data is being retrieved programatically, so, I will ignore
+        ACS files.
+
+        Parameters
+        ---------
+        path : str or pathlib.Path
+        """
+        dst = self.to_department()
+
+        # copy shapefiles
+        src_shapefile = self.shp_path
+        dst_shapefile = dst.external_shapefile_path
+        util.path.maybe_rmtree(dst_shapefile)
+        shutil.copytree(src_shapefile, dst_shapefile)
+
+        # copy other files
+        for file in self.other_files:
+            shutil.copy(file, dst.external_dir)
 
     @classmethod
     def from_path(cls, path):
@@ -180,4 +205,19 @@ def task_create_department_directories():
             'targets': dept.directories,
             'actions': [dept.create_directories],
             'uptodate': [True],
+        }
+
+
+@doit.create_after('create_department_directories')
+def task_spread_department_data():
+    """
+    Spread department data from inputs to working directory
+    """
+    for dept in InputDepartment.list():
+        # task will always run
+        # I don't want to set up complex file handling now
+        # may change when dealing with 'clean'
+        yield {
+            'name': dept.name,
+            'actions': [dept.spread_files],
         }

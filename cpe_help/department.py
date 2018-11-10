@@ -74,11 +74,11 @@ class Department():
 
     @property
     def external_shapefile_path(self):
-        return self.external_dir / 'police_districts'
+        return self.external_dir / 'shapefiles'
 
     @property
     def preprocessed_shapefile_path(self):
-        return self.preprocessed_dir / 'police_districts.zip'
+        return self.preprocessed_dir / 'shapefile.zip'
 
     @property
     def guessed_state_path(self):

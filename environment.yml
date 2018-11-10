@@ -24,4 +24,5 @@ dependencies:
     - kaggle==1.4.*
     - flake8==3.6.*
     - us==1.0.*
+    - pytess=1.0.0
 

@@ -279,9 +279,9 @@ def task_process_police_precincts():
         }
 
 
-def task_preprocess_4900033():
+def task_preprocess_4900033_arrests():
     """
-    Preprocess external data for Department 49-00033
+    Preprocess arrests data for Department 49-00033
     """
     dept = Department('49-00033')
     return {

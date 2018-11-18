@@ -1,5 +1,5 @@
 """
-Module for department 49-00033
+Department file for Department 49-00033 (Los Angeles, CA)
 """
 
 import geopandas

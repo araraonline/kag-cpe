@@ -76,3 +76,6 @@ class Department4900033(Department):
         df = df.to_crs(util.crs.DEFAULT)
 
         self.save_preprocessed_arrests(df)
+
+    def remove_preprocessed_arrests(self):
+        util.path.maybe_rmfile(self.preprocessed_arrests_path)

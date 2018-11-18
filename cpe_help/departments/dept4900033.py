@@ -25,18 +25,7 @@ class Department4900033(Department):
     def preprocessed_arrests_path(self):
         return self.preprocessed_dir / 'arrests_2015.pkl'
 
-    def load_external_arrests(self):
-        return pandas.read_csv(
-            self.external_arrests_path,
-            low_memory=False,
-            skiprows=[1],
-        )
-
-    def load_preprocessed_arrests(self):
-        return pandas.read_pickle(self.preprocessed_arrests_path)
-
-    def save_preprocessed_arrests(self, df):
-        df.to_pickle(self.preprocessed_arrests_path)
+    # doit actions
 
     def preprocess_arrests(self):
         df = self.load_external_arrests()
@@ -77,3 +66,20 @@ class Department4900033(Department):
 
     def remove_preprocessed_arrests(self):
         util.path.maybe_rmfile(self.preprocessed_arrests_path)
+
+    # input
+
+    def load_external_arrests(self):
+        return pandas.read_csv(
+            self.external_arrests_path,
+            low_memory=False,
+            skiprows=[1],
+        )
+
+    def load_preprocessed_arrests(self):
+        return pandas.read_pickle(self.preprocessed_arrests_path)
+
+    # output
+
+    def save_preprocessed_arrests(self, df):
+        df.to_pickle(self.preprocessed_arrests_path)

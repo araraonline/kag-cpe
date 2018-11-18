@@ -39,9 +39,6 @@ class Department4900033(Department):
         df.to_pickle(self.preprocessed_arrests_path)
 
     def preprocess_arrests(self):
-        """
-        Preprocess arrests table
-        """
         df = self.load_external_arrests()
 
         # drop time

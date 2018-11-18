@@ -132,7 +132,7 @@ class Department():
         assert cls == Department
 
         name = name.replace('-', '')
-        module_name = f"cpe_help.departments.dept{name}"
+        module_name = f"cpe_help.departments.department{name}"
         class_name = f"Department{name}"
 
         try:

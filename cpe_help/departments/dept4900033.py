@@ -16,6 +16,7 @@ class Department4900033(Department):
     Specified here is an example of how the preprocessing of specific
     department files will proceed.
     """
+
     @property
     def external_arrests_path(self):
         return self.external_dir / '49-00033_Arrests_2015.csv'

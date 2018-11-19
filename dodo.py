@@ -297,7 +297,6 @@ def task_extract_city_boundaries():
     """
     Extract city boundaries for each department
     """
-    tiger = get_tiger()
     for dept in list_departments():
         yield {
             'name': dept.name,

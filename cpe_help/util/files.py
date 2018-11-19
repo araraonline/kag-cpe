@@ -1,8 +1,10 @@
+"""
+Utilities for creating/removing files and directories
+"""
+
 import os
 import shutil
 
-
-# Utils
 
 def maybe_mkdir(path):
     """
@@ -10,7 +12,7 @@ def maybe_mkdir(path):
 
     Parameters
     ----------
-    path : str or Path
+    path : str or pathlib.Path
     """
     try:
         os.mkdir(path)
@@ -24,7 +26,7 @@ def maybe_rmfile(path):
 
     Parameters
     ----------
-    path : str or Path
+    path : str or pathlib.Path
     """
     try:
         os.remove(path)
@@ -38,7 +40,7 @@ def maybe_rmtree(path):
 
     Parameters
     ----------
-    path : str or Path
+    path : str or pathlib.Path
     """
     try:
         shutil.rmtree(path)

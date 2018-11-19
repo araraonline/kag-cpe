@@ -1,5 +1,5 @@
 """
-Shortcut for the main directories in this package
+Shortcut for the main directories in the project
 """
 
 import pathlib

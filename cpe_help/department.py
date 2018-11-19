@@ -63,10 +63,13 @@ class Department():
     def directories(self):
         return [
             self.path,
-            self.external_dir,
             self.raw_dir,
             self.preprocessed_dir,
             self.processed_dir,
+            self.input_dir,
+            self.output_dir,
+            self.tabular_input_dir,
+            self.shapefile_input_dir,
         ]
 
     @property

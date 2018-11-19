@@ -113,10 +113,6 @@ class Department():
         return self.processed_dir / 'police_precincts.geojson'
 
     @property
-    def city_boundaries_path(self):
-        return self.preprocessed_dir / 'city_boundaries.geojson'
-
-    @property
     def city_path(self):
         return self.processed_dir / 'city.geojson'
 
@@ -502,23 +498,6 @@ class Department():
     def remove_police_precincts(self):
         maybe_rmfile(self.police_precincts_path)
 
-    def extract_city_boundaries(self):
-        """
-        Extract city boundaries for this department
-        """
-        tiger = get_tiger()
-        state = self.state
-        city = self.city
-
-        places = tiger.load_place_boundaries(state.fips)
-        places = places[places['NAME'] == city]
-        assert places.shape[0] == 1
-
-        self.save_city_boundaries(places)
-
-    def remove_city_boundaries(self):
-        maybe_rmfile(self.city_boundaries_path)
-
     def process_city(self):
         """
         Generate city file
@@ -569,9 +548,6 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
-    def load_city_boundaries(self):
-        return util.io.load_geojson(self.city_boundaries_path)
-
     def load_city(self):
         return util.io.load_geojson(self.city_path)
 
@@ -603,9 +579,6 @@ class Department():
 
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
-
-    def save_city_boundaries(self, df):
-        util.io.save_geojson(df, self.city_boundaries_path)
 
     def save_city(self, df):
         util.io.save_geojson(df, self.city_path)

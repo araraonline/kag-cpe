@@ -181,6 +181,22 @@ class Department():
         """
         return self.load_guessed_city()
 
+    def load_city_metadata(self):
+        """
+        Load data associated with my city from TIGER
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            A 1-lined GeoDataFrame whose only entry corresponds to the
+            requested metadata.
+        """
+        tiger = get_tiger()
+        places = tiger.load_place_boundaries(self.state.fips)
+        places = places[places['NAME'] == self.city]
+        assert places.shape[0] == 1
+        return places
+
     @property
     def state(self):
         """

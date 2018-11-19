@@ -31,8 +31,8 @@ BASE_DIRECTORIES = [
 ]
 
 KAGGLE_DIR = DATA_DIR / 'kaggle'
+CPE_DATA_DIR = KAGGLE_DIR / 'cpe-data'
 KAGGLE_ZIPFILE = KAGGLE_DIR / 'cpe-data.zip'
-CPEDATA_DIR = KAGGLE_DIR / 'cpe-data'
 
 
 # helper/actions
@@ -44,7 +44,7 @@ class InputDepartment():
 
     @property
     def path(self):
-        return CPEDATA_DIR / f'Dept_{self.name}'
+        return CPE_DATA_DIR / f'Dept_{self.name}'
 
     @property
     def acs_path(self):
@@ -97,7 +97,7 @@ class InputDepartment():
     @classmethod
     def list(cls):
         return [cls.from_path(x)
-                for x in CPEDATA_DIR.iterdir()
+                for x in CPE_DATA_DIR.iterdir()
                 if x.is_dir()]
 
 

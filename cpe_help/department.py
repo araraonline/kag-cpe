@@ -116,6 +116,10 @@ class Department():
     def city_boundaries_path(self):
         return self.preprocessed_dir / 'city_boundaries.geojson'
 
+    @property
+    def city_path(self):
+        return self.processed_dir / 'city.geojson'
+
     def __new__(cls, name):
         """
         Create a new department object
@@ -509,6 +513,23 @@ class Department():
     def remove_city_boundaries(self):
         maybe_rmfile(self.city_boundaries_path)
 
+    def process_city(self):
+        """
+        Generate city file
+
+        The city file is a one-entry geojson file that, alongside
+        geography information, has general statistics from the city that
+        were retrieved from the U.S. Census.
+        """
+        city = self.load_city_boundaries()
+        bgs = self.load_block_groups()
+        new_city = util.interpolation.weighted_areas(bgs, city.geometry)
+        joined = city.join(new_city.drop('geometry', axis=1))
+        self.save_city(joined)
+
+    def remove_city(self):
+        maybe_rmfile(self.city_path)
+
     # input
 
     def load_external_shapefile(self):
@@ -545,6 +566,9 @@ class Department():
     def load_city_boundaries(self):
         return util.io.load_geojson(self.city_boundaries_path)
 
+    def load_city(self):
+        return util.io.load_geojson(self.city_path)
+
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -576,6 +600,9 @@ class Department():
 
     def save_city_boundaries(self, df):
         util.io.save_geojson(df, self.city_boundaries_path)
+
+    def save_city(self, df):
+        util.io.save_geojson(df, self.city_path)
 
 
 class DepartmentCollection():

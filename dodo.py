@@ -309,3 +309,20 @@ def task_extract_city_boundaries():
             'actions': [dept.extract_city_boundaries],
             'clean': [dept.remove_city_boundaries],
         }
+
+
+def task_process_city():
+    """
+    Process city data
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.city_boundaries_path,
+                dept.block_groups_path,
+            ],
+            'targets': [dept.city_path],
+            'actions': [dept.process_city],
+            'clean': [dept.remove_city],
+        }

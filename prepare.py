@@ -31,7 +31,7 @@ BASE_DIRECTORIES = [
 ]
 
 KAGGLE_DIR = DATA_DIR / 'kaggle'
-KAGGLE_ZIPFILE = KAGGLE_DIR / 'data-science-for-good.zip'
+KAGGLE_ZIPFILE = KAGGLE_DIR / 'cpe-data.zip'
 CPEDATA_DIR = KAGGLE_DIR / 'cpe-data'
 
 
@@ -141,26 +141,6 @@ def task_create_base_directories():
 
 
 @doit.create_after('create_base_directories')
-def task_download_inputs():
-    """
-    Retrieve raw departments data from Kaggle
-    """
-    return {
-        'actions': [[
-            'kaggle',
-            'datasets',
-            'download',
-            '-d',
-            'center-for-policing-equity/data-science-for-good',
-            '-p',
-            'data/kaggle',
-        ]],
-        'targets': [KAGGLE_ZIPFILE],
-        'uptodate': [True],
-    }
-
-
-@doit.create_after('download_inputs')
 def task_unzip_inputs():
     """
     Unzip raw departments data from Kaggle

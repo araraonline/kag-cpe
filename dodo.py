@@ -20,7 +20,7 @@ from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import DATA_DIR
 
 
-KAGGLE_ZIPFILE = DATA_DIR / 'kaggle' / 'data-science-for-good.zip'
+KAGGLE_ZIPFILE = DATA_DIR / 'kaggle' / 'cpe-help.zip'
 
 
 def task_download_state_boundaries():

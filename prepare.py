@@ -77,22 +77,18 @@ class InputDepartment():
 
         ACS data is being retrieved programatically, so, I will ignore
         ACS files.
-
-        Parameters
-        ---------
-        path : str or pathlib.Path
         """
         dst = self.to_department()
 
         # copy shapefiles
         src_shapefile = self.shp_path
-        dst_shapefile = dst.external_shapefile_path
+        dst_shapefile = dst.shapefile_input_dir
         util.path.maybe_rmtree(dst_shapefile)
         shutil.copytree(src_shapefile, dst_shapefile)
 
         # copy other files
         for file in self.other_files:
-            shutil.copy(file, dst.external_dir)
+            shutil.copy(file, dst.tabular_input_dir)
 
     @classmethod
     def from_path(cls, path):

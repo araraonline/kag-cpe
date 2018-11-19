@@ -52,6 +52,14 @@ class Department():
         return util.path.OUTPUT_DIR / 'department' / self.name
 
     @property
+    def tabular_input_dir(self):
+        return self.input_dir / 'tabular'
+
+    @property
+    def shapefile_input_dir(self):
+        return self.input_dir / 'shapefile'
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -83,7 +91,7 @@ class Department():
 
     @property
     def external_shapefile_path(self):
-        return self.external_dir / 'shapefiles'
+        return self.shapefile_input_dir
 
     @property
     def preprocessed_shapefile_path(self):

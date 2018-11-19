@@ -20,8 +20,8 @@ class Department3500103(Department):
         proj = util.crs.equal_area_from_geodf(df)
         df = df.to_crs(proj)
 
-        # calculate buffer (1.5km around each point)
-        df.geometry = df.geometry.buffer(1500)
+        # calculate buffer (0.9mi around each point)
+        df.geometry = df.geometry.buffer(0.9)
 
         # project into default
         df = df.to_crs(util.crs.DEFAULT)

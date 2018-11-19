@@ -59,7 +59,7 @@ def equal_area_from_geodf(df):
         'y_0': 0,
         'ellps': 'GRS80',
         'datum': 'NAD83',
-        'units': 'm',
+        'units': 'mi',
         'no_defs': True,
     }
 

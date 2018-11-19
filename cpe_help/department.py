@@ -317,14 +317,17 @@ class Department():
         counties = tiger.load_county_boundaries()
         counties = counties.set_index('COUNTYFP')
 
-        shape1 = self.load_preprocessed_shapefile()
+        # load city boundaries
+        shape1 = self.load_city_metadata()
         shape1 = shape1.to_crs(counties.crs)
         shape1 = shape1.unary_union
 
-        shape2 = self.load_city_metadata()
+        # load department boundaries
+        shape2 = self.load_preprocessed_shapefile()
         shape2 = shape2.to_crs(counties.crs)
         shape2 = shape2.unary_union
 
+        # unite city and department
         union = shape1.union(shape2)
 
         intersecting = [ix for ix, geom in counties.geometry.iteritems()

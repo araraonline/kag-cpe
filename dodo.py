@@ -293,24 +293,6 @@ def task_preprocess_4900033_arrests():
     }
 
 
-def task_extract_city_boundaries():
-    """
-    Extract city boundaries for each department
-    """
-    for dept in list_departments():
-        yield {
-            'name': dept.name,
-            'file_dep': [
-                dept.guessed_city_path,
-                dept.guessed_state_path,
-            ],
-            'task_dep': ['download_place_boundaries'],
-            'targets': [dept.city_boundaries_path],
-            'actions': [dept.extract_city_boundaries],
-            'clean': [dept.remove_city_boundaries],
-        }
-
-
 def task_process_city():
     """
     Process city data

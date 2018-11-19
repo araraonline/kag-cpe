@@ -115,7 +115,7 @@ class Department():
 
     @property
     def city_stats_path(self):
-        return self.processed_dir / 'city_stats.csv'
+        return self.processed_dir / 'city_stats.json'
 
     def __new__(cls, name):
         """
@@ -525,8 +525,8 @@ class Department():
         city = self.load_city_metadata()
         bgs = self.load_block_groups()
         stats = util.interpolation.weighted_areas(bgs, city.geometry)
-        # remove spatial information
-        stats = pandas.DataFrame(stats.drop('geometry', axis=1))
+        # use stats as a Series without geometry
+        stats = stats.iloc[0].drop('geometry')
         self.save_city_stats(stats)
 
     def remove_city_stats(self):
@@ -566,7 +566,9 @@ class Department():
         return util.io.load_geojson(self.police_precincts_path)
 
     def load_city_stats(self):
-        return pandas.read_csv(self.city_stats_path)
+        obj = util.io.load_json(self.city_stats_path)
+        ser = pandas.Series(obj)
+        return ser
 
     # output
 
@@ -597,8 +599,9 @@ class Department():
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
 
-    def save_city_stats(self, df):
-        df.to_csv(self.city_stats_path, index=False)
+    def save_city_stats(self, ser):
+        obj = ser.to_dict()
+        util.io.save_json(obj, self.city_stats_path)
 
 
 class DepartmentCollection():

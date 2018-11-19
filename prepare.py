@@ -143,7 +143,7 @@ def task_create_tiger_directories():
 
 # department tasks
 
-@doit.create_after('preprocess_inputs')
+@doit.create_after('create_base_directories')
 def task_create_department_directories():
     """
     Create departments' directories

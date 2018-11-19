@@ -190,7 +190,7 @@ class Department():
         -------
         geopandas.GeoDataFrame
             A 1-lined GeoDataFrame whose only entry corresponds to the
-            requested metadata.
+            requested data.
         """
         tiger = get_tiger()
         places = tiger.load_place_boundaries(self.state.fips)

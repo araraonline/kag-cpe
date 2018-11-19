@@ -293,18 +293,19 @@ def task_preprocess_4900033_arrests():
     }
 
 
-def task_process_city():
+def task_city_stats():
     """
-    Process city data
+    Generate stats for each relevant city
     """
     for dept in list_departments():
         yield {
             'name': dept.name,
             'file_dep': [
-                dept.city_boundaries_path,
+                dept.guessed_city_path,
                 dept.block_groups_path,
             ],
-            'targets': [dept.city_path],
-            'actions': [dept.process_city],
-            'clean': [dept.remove_city],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.city_stats_path],
+            'actions': [dept.generate_city_stats],
+            'clean': [dept.remove_city_stats],
         }

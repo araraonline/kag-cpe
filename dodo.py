@@ -102,7 +102,10 @@ def task_guess_counties():
                 dept.guessed_city_path,
                 dept.preprocessed_shapefile_path,
             ],
-            'task_dep': ['download_county_boundaries'],
+            'task_dep': [
+                'download_place_boundaries',
+                'download_county_boundaries',
+            ],
             'targets': [dept.guessed_counties_path],
             'actions': [dept.guess_counties],
             'clean': [dept.remove_guessed_counties],

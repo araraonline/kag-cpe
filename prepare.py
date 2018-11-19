@@ -12,12 +12,9 @@ import doit.tools
 
 from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
-from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
     maybe_mkdir,
-    maybe_rmfile,
-    maybe_rmtree,
 )
 
 

@@ -113,20 +113,6 @@ def create_base_directories():
         maybe_mkdir(dir)
 
 
-def preprocess_inputs():
-    """
-    Fix errors in the raw department data
-    """
-    dept1 = InputDepartment('35-00016')
-    maybe_rmtree(dept1.acs_path / '35-00016_employment')
-
-    dept2 = InputDepartment('11-00091')
-    maybe_rmtree(dept2.acs_path / '11-00091_ACS_race-age-sex')
-
-    dept3 = InputDepartment('49-00009')
-    maybe_rmfile(dept3.path / '49-0009_UOF.csv')
-
-
 # basic tasks
 
 def task_create_base_directories():
@@ -137,24 +123,6 @@ def task_create_base_directories():
         'targets': BASE_DIRECTORIES,
         'actions': [create_base_directories],
         'uptodate': [True],
-    }
-
-
-@doit.create_after('create_base_directories')
-def task_unzip_inputs():
-    """
-    Unzip raw departments data from Kaggle
-    """
-    return TaskHelper.unzip(KAGGLE_ZIPFILE, CPEDATA_DIR)
-
-
-@doit.create_after('unzip_inputs')
-def task_preprocess_inputs():
-    """
-    Fix errors in the raw department data
-    """
-    return {
-        'actions': [preprocess_inputs],
     }
 
 

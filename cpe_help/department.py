@@ -7,6 +7,7 @@ Probably will become the main file of the project.
 from importlib import import_module
 
 import geopandas as gpd
+import pandas
 import pandas as pd
 import us
 
@@ -113,8 +114,8 @@ class Department():
         return self.processed_dir / 'police_precincts.geojson'
 
     @property
-    def city_path(self):
-        return self.processed_dir / 'city.geojson'
+    def city_stats_path(self):
+        return self.processed_dir / 'city_stats.csv'
 
     def __new__(cls, name):
         """
@@ -320,7 +321,7 @@ class Department():
         shape1 = shape1.to_crs(counties.crs)
         shape1 = shape1.unary_union
 
-        shape2 = self.load_city_boundaries()
+        shape2 = self.load_city_metadata()
         shape2 = shape2.to_crs(counties.crs)
         shape2 = shape2.unary_union
 
@@ -514,22 +515,22 @@ class Department():
     def remove_police_precincts(self):
         maybe_rmfile(self.police_precincts_path)
 
-    def process_city(self):
+    def generate_city_stats(self):
         """
-        Generate city file
+        Generate statistics for my city
 
-        The city file is a one-entry geojson file that, alongside
-        geography information, has general statistics from the city that
-        were retrieved from the U.S. Census.
+        The statistics are extracted from the BGs that intersect with
+        the city, in a method called areal interpolation.
         """
-        city = self.load_city_boundaries()
+        city = self.load_city_metadata()
         bgs = self.load_block_groups()
-        new_city = util.interpolation.weighted_areas(bgs, city.geometry)
-        joined = city.join(new_city.drop('geometry', axis=1))
-        self.save_city(joined)
+        stats = util.interpolation.weighted_areas(bgs, city.geometry)
+        # remove spatial information
+        stats = pandas.DataFrame(stats.drop('geometry', axis=1))
+        self.save_city_stats(stats)
 
-    def remove_city(self):
-        maybe_rmfile(self.city_path)
+    def remove_city_stats(self):
+        maybe_rmfile(self.city_stats_path)
 
     # input
 
@@ -564,8 +565,8 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
-    def load_city(self):
-        return util.io.load_geojson(self.city_path)
+    def load_city_stats(self):
+        return pandas.read_csv(self.city_stats_path)
 
     # output
 
@@ -596,8 +597,8 @@ class Department():
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
 
-    def save_city(self, df):
-        util.io.save_geojson(df, self.city_path)
+    def save_city_stats(self, df):
+        df.to_csv(self.city_stats_path, index=False)
 
 
 class DepartmentCollection():

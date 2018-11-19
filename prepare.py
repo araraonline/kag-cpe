@@ -12,36 +12,36 @@ import doit.tools
 
 from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
-from cpe_help.util.doit_tasks import TaskHelper
 from cpe_help.util.path import (
     DATA_DIR,
     maybe_mkdir,
-    maybe_rmfile,
-    maybe_rmtree,
 )
 
 
 BASE_DIRECTORIES = [
+    DATA_DIR / 'kaggle',
+    DATA_DIR / 'input',
+    DATA_DIR / 'input' / 'department',
+
     DATA_DIR / 'departments',
-    DATA_DIR / 'inputs',
     DATA_DIR / 'tiger',
 ]
 
-INPUTS_DIR = DATA_DIR / 'inputs'
-KAGGLE_ZIPFILE = INPUTS_DIR / 'data-science-for-good.zip'
-DEPARTMENTS_DIR = INPUTS_DIR / 'cpe-data'
+KAGGLE_DIR = DATA_DIR / 'kaggle'
+CPE_DATA_DIR = KAGGLE_DIR / 'cpe-data'
+KAGGLE_ZIPFILE = KAGGLE_DIR / 'cpe-data.zip'
 
 
 # helper/actions
 
 class InputDepartment():
     """
-    I represent a Department that was just unzipped
+    I represent a raw Department (that came directly from Kaggle data)
     """
 
     @property
     def path(self):
-        return DEPARTMENTS_DIR / f'Dept_{self.name}'
+        return CPE_DATA_DIR / f'Dept_{self.name}'
 
     @property
     def acs_path(self):
@@ -74,22 +74,18 @@ class InputDepartment():
 
         ACS data is being retrieved programatically, so, I will ignore
         ACS files.
-
-        Parameters
-        ---------
-        path : str or pathlib.Path
         """
         dst = self.to_department()
 
         # copy shapefiles
         src_shapefile = self.shp_path
-        dst_shapefile = dst.external_shapefile_path
+        dst_shapefile = dst.spatial_input_dir
         util.path.maybe_rmtree(dst_shapefile)
         shutil.copytree(src_shapefile, dst_shapefile)
 
         # copy other files
         for file in self.other_files:
-            shutil.copy(file, dst.external_dir)
+            shutil.copy(file, dst.tabular_input_dir)
 
     @classmethod
     def from_path(cls, path):
@@ -98,7 +94,7 @@ class InputDepartment():
     @classmethod
     def list(cls):
         return [cls.from_path(x)
-                for x in DEPARTMENTS_DIR.iterdir()
+                for x in CPE_DATA_DIR.iterdir()
                 if x.is_dir()]
 
 
@@ -108,20 +104,6 @@ def create_base_directories():
     """
     for dir in BASE_DIRECTORIES:
         maybe_mkdir(dir)
-
-
-def preprocess_inputs():
-    """
-    Fix errors in the raw department data
-    """
-    dept1 = InputDepartment('35-00016')
-    maybe_rmtree(dept1.acs_path / '35-00016_employment')
-
-    dept2 = InputDepartment('11-00091')
-    maybe_rmtree(dept2.acs_path / '11-00091_ACS_race-age-sex')
-
-    dept3 = InputDepartment('49-00009')
-    maybe_rmfile(dept3.path / '49-0009_UOF.csv')
 
 
 # basic tasks
@@ -134,44 +116,6 @@ def task_create_base_directories():
         'targets': BASE_DIRECTORIES,
         'actions': [create_base_directories],
         'uptodate': [True],
-    }
-
-
-@doit.create_after('create_base_directories')
-def task_download_inputs():
-    """
-    Retrieve raw departments data from Kaggle
-    """
-    return {
-        'actions': [[
-            'kaggle',
-            'datasets',
-            'download',
-            '-d',
-            'center-for-policing-equity/data-science-for-good',
-            '-p',
-            'data/inputs'
-        ]],
-        'targets': [KAGGLE_ZIPFILE],
-        'uptodate': [True],
-    }
-
-
-@doit.create_after('download_inputs')
-def task_unzip_inputs():
-    """
-    Unzip raw departments data from Kaggle
-    """
-    return TaskHelper.unzip(KAGGLE_ZIPFILE, DEPARTMENTS_DIR)
-
-
-@doit.create_after('unzip_inputs')
-def task_preprocess_inputs():
-    """
-    Fix errors in the raw department data
-    """
-    return {
-        'actions': [preprocess_inputs],
     }
 
 
@@ -192,7 +136,7 @@ def task_create_tiger_directories():
 
 # department tasks
 
-@doit.create_after('preprocess_inputs')
+@doit.create_after('create_base_directories')
 def task_create_department_directories():
     """
     Create departments' directories

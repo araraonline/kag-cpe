@@ -19,7 +19,7 @@ class Department4900033(Department):
 
     @property
     def external_arrests_path(self):
-        return self.external_dir / '49-00033_Arrests_2015.csv'
+        return self.tabular_input_dir / '49-00033_Arrests_2015.csv'
 
     @property
     def preprocessed_arrests_path(self):

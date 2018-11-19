@@ -17,10 +17,6 @@ from cpe_help import (
 )
 from cpe_help.tiger import get_tiger
 from cpe_help.util.doit_tasks import TaskHelper
-from cpe_help.util.path import DATA_DIR
-
-
-KAGGLE_ZIPFILE = DATA_DIR / 'inputs' / 'data-science-for-good.zip'
 
 
 def task_download_state_boundaries():
@@ -147,10 +143,12 @@ def task_preprocess_shapefiles():
     for dept in list_departments():
         yield {
             'name': dept.name,
-            'file_dep': [KAGGLE_ZIPFILE],
+            # TODO: arrange dependencies
+            # TODO: remove uptodate
             'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
             'clean': [dept.remove_preprocessed_shapefile],
+            'uptodate': [True],
         }
 
 

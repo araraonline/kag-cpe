@@ -6,7 +6,6 @@ Probably will become the main file of the project.
 
 from importlib import import_module
 
-import geopandas as gpd
 import pandas
 import pandas as pd
 import us
@@ -44,18 +43,28 @@ class Department():
         return DATA_DIR / 'departments' / self.name
 
     @property
+    def input_dir(self):
+        return util.path.INPUT_DIR / 'department' / self.name
+
+    @property
+    def tabular_input_dir(self):
+        return self.input_dir / 'tabular'
+
+    @property
+    def spatial_input_dir(self):
+        return self.input_dir / 'shapefile'
+
+    @property
     def directories(self):
         return [
             self.path,
-            self.external_dir,
             self.raw_dir,
             self.preprocessed_dir,
             self.processed_dir,
+            self.input_dir,
+            self.tabular_input_dir,
+            self.spatial_input_dir,
         ]
-
-    @property
-    def external_dir(self):
-        return self.path / 'external'
 
     @property
     def raw_dir(self):
@@ -68,14 +77,6 @@ class Department():
     @property
     def processed_dir(self):
         return self.path / 'processed'
-
-    @property
-    def external_acs_path(self):
-        return self.external_dir / 'ACS'
-
-    @property
-    def external_shapefile_path(self):
-        return self.external_dir / 'shapefiles'
 
     @property
     def preprocessed_shapefile_path(self):
@@ -538,7 +539,7 @@ class Department():
     # input
 
     def load_external_shapefile(self):
-        path = str(self.external_shapefile_path)
+        path = str(self.spatial_input_dir)
         return util.io.load_shp(path)
 
     def load_preprocessed_shapefile(self):

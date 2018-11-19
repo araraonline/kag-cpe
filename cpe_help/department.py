@@ -48,10 +48,6 @@ class Department():
         return util.path.INPUT_DIR / 'department' / self.name
 
     @property
-    def output_dir(self):
-        return util.path.OUTPUT_DIR / 'department' / self.name
-
-    @property
     def tabular_input_dir(self):
         return self.input_dir / 'tabular'
 
@@ -67,7 +63,6 @@ class Department():
             self.preprocessed_dir,
             self.processed_dir,
             self.input_dir,
-            self.output_dir,
             self.tabular_input_dir,
             self.shapefile_input_dir,
         ]

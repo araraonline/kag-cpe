@@ -91,16 +91,18 @@ def task_guess_states():
 def task_guess_counties():
     """
     Guess the counties that compose each police department
+
+    The city surrounding each police department is also taken into
+    account.
     """
-    tiger = get_tiger()
     for dept in list_departments():
         yield {
             'name': dept.name,
             'file_dep': [
-                tiger.county_boundaries_path,
-                dept.city_boundaries_path,
+                dept.guessed_city_path,
                 dept.preprocessed_shapefile_path,
             ],
+            'task_dep': ['download_county_boundaries'],
             'targets': [dept.guessed_counties_path],
             'actions': [dept.guess_counties],
             'clean': [dept.remove_guessed_counties],

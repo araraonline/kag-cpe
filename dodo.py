@@ -98,6 +98,7 @@ def task_guess_counties():
             'name': dept.name,
             'file_dep': [
                 tiger.county_boundaries_path,
+                dept.city_boundaries_path,
                 dept.preprocessed_shapefile_path,
             ],
             'targets': [dept.guessed_counties_path],

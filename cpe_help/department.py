@@ -298,15 +298,21 @@ class Department():
 
     def guess_counties(self):
         """
-        Guess the counties that make part of this department
+        Guess the counties that make part of this city and department
         """
         tiger = get_tiger()
         counties = tiger.load_county_boundaries()
         counties = counties.set_index('COUNTYFP')
 
-        shape = self.load_preprocessed_shapefile()
-        shape = shape.to_crs(counties.crs)
-        union = shape.unary_union
+        shape1 = self.load_preprocessed_shapefile()
+        shape1 = shape1.to_crs(counties.crs)
+        shape1 = shape1.unary_union
+
+        shape2 = self.load_city_boundaries()
+        shape2 = shape2.to_crs(counties.crs)
+        shape2 = shape2.unary_union
+
+        union = shape1.union(shape2)
 
         intersecting = [ix for ix, geom in counties.geometry.iteritems()
                         if union.intersects(geom)]

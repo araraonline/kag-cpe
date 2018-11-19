@@ -39,7 +39,7 @@ CPEDATA_DIR = KAGGLE_DIR / 'cpe-data'
 
 class InputDepartment():
     """
-    I represent a Department that was just unzipped
+    I represent a raw Department (came directly from the Kaggle data)
     """
 
     @property

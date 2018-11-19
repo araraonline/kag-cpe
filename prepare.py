@@ -22,16 +22,17 @@ from cpe_help.util.path import (
 
 
 BASE_DIRECTORIES = [
-    DATA_DIR / 'departments',
-    DATA_DIR / 'inputs',
-    DATA_DIR / 'tiger',
+    DATA_DIR / 'kaggle',
     DATA_DIR / 'input',
     DATA_DIR / 'input' / 'department',
+
+    DATA_DIR / 'departments',
+    DATA_DIR / 'tiger',
 ]
 
-INPUTS_DIR = DATA_DIR / 'inputs'
-KAGGLE_ZIPFILE = INPUTS_DIR / 'data-science-for-good.zip'
-DEPARTMENTS_DIR = INPUTS_DIR / 'cpe-data'
+KAGGLE_DIR = DATA_DIR / 'kaggle'
+KAGGLE_ZIPFILE = KAGGLE_DIR / 'data-science-for-good.zip'
+CPEDATA_DIR = KAGGLE_DIR / 'cpe-data'
 
 
 # helper/actions
@@ -43,7 +44,7 @@ class InputDepartment():
 
     @property
     def path(self):
-        return DEPARTMENTS_DIR / f'Dept_{self.name}'
+        return CPEDATA_DIR / f'Dept_{self.name}'
 
     @property
     def acs_path(self):
@@ -100,7 +101,7 @@ class InputDepartment():
     @classmethod
     def list(cls):
         return [cls.from_path(x)
-                for x in DEPARTMENTS_DIR.iterdir()
+                for x in CPEDATA_DIR.iterdir()
                 if x.is_dir()]
 
 
@@ -152,7 +153,7 @@ def task_download_inputs():
             '-d',
             'center-for-policing-equity/data-science-for-good',
             '-p',
-            'data/inputs'
+            'data/kaggle',
         ]],
         'targets': [KAGGLE_ZIPFILE],
         'uptodate': [True],
@@ -164,7 +165,7 @@ def task_unzip_inputs():
     """
     Unzip raw departments data from Kaggle
     """
-    return TaskHelper.unzip(KAGGLE_ZIPFILE, DEPARTMENTS_DIR)
+    return TaskHelper.unzip(KAGGLE_ZIPFILE, CPEDATA_DIR)
 
 
 @doit.create_after('unzip_inputs')

@@ -80,10 +80,6 @@ class Department():
         return self.path / 'processed'
 
     @property
-    def external_shapefile_path(self):
-        return self.shapefile_input_dir
-
-    @property
     def preprocessed_shapefile_path(self):
         return self.preprocessed_dir / 'shapefile.zip'
 
@@ -544,7 +540,7 @@ class Department():
     # input
 
     def load_external_shapefile(self):
-        path = str(self.external_shapefile_path)
+        path = str(self.shapefile_input_dir)
         return util.io.load_shp(path)
 
     def load_preprocessed_shapefile(self):

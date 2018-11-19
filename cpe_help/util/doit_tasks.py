@@ -68,7 +68,7 @@ class TaskHelper(object):
         (not its contents).
         """
         from cpe_help.util.compression import extract_zipfile
-        from cpe_help.util.path import maybe_rmtree
+        from cpe_help.util.files import maybe_rmtree
         task = {
             'file_dep': [file],
             'targets': [dir],

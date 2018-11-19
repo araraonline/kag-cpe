@@ -12,10 +12,8 @@ import doit.tools
 
 from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
-from cpe_help.util.path import (
-    DATA_DIR,
-    maybe_mkdir,
-)
+from cpe_help.util.files import maybe_mkdir
+from cpe_help.util.path import DATA_DIR
 
 
 BASE_DIRECTORIES = [
@@ -80,7 +78,7 @@ class InputDepartment():
         # copy shapefiles
         src_shapefile = self.shp_path
         dst_shapefile = dst.spatial_input_dir
-        util.path.maybe_rmtree(dst_shapefile)
+        util.files.maybe_rmtree(dst_shapefile)
         shutil.copytree(src_shapefile, dst_shapefile)
 
         # copy other files

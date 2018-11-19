@@ -23,8 +23,9 @@ from cpe_help.util.io import (
     save_zipshp,
 )
 from cpe_help.util.configuration import get_acs_variables
+from cpe_help.util.files import maybe_mkdir, maybe_rmfile
 from cpe_help.util.interpolation import weighted_areas
-from cpe_help.util.path import DATA_DIR, maybe_mkdir, maybe_rmfile
+from cpe_help.util.path import DATA_DIR
 
 
 class InputError(Exception):

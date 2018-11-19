@@ -295,9 +295,9 @@ def task_preprocess_4900033_arrests():
     }
 
 
-def task_city_stats():
+def task_generate_city_stats():
     """
-    Generate stats for each relevant city
+    Generate statistics for the city of each department
     """
     for dept in list_departments():
         yield {

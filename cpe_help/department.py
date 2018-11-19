@@ -7,6 +7,7 @@ Probably will become the main file of the project.
 from importlib import import_module
 
 import geopandas as gpd
+import pandas
 import pandas as pd
 import us
 
@@ -112,6 +113,10 @@ class Department():
     def police_precincts_path(self):
         return self.processed_dir / 'police_precincts.geojson'
 
+    @property
+    def city_stats_path(self):
+        return self.processed_dir / 'city_stats.json'
+
     def __new__(cls, name):
         """
         Create a new department object
@@ -176,6 +181,22 @@ class Department():
         'Boston'
         """
         return self.load_guessed_city()
+
+    def load_city_metadata(self):
+        """
+        Load data associated with my city from TIGER
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            A 1-lined GeoDataFrame whose only entry corresponds to the
+            requested data.
+        """
+        tiger = get_tiger()
+        places = tiger.load_place_boundaries(self.state.fips)
+        places = places[places['NAME'] == self.city]
+        assert places.shape[0] == 1
+        return places
 
     @property
     def state(self):
@@ -290,15 +311,24 @@ class Department():
 
     def guess_counties(self):
         """
-        Guess the counties that make part of this department
+        Guess the counties that make part of this city and department
         """
         tiger = get_tiger()
         counties = tiger.load_county_boundaries()
         counties = counties.set_index('COUNTYFP')
 
-        shape = self.load_preprocessed_shapefile()
-        shape = shape.to_crs(counties.crs)
-        union = shape.unary_union
+        # load city boundaries
+        shape1 = self.load_city_metadata()
+        shape1 = shape1.to_crs(counties.crs)
+        shape1 = shape1.unary_union
+
+        # load department boundaries
+        shape2 = self.load_preprocessed_shapefile()
+        shape2 = shape2.to_crs(counties.crs)
+        shape2 = shape2.unary_union
+
+        # unite city and department
+        union = shape1.union(shape2)
 
         intersecting = [ix for ix, geom in counties.geometry.iteritems()
                         if union.intersects(geom)]
@@ -488,6 +518,23 @@ class Department():
     def remove_police_precincts(self):
         maybe_rmfile(self.police_precincts_path)
 
+    def generate_city_stats(self):
+        """
+        Generate statistics for my city
+
+        The statistics are extracted from the BGs that intersect with
+        the city, in a method called areal interpolation.
+        """
+        city = self.load_city_metadata()
+        bgs = self.load_block_groups()
+        stats = util.interpolation.weighted_areas(bgs, city.geometry)
+        # use stats as a Series without geometry
+        stats = stats.iloc[0].drop('geometry')
+        self.save_city_stats(stats)
+
+    def remove_city_stats(self):
+        maybe_rmfile(self.city_stats_path)
+
     # input
 
     def load_external_shapefile(self):
@@ -521,6 +568,11 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
+    def load_city_stats(self):
+        obj = util.io.load_json(self.city_stats_path)
+        ser = pandas.Series(obj)
+        return ser
+
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -549,6 +601,10 @@ class Department():
 
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
+
+    def save_city_stats(self, ser):
+        obj = ser.to_dict()
+        util.io.save_json(obj, self.city_stats_path)
 
 
 class DepartmentCollection():

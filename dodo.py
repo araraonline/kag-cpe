@@ -91,14 +91,20 @@ def task_guess_states():
 def task_guess_counties():
     """
     Guess the counties that compose each police department
+
+    The city surrounding each police department is also taken into
+    account.
     """
-    tiger = get_tiger()
     for dept in list_departments():
         yield {
             'name': dept.name,
             'file_dep': [
-                tiger.county_boundaries_path,
+                dept.guessed_city_path,
                 dept.preprocessed_shapefile_path,
+            ],
+            'task_dep': [
+                'download_place_boundaries',
+                'download_county_boundaries',
             ],
             'targets': [dept.guessed_counties_path],
             'actions': [dept.guess_counties],
@@ -290,3 +296,21 @@ def task_preprocess_4900033_arrests():
         'actions': [dept.preprocess_arrests],
         'clean': [dept.remove_preprocessed_arrests],
     }
+
+
+def task_generate_city_stats():
+    """
+    Generate statistics for the city of each department
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_city_path,
+                dept.block_groups_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.city_stats_path],
+            'actions': [dept.generate_city_stats],
+            'clean': [dept.remove_city_stats],
+        }

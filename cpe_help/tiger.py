@@ -11,8 +11,9 @@ https://www.census.gov/geo/maps-data/data/tiger.html
 
 from cpe_help.util.configuration import get_configuration
 from cpe_help.util.download import download
+from cpe_help.util.files import maybe_mkdir
 from cpe_help.util.io import load_zipshp
-from cpe_help.util.path import DATA_DIR, maybe_mkdir
+from cpe_help.util.path import DATA_DIR
 
 
 class TIGER():

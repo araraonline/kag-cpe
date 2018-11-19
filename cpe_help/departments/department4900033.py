@@ -65,7 +65,7 @@ class Department4900033(Department):
         self.save_preprocessed_arrests(df)
 
     def remove_preprocessed_arrests(self):
-        util.path.maybe_rmfile(self.preprocessed_arrests_path)
+        util.files.maybe_rmfile(self.preprocessed_arrests_path)
 
     # input
 

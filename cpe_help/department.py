@@ -6,7 +6,6 @@ Probably will become the main file of the project.
 
 from importlib import import_module
 
-import geopandas as gpd
 import pandas
 import pandas as pd
 import us

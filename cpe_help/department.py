@@ -44,6 +44,14 @@ class Department():
         return DATA_DIR / 'departments' / self.name
 
     @property
+    def input_dir(self):
+        return util.path.INPUT_DIR / 'department' / self.name
+
+    @property
+    def output_dir(self):
+        return util.path.OUTPUT_DIR / 'department' / self.name
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -55,7 +63,7 @@ class Department():
 
     @property
     def external_dir(self):
-        return self.path / 'external'
+        return self.input_dir
 
     @property
     def raw_dir(self):

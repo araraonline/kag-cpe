@@ -68,10 +68,6 @@ class Department():
         ]
 
     @property
-    def external_dir(self):
-        return self.input_dir
-
-    @property
     def raw_dir(self):
         return self.path / 'raw'
 
@@ -82,10 +78,6 @@ class Department():
     @property
     def processed_dir(self):
         return self.path / 'processed'
-
-    @property
-    def external_acs_path(self):
-        return self.external_dir / 'ACS'
 
     @property
     def external_shapefile_path(self):

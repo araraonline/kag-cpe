@@ -12,7 +12,7 @@ class Department3500016(Department):
         """
         Load shapefile for Police Districts
         """
-        path = str(self.shapefile_input_dir)
+        path = str(self.spatial_input_dir)
         layer = 'OrlandoPoliceDistricts'
         df = geopandas.read_file(path, layer=layer)
         return df

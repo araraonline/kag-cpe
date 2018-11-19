@@ -82,7 +82,7 @@ class InputDepartment():
 
         # copy shapefiles
         src_shapefile = self.shp_path
-        dst_shapefile = dst.shapefile_input_dir
+        dst_shapefile = dst.spatial_input_dir
         util.path.maybe_rmtree(dst_shapefile)
         shutil.copytree(src_shapefile, dst_shapefile)
 

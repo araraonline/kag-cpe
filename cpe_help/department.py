@@ -52,7 +52,7 @@ class Department():
         return self.input_dir / 'tabular'
 
     @property
-    def shapefile_input_dir(self):
+    def spatial_input_dir(self):
         return self.input_dir / 'shapefile'
 
     @property
@@ -64,7 +64,7 @@ class Department():
             self.processed_dir,
             self.input_dir,
             self.tabular_input_dir,
-            self.shapefile_input_dir,
+            self.spatial_input_dir,
         ]
 
     @property
@@ -540,7 +540,7 @@ class Department():
     # input
 
     def load_external_shapefile(self):
-        path = str(self.shapefile_input_dir)
+        path = str(self.spatial_input_dir)
         return util.io.load_shp(path)
 
     def load_preprocessed_shapefile(self):

@@ -202,7 +202,7 @@ class ACS(object):
         numeric_vars = [x for x in query_vars if x not in _NONNUMERIC_VARS]
         result[numeric_vars] = result[numeric_vars].apply(pandas.to_numeric)
 
-        # check if there are variables not available at the desired level
+        # check if there are columns whose values are all NaN (GH19)
         all_nans = result.isnull().all()
         if all_nans.any():
             columns = all_nans[all_nans].index.tolist()

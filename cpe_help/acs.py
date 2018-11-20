@@ -205,10 +205,10 @@ class ACS(object):
         # check if there are variables not available at the desired level
         all_nans = result.isnull().all()
         if all_nans.any():
+            columns = all_nans[all_nans].index.tolist()
             wmsg = ("The Census API returned an all null column for some"
-                    " variables: {}. You can make sure if they are available"
-                    " at the requested level ({!r}).")
-            columns = all_nans[all_nans].index
+                    " variables: {}. You can make sure that they are available"
+                    " at the requested geography level ({!r}).")
             wmsg = wmsg.format(columns, geography)
             warnings.warn(wmsg, UserWarning)
 

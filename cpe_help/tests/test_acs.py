@@ -2,6 +2,8 @@
 Module for testing the ACS class
 """
 
+import pytest
+
 from cpe_help.acs import get_acs
 
 
@@ -104,3 +106,27 @@ def test_dtypes():
     result = set(c for c in df.select_dtypes('object').columns)
     expected = {'NAME', 'county', 'state'}
     assert result == expected
+
+
+def test_null_variables():
+    # When we make a request with a variable not available at the
+    # desired level, the Census returns nulls, and the ACS class should
+    # generate a warning.
+
+    acs = get_acs()
+
+    variables = {
+        'B01001_001E': 'VARIABLE_OKAY',
+        'B06009_001E': 'VARIABLE_NULLS',
+    }
+    geography = 'block group'
+    inside = 'state:01 county:001'
+
+    with pytest.warns(UserWarning) as record:
+        result = acs.data(variables, geography, inside)
+
+    assert 'B06009_001E' in record[0].message.args[0]
+    assert 'B01001_001E' not in record[0].message.args[0]
+    assert set(result.columns) >= set(variables.values())
+    # exactly one column with all nulls
+    assert result.isnull().all(axis=0).sum() == 1

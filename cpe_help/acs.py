@@ -208,7 +208,7 @@ class ACS(object):
             columns = all_nans[all_nans].index.tolist()
             wmsg = ("The Census API returned an all null column for some"
                     " variables: {}. You can make sure that they are available"
-                    " at the requested geography level ({!r}).")
+                    " at the requested geography level {!r}.")
             wmsg = wmsg.format(columns, geography)
             warnings.warn(wmsg, UserWarning)
 

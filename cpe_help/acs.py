@@ -1,3 +1,5 @@
+import warnings
+
 import pandas
 import requests
 
@@ -199,6 +201,16 @@ class ACS(object):
         # convert column values to numbers
         numeric_vars = [x for x in query_vars if x not in _NONNUMERIC_VARS]
         result[numeric_vars] = result[numeric_vars].apply(pandas.to_numeric)
+
+        # check if there are columns whose values are all NaN (GH19)
+        all_nans = result.isnull().all()
+        if all_nans.any():
+            columns = all_nans[all_nans].index.tolist()
+            wmsg = ("The Census API returned an all null column for some"
+                    " variables: {}. You can make sure that they are available"
+                    " at the requested geography level {!r}.")
+            wmsg = wmsg.format(columns, geography)
+            warnings.warn(wmsg, UserWarning)
 
         if rename_vars is not None:
             result = result.rename(columns=rename_vars)

@@ -125,8 +125,9 @@ def test_null_variables():
     with pytest.warns(UserWarning) as record:
         result = acs.data(variables, geography, inside)
 
-    assert 'B06009_001E' in record[0].message.args[0]
-    assert 'B01001_001E' not in record[0].message.args[0]
+    wmsg = record[0].message.args[0]
+    assert 'B06009_001E' in wmsg
+    assert 'B01001_001E' not in wmsg
     assert set(result.columns) >= set(variables.values())
     # exactly one column with all nulls
     assert result.isnull().all(axis=0).sum() == 1

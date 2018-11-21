@@ -132,6 +132,10 @@ class Department():
     # output paths
 
     @property
+    def block_groups_output(self):
+        return self.acs_output_dir / 'block_groups.geojson'
+
+    @property
     def police_precincts_output(self):
         return self.acs_output_dir / 'police_precincts.geojson'
 

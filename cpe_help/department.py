@@ -60,6 +60,10 @@ class Department():
         return util.path.OUTPUT_DIR / 'department' / self.name
 
     @property
+    def acs_output_dir(self):
+        return self.output_dir / 'acs'
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -70,6 +74,7 @@ class Department():
             self.tabular_input_dir,
             self.spatial_input_dir,
             self.output_dir,
+            self.acs_output_dir,
         ]
 
     @property

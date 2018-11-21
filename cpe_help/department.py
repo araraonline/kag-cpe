@@ -114,6 +114,10 @@ class Department():
         return self.raw_dir / 'bg_values.pkl'
 
     @property
+    def city_stats_path(self):
+        return self.processed_dir / 'city_stats.json'
+
+    @property
     def census_tracts_path(self):
         return self.processed_dir / 'census_tracts.geojson'
 
@@ -125,11 +129,11 @@ class Department():
     def police_precincts_path(self):
         return self.processed_dir / 'police_precincts.geojson'
 
-    @property
-    def city_stats_path(self):
-        return self.processed_dir / 'city_stats.json'
-
     # output paths
+
+    @property
+    def city_stats_output(self):
+        return self.acs_output_dir / 'city_stats.json'
 
     @property
     def census_tracts_output(self):

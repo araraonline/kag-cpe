@@ -27,12 +27,12 @@ dependencies:
   - pip:
     - doit==0.31.*
     - httpie==0.9.*
-    - requests=2.20.*
+    - requests==2.20.*
     - pytest==3.9.*
     - kaggle==1.4.*
     - flake8==3.6.*
     - us==1.0.*
-    - pytess=1.0.0
+    - pytess==1.0.0
     - folium==0.6.*
     - branca==0.3.*
     - contextily==0.99.*

@@ -129,6 +129,14 @@ class Department():
     def city_stats_path(self):
         return self.processed_dir / 'city_stats.json'
 
+    # output paths
+
+    @property
+    def police_precincts_output(self):
+        return self.acs_output_dir / 'police_precincts.geojson'
+
+    # basic
+
     def __new__(cls, name):
         """
         Create a new department object

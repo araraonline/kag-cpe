@@ -56,6 +56,10 @@ class Department():
         return self.input_dir / 'shapefile'
 
     @property
+    def output_dir(self):
+        return util.path.OUTPUT_DIR / 'department' / self.name
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -65,6 +69,7 @@ class Department():
             self.input_dir,
             self.tabular_input_dir,
             self.spatial_input_dir,
+            self.output_dir,
         ]
 
     @property

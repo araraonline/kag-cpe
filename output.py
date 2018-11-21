@@ -8,6 +8,20 @@ the end of the main dodo.py file and will be run from there.
 from cpe_help import list_departments
 
 
+def task_output_census_tracts():
+    """
+    Output census tracts for each department
+    """
+    for dept in list_departments():
+        yield {
+            'name': dept.name,
+            'file_dep': [dept.census_tracts_path],
+            'targets': [dept.census_tracts_output],
+            'actions': ['cp %(dependencies)s %(targets)s'],
+            'clean': True,
+        }
+
+
 def task_output_block_groups():
     """
     Output block groups for each department

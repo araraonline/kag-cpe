@@ -147,7 +147,7 @@ class Department():
     def police_precincts_output(self):
         return self.acs_output_dir / 'police_precincts.geojson'
 
-    # basic
+    # base
 
     def __new__(cls, name):
         """

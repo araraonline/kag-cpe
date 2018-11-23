@@ -312,3 +312,8 @@ def task_generate_city_stats():
             'actions': [dept.generate_city_stats],
             'clean': [dept.remove_city_stats],
         }
+
+
+# import tasks from output.py
+# leave me at the end of this file
+from output import *

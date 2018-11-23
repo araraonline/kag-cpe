@@ -56,6 +56,14 @@ class Department():
         return self.input_dir / 'shapefile'
 
     @property
+    def output_dir(self):
+        return util.path.OUTPUT_DIR / 'department' / self.name
+
+    @property
+    def acs_output_dir(self):
+        return self.output_dir / 'acs'
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -65,6 +73,8 @@ class Department():
             self.input_dir,
             self.tabular_input_dir,
             self.spatial_input_dir,
+            self.output_dir,
+            self.acs_output_dir,
         ]
 
     @property
@@ -104,6 +114,10 @@ class Department():
         return self.raw_dir / 'bg_values.pkl'
 
     @property
+    def city_stats_path(self):
+        return self.processed_dir / 'city_stats.json'
+
+    @property
     def census_tracts_path(self):
         return self.processed_dir / 'census_tracts.geojson'
 
@@ -115,9 +129,25 @@ class Department():
     def police_precincts_path(self):
         return self.processed_dir / 'police_precincts.geojson'
 
+    # ACS outputs
+
     @property
-    def city_stats_path(self):
-        return self.processed_dir / 'city_stats.json'
+    def city_stats_output(self):
+        return self.acs_output_dir / 'city_stats.json'
+
+    @property
+    def census_tracts_output(self):
+        return self.acs_output_dir / 'census_tracts.geojson'
+
+    @property
+    def block_groups_output(self):
+        return self.acs_output_dir / 'block_groups.geojson'
+
+    @property
+    def police_precincts_output(self):
+        return self.acs_output_dir / 'police_precincts.geojson'
+
+    # base
 
     def __new__(cls, name):
         """

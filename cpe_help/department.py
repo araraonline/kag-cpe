@@ -129,7 +129,7 @@ class Department():
     def police_precincts_path(self):
         return self.processed_dir / 'police_precincts.geojson'
 
-    # output paths
+    # ACS outputs
 
     @property
     def city_stats_output(self):

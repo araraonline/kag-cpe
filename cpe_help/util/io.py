@@ -8,6 +8,7 @@ import tempfile
 
 import geopandas
 
+from cpe_help import util
 from cpe_help.util.compression import make_zipfile
 from cpe_help.util.files import maybe_rmfile
 
@@ -83,8 +84,16 @@ def save_geojson(df, path):
     -------
     None
     """
+    # geopandas (fiona) cannot save bool columns
+    cols = df.select_dtypes(include='bool').columns
+    df[cols] = df[cols].astype(int)
+
+    # geojson does not have a date data type
+    cols = df.select_dtypes(include='datetime').columns
+    format = _get_dt_format()
+    df[cols] = df[cols].apply(lambda c: c.dt.strftime(format))
+
     maybe_rmfile(path)
-    # XXX: if line below fails, the file will still be removed
     df.to_file(str(path), driver='GeoJSON')
 
 
@@ -113,3 +122,12 @@ def save_zipshp(df, path):
         tmpname = (pathlib.Path(tmpdir) / name).with_suffix('.shp')
         df.to_file(str(tmpname))
         make_zipfile(path, tmpdir)
+
+
+def _get_dt_format():
+    """
+    Return the datetime format that should be used in the outputs
+    """
+    config = util.configuration.get_configuration()
+    format = config['Output']['DateAndTimeFormat']
+    return format

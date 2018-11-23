@@ -314,6 +314,6 @@ def task_generate_city_stats():
         }
 
 
-# import output tasks
-# leave this at the end of the file
+# import tasks from output.py
+# leave me at the end of this file
 from output import *

@@ -62,3 +62,18 @@ def task_output_police_precincts():
             'actions': ['cp %(dependencies)s %(targets)s'],
             'clean': True,
         }
+
+
+def task_process_department_files():
+    """
+    Preprocess individual files for departments
+    """
+    for dept in list_departments():
+        for file_name, file in dept.files.items():
+            yield {
+                'name': f'{dept}:{file_name}',
+                'file_dep': [file.raw_path] + file.dependencies,
+                'targets': [file.processed_path],
+                'actions': [file.process],
+                'clean': True,
+            }

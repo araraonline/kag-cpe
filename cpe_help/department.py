@@ -4,6 +4,8 @@ This is the main file for dealing with departments
 Probably will become the main file of the project.
 """
 
+import abc
+import collections
 from importlib import import_module
 
 import pandas
@@ -146,6 +148,12 @@ class Department():
     @property
     def police_precincts_output(self):
         return self.acs_output_dir / 'police_precincts.geojson'
+
+    # department-specific files
+
+    @property
+    def files(self):
+        return collections.OrderedDict([])
 
     # base
 
@@ -640,6 +648,41 @@ class Department():
     def save_city_stats(self, ser):
         obj = ser.to_dict()
         util.io.save_json(obj, self.city_stats_path)
+
+
+class DepartmentFile(abc.ABC):
+    """
+    I represent a file specific to a department
+    """
+
+    @property
+    def dependencies(self):
+        """
+        List of dependencies that are not the raw file itself
+        """
+        return []
+
+    @property
+    @abc.abstractmethod
+    def raw_path(self):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def processed_path(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def load_raw(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def load_processed(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def process(self):
+        raise NotImplementedError
 
 
 class DepartmentCollection():

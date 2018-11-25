@@ -66,6 +66,10 @@ class Department():
         return self.output_dir / 'acs'
 
     @property
+    def other_output_dir(self):
+        return self.output_dir / 'other'
+
+    @property
     def directories(self):
         return [
             self.path,
@@ -77,6 +81,7 @@ class Department():
             self.spatial_input_dir,
             self.output_dir,
             self.acs_output_dir,
+            self.other_output_dir,
         ]
 
     @property

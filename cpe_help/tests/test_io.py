@@ -6,7 +6,6 @@ import tempfile
 
 import geopandas
 import pandas
-import shapely.geometry
 from pandas.util.testing import assert_frame_equal
 from shapely.geometry import Point
 

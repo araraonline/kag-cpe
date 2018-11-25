@@ -1,5 +1,5 @@
 """
-Department file for Department 35-00103 (Charlotte, NC)
+Module for department 35-00103 (Charlotte, NC)
 """
 
 from cpe_help import Department, util

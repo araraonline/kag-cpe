@@ -1,5 +1,5 @@
 """
-Department file for Department 35-00016 (Orlando, FL)
+Module for department 35-00016 (Orlando, FL)
 """
 
 import geopandas

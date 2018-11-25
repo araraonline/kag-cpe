@@ -25,6 +25,7 @@ dependencies:
   - phantomjs=2.1.*
   - cartopy=0.16.*
   - rasterio=1.0.*
+  - geopandas=0.4.*
   - pip:
     - doit==0.31.*
     - httpie==0.9.*

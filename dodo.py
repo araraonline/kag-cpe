@@ -283,19 +283,6 @@ def task_process_police_precincts():
         }
 
 
-def task_preprocess_4900033_arrests():
-    """
-    Preprocess arrests data for Department 49-00033
-    """
-    dept = Department('49-00033')
-    return {
-        'file_dep': [dept.external_arrests_path],
-        'targets': [dept.preprocessed_arrests_path],
-        'actions': [dept.preprocess_arrests],
-        'clean': [dept.remove_preprocessed_arrests],
-    }
-
-
 def task_generate_city_stats():
     """
     Generate statistics for the city of each department

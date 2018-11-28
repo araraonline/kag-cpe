@@ -3,23 +3,19 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-pool:
-  vmImage: 'Ubuntu 16.04'
+- job: 'macOS build'
 
-
-steps:
-- task: CondaEnvironment@1
-
-- script: ls
-  displayName: 'List directory'
-
-- script: conda update conda
-  displayName: 'Update conda'
-
-- script: conda env create -f environment.yml
-  displayName: 'Create environment'
-
-- script: du -hs /usr/share/miniconda/envs
-  displayName: 'Check environment size'
-
-- script: ls ~
+  pool:
+    vmImage: 'macOS-10.13'
+  
+  steps:
+  - task: CondaEnvironment@1
+  
+  - script: ls
+    displayName: 'List directory'
+  
+  - script: conda update conda
+    displayName: 'Update conda'
+  
+  - script: conda env create -f environment.yml
+    displayName: 'Create environment'

@@ -9,10 +9,18 @@ pool:
 
 steps:
 - task: CondaEnvironment@1
-- script: pwd
+
 - script: ls
-- script: echo Hello, world!
+  displayName: 'List directory'
+
 - script: conda update conda
+  displayName: 'Update conda'
+
 - script: conda env create -f environment.yml
+  displayName: 'Create environment'
+
 - script: conda activate cpe
+  displayName: 'Activate environment'
+
 - script: du -hs /usr/share/miniconda/envs
+  displayName: 'Check environment size'

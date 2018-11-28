@@ -1,38 +1,23 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-- job: 'macOS build'
-
+jobs:
+- job: 'macOS'
   pool:
     vmImage: 'macOS-10.13'
-  
   steps:
   - task: CondaEnvironment@1
-  
   - script: ls
     displayName: 'List directory'
-  
   - script: conda update conda
     displayName: 'Update conda'
-  
   - script: conda env create -f environment.yml
     displayName: 'Create environment'
-
-- job: 'Windows build'
-
+- job: 'Windows'
   pool:
     vmImage: 'vs2017-win2016'
-  
   steps:
   - task: CondaEnvironment@1
-  
   - script: dir
     displayName: 'List directory'
-  
   - script: conda update conda
     displayName: 'Update conda'
-  
   - script: conda env create -f environment.yml
     displayName: 'Create environment'

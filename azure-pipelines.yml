@@ -21,3 +21,6 @@ steps:
 
 - script: du -hs /usr/share/miniconda/envs
   displayName: 'Check environment size'
+
+- script: find / -type d -name '*conda*'
+  displayName: 'Find conda'

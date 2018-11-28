@@ -19,3 +19,20 @@
   
   - script: conda env create -f environment.yml
     displayName: 'Create environment'
+
+- job: 'Windows build'
+
+  pool:
+    vmImage: 'vs2017-win2016'
+  
+  steps:
+  - task: CondaEnvironment@1
+  
+  - script: dir
+    displayName: 'List directory'
+  
+  - script: conda update conda
+    displayName: 'Update conda'
+  
+  - script: conda env create -f environment.yml
+    displayName: 'Create environment'

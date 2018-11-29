@@ -8,20 +8,42 @@ prone to errors.
 import pyproj
 
 
-epsg4269 = {
-    'init': 'epsg:4269',
-    'no_defs': True,
-}
+def from_epsg(code):
+    """
+    Return a CRS mapping from the given EPSG code
 
-epsg4326 = {
-    'init': 'epsg:4326',
-    'no_defs': True,
-}
+    Parameters
+    ----------
+    code : int or str
 
-esri102739 = {
-    'init': 'esri:102739',
-    'no_defs': True,
-}
+    Returns
+    -------
+    dict
+        A dictionary representing a PROJ.4 projection.
+    """
+    return {
+        'init': f'epsg:{code}',
+        'no_defs': True,
+    }
+
+
+def from_esri(code):
+    """
+    Return a CRS mapping from the given ESRI code
+
+    Parameters
+    ----------
+    code : int or str
+
+    Returns
+    -------
+    dict
+        A dictionary representing a PROJ.4 projection.
+    """
+    return {
+        'init': f'esri:{code}',
+        'no_defs': True,
+    }
 
 
 def equal_area_from_geodf(df):
@@ -44,7 +66,7 @@ def equal_area_from_geodf(df):
     minx, miny, maxx, maxy = df.total_bounds
 
     p1 = pyproj.Proj(df.crs)
-    p2 = pyproj.Proj(epsg4269)  # NAD83
+    p2 = pyproj.Proj(EPSG4269)  # NAD83
 
     minx, miny = pyproj.transform(p1, p2, minx, miny)
     maxx, maxy = pyproj.transform(p1, p2, maxx, maxy)
@@ -64,11 +86,17 @@ def equal_area_from_geodf(df):
     }
 
 
-DEFAULT = epsg4269
-"""
-Default projection for storing files
+# NAD83
+EPSG4269 = from_epsg(4269)
 
-EPSG:4269 (NAD83) is a good choice because it is the one used by the
-Census. By storing our files in the same projection as the Census, we
-can skip some reprojections.
-"""
+
+# WGS 84
+EPSG4326 = from_epsg(4326)
+
+
+# Default projection for storing files
+#
+# EPSG:4269 (NAD83) is a good choice because it is the one used by the
+# Census. By storing our files in the same projection as the Census, we
+# can skip some reprojections.
+DEFAULT = EPSG4269

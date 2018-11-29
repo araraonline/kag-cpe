@@ -14,7 +14,8 @@ from cpe_help import Department, DepartmentFile, util
 
 class Department3700027(Department):
 
-    CRS = util.crs.esri102739
+    # NAD 1983 StatePlane Texas Central FIPS 4203 Feet
+    CRS = util.crs.from_esri(102739)
 
     @property
     def files(self):

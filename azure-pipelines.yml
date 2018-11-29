@@ -1,0 +1,22 @@
+jobs:
+
+- job: 'Windows'
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
+  - script: conda update conda
+    displayName: Update conda
+  - script: conda env create --file environment.yml
+    displayName: Create conda environment
+
+- job: 'macOS'
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - task: CondaEnvironment@1
+  - script: conda update conda
+    displayName: Update conda
+  - script: conda env create --file environment.yml
+    displayName: Create conda environment

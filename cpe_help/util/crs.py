@@ -98,11 +98,3 @@ EPSG4326 = from_epsg(4326)
 # Census. By storing our files in the same projection as the Census, we
 # can skip some reprojections.
 DEFAULT = EPSG4269
-
-
-# ---- clean below ----
-
-esri102739 = {
-    'init': 'esri:102739',
-    'no_defs': True,
-}

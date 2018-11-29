@@ -260,7 +260,7 @@ class TestWeightedAreasNoIgnoreCRS():
         from cpe_help.util.interpolation import weighted_areas
 
         self.crs1 = crs.EPSG4326
-        self.crs2 = crs.esri102739  # equal area
+        self.crs2 = crs.from_esri(102739)  # equal area
 
         sq1 = Polygon([(0, 0), (0, 2), (2, 2), (2, 0)])
         sq2 = Polygon([(2, 0), (2, 2), (4, 2), (4, 0)])
@@ -369,7 +369,7 @@ class TestWeightedAreasIgnoreCRS():
         from cpe_help.util.interpolation import weighted_areas
 
         self.crs1 = crs.EPSG4326
-        self.crs2 = crs.esri102739  # equal area
+        self.crs2 = crs.from_esri(102739)  # equal area
 
         sq1 = Polygon([(0, 0), (0, 2), (2, 2), (2, 0)])
         sq2 = Polygon([(2, 0), (2, 2), (4, 2), (4, 0)])

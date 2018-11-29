@@ -12,7 +12,6 @@ import doit.tools
 from cpe_help import (
     Department,
     DepartmentCollection,
-    list_departments,
     list_states,
 )
 from cpe_help.tiger import get_tiger
@@ -71,7 +70,7 @@ def task_guess_states():
     Guess the state for each department
     """
     tiger = get_tiger()
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -91,7 +90,7 @@ def task_guess_counties():
     The city surrounding each police department is also taken into
     account.
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -112,7 +111,7 @@ def task_guess_cities():
     """
     Guess the city of each department
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -132,7 +131,7 @@ def task_create_list_of_states():
     """
     dept_coll = DepartmentCollection()
     return {
-        'file_dep': [dept.guessed_state_path for dept in list_departments()],
+        'file_dep': [dept.guessed_state_path for dept in Department.list()],
         'targets': [dept_coll.list_of_states_path],
         'actions': [dept_coll.create_list_of_states],
         'clean': [dept_coll.remove_list_of_states],
@@ -140,7 +139,7 @@ def task_create_list_of_states():
 
 
 def task_preprocess_shapefiles():
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             # TODO: arrange dependencies
@@ -156,7 +155,7 @@ def task_download_tract_values():
     """
     Download census tract values for each department
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -170,7 +169,7 @@ def task_download_tract_values():
 
 
 def task_download_bg_values():
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -232,7 +231,7 @@ def task_process_census_tracts():
     """
     Merge census tract values with census tract boundaries
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -251,7 +250,7 @@ def task_process_block_groups():
     """
     Merge block group values with block group boundaries
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -270,7 +269,7 @@ def task_process_police_precincts():
     """
     Process police precincts data
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
@@ -287,7 +286,7 @@ def task_generate_city_stats():
     """
     Generate statistics for the city of each department
     """
-    for dept in list_departments():
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [

@@ -102,16 +102,6 @@ DEFAULT = EPSG4269
 
 # ---- clean below ----
 
-epsg4269 = {
-    'init': 'epsg:4269',
-    'no_defs': True,
-}
-
-epsg4326 = {
-    'init': 'epsg:4326',
-    'no_defs': True,
-}
-
 esri102739 = {
     'init': 'esri:102739',
     'no_defs': True,

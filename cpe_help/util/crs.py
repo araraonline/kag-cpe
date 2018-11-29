@@ -8,38 +8,40 @@ prone to errors.
 import pyproj
 
 
-def from_epsg(number):
+def from_epsg(code):
     """
-    Return a CRS object referring to the specified EPSG number
+    Return a CRS mapping from the given EPSG code
 
     Parameters
     ----------
-    number : int or str
+    code : int or str
 
     Returns
     -------
     dict
+        A dictionary representing a PROJ.4 projection.
     """
     return {
-        'init': f'epsg:{number}',
+        'init': f'epsg:{code}',
         'no_defs': True,
     }
 
 
-def from_esri(number):
+def from_esri(code):
     """
-    Return a CRS object referring to the specified ESRI number
+    Return a CRS mapping from the given ESRI code
 
     Parameters
     ----------
-    number : int or str
+    code : int or str
 
     Returns
     -------
     dict
+        A dictionary representing a PROJ.4 projection.
     """
     return {
-        'init': f'esri:{number}',
+        'init': f'esri:{code}',
         'no_defs': True,
     }
 

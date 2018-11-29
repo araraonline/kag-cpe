@@ -301,7 +301,11 @@ class Department():
         """
         Return one sample department from the list
         """
-        return list_departments()[0]
+        return Department.list()[0]
+
+    @classmethod
+    def list(cls):
+        return list_departments()
 
     # doit actions
 

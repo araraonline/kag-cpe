@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker: 
+      - image: continuumio/miniconda3:latest
+    steps:
+      - checkout
+      - run: conda update conda
+      - run: conda env create -f environment.yml
+      - run:
+          name: install
+          command: |
+              source activate cpe-kaggle
+              pip install -e .
+      - run:
+          name: import
+          command: |
+              source activate cpe-kaggle
+              python -c 'import cpe_help'
+      - run: du -hs /opt/conda/envs/*

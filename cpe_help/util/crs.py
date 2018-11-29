@@ -24,6 +24,42 @@ esri102739 = {
 }
 
 
+def from_epsg(number):
+    """
+    Return a CRS object referring to the specified EPSG number
+
+    Parameters
+    ----------
+    number : int or str
+
+    Returns
+    -------
+    dict
+    """
+    return {
+        'init': f'epsg:{number}',
+        'no_defs': True,
+    }
+
+
+def from_esri(number):
+    """
+    Return a CRS object referring to the specified ESRI number
+
+    Parameters
+    ----------
+    number : int or str
+
+    Returns
+    -------
+    dict
+    """
+    return {
+        'init': f'esri:{number}',
+        'no_defs': True,
+    }
+
+
 def equal_area_from_geodf(df):
     """
     Return equal-area projection for minimum distortion between bounds

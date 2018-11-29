@@ -17,4 +17,9 @@ jobs:
           command: |
               source activate cpe-kaggle
               python -c 'import cpe_help'
+      - run:
+          name: test
+          command: |
+              source activate cpe-kaggle
+              pytest cpe_help/tests/
       - run: du -hs /opt/conda/envs/*

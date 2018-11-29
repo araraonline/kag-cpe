@@ -305,7 +305,10 @@ class Department():
 
     @classmethod
     def list(cls):
-        return list_departments()
+        """
+        Return a list with all available Departments
+        """
+        return DepartmentCollection().list()
 
     # doit actions
 
@@ -738,15 +741,6 @@ class DepartmentCollection():
 
     def save_list_of_states(self, lst):
         save_json(lst, self.list_of_states_path)
-
-
-def list_departments():
-    """
-    Returns a list with all available Department's
-
-    This is a shortcut.
-    """
-    return DepartmentCollection().list()
 
 
 def list_states():

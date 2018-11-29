@@ -1,42 +1,29 @@
-name: cpe
+name: cpe-kaggle
 channels:
-  - nodefaults
-  - ioam
+  - defaults
   - conda-forge
 dependencies:
-  - python=3.6
-  - testpath=0.3.*
+  - contextily==0.99.*
+  - doit==0.31.*
+  - fiona=1.7.*
+  - flake8==3.6.*
+  - folium==0.6.*
+  - geopandas=0.4.*
+  - httpie==0.9.*
   - ipython=7.0.*
   - jupyter=1.0.*
-  - click=7.0.*
+  - matplotlib=3.0.*
   - numpy=1.15.*
   - pandas=0.23.*
-  - fiona=1.7.*
   - pyproj=1.9.*
-  - shapely=1.6.*
-  - matplotlib=3.0.*
-  - descartes=1.1.*
-  - statsmodels=0.9.*
+  - pytest==3.9.*
+  - python=3.7
+  - requests==2.20.*
   - scikit-learn=0.20.*
-  - bokeh=0.13.*
-  - holoviews=1.10.*
-  - selenium=3.14.*
-  - pillow=5.3.*
-  - phantomjs=2.1.*
-  - cartopy=0.16.*
-  - rasterio=1.0.*
-  - geopandas=0.4.*
+  - scipy=1.1.*
+  - seaborn==0.9.*
+  - shapely=1.6.*
+  - statsmodels=0.9.*
   - pip:
-    - doit==0.31.*
-    - httpie==0.9.*
-    - requests==2.20.*
-    - pytest==3.9.*
-    - kaggle==1.4.*
-    - flake8==3.6.*
     - us==1.0.*
-    - pytess==1.0.0
-    - folium==0.6.*
-    - branca==0.3.*
-    - contextily==0.99.*
-    - seaborn==0.9.*
 

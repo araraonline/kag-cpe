@@ -55,7 +55,7 @@ class Department():
 
     @property
     def spatial_input_dir(self):
-        return self.input_dir / 'shapefile'
+        return self.input_dir / 'spatial'
 
     @property
     def output_dir(self):

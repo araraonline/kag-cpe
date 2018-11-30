@@ -14,3 +14,5 @@ __all__ = [
     'path',
     'testing',
 ]
+
+from cpe_help.util.doit_tasks import TaskHelper

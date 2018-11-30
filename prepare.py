@@ -5,7 +5,7 @@ The tasks present here are required for the creation of tasks in the
 main dodo.py file.
 """
 
-import doit.tools
+import doit
 
 from cpe_help import Department, util
 from cpe_help.tiger import get_tiger

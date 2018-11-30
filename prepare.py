@@ -24,7 +24,7 @@ BASE_DIRECTORIES = [
     DATA_DIR / 'output',
     DATA_DIR / 'output' / 'department',
 
-    DATA_DIR / 'departments',
+    DATA_DIR / 'department',
     DATA_DIR / 'tiger',
 ]
 

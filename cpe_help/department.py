@@ -43,7 +43,7 @@ class Department():
 
     @property
     def path(self):
-        return DATA_DIR / 'departments' / self.name
+        return DATA_DIR / 'department' / self.name
 
     @property
     def input_dir(self):
@@ -703,7 +703,7 @@ class DepartmentCollection():
     """
     @property
     def path(self):
-        return DATA_DIR / 'departments'
+        return DATA_DIR / 'department'
 
     @property
     def list_of_states_path(self):

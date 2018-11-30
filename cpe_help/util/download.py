@@ -1,7 +1,7 @@
 import subprocess
 
 from cpe_help.util.configuration import get_configuration
-from cpe_help.util.files import maybe_rmfile
+from cpe_help.util.file import maybe_rmfile
 
 
 def download(url, out):

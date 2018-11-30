@@ -5,7 +5,7 @@ Tools for dealing with file compression
 import pathlib
 import shutil
 
-from cpe_help.util.files import (
+from cpe_help.util.file import (
     maybe_rmfile,
     maybe_rmtree,
 )

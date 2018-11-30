@@ -118,7 +118,11 @@ def spread_kaggle_inputs():
     """
     Spread Kaggle files into the input directory
     """
-    raise NotImplementedError
+    for dept in KaggleDepartment.list():
+        yield {
+            'name': dept.name,
+            'actions': [dept.spread_inputs],
+        }
 
 
 @doit.create_after('create_base_directories')

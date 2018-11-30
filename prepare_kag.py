@@ -73,8 +73,6 @@ class KaggleDepartment():
         """
         dst = Department(self.name)
 
-        # TODO: create subdirectories
-
         # copy shapefiles
         src_shapefile = self.shp_path
         dst_shapefile = dst.spatial_input_dir
@@ -82,6 +80,7 @@ class KaggleDepartment():
         shutil.copytree(src_shapefile, dst_shapefile)
 
         # copy tabular files
+        util.file.maybe_mkdir(dst.tabular_input_dir)
         for file in self.other_files:
             shutil.copy(file, dst.tabular_input_dir)
 

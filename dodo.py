@@ -15,7 +15,6 @@ from cpe_help import (
     list_states,
 )
 from cpe_help.tiger import get_tiger
-from cpe_help.util.doit_tasks import TaskHelper
 
 
 def task_download_state_boundaries():
@@ -42,27 +41,6 @@ def task_download_county_boundaries():
         'actions': [tiger.download_county_boundaries],
         'uptodate': [doit.tools.run_once],
     }
-
-
-def task_download_extra():
-    # just a prototype for other data that may be retrieved
-    yield TaskHelper.download(
-        'https://data.austintexas.gov/api/views/u2k2-n8ez/rows.csv?accessType=DOWNLOAD',
-        Department('37-00027').raw_dir / 'OIS.csv',
-        name='austin_ois',
-    )
-
-    yield TaskHelper.download(
-        'https://www2.census.gov/programs-surveys/acs/replicate_estimates/2016/data/5-year/140/B01001_25.csv.gz',
-        get_tiger().path / 'sample_vrt.csv.gz',
-        name='variance_rep_table',
-    )
-
-    # yield TaskHelper.download(
-    #     'https://data.austintexas.gov/api/views/g3bw-w7hh/rows.csv?accessType=DOWNLOAD',
-    #     Department('37-00027').raw_dir / 'crime_reports.csv',
-    #     name='austin_crimes',
-    # )
 
 
 def task_guess_states():

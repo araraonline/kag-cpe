@@ -65,7 +65,6 @@ def task_create_department_directories():
     Create departments' directories
     """
     depts = Department.list()
-    depts = [d.to_department() for d in depts]
     for dept in depts:
         yield {
             'name': dept.name,

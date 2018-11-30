@@ -98,10 +98,14 @@ class ACS(object):
         if self.key != '':
             params['key'] = self.key
 
+        # generate headers
+        ua = get_configuration()['Downloads']['UserAgent']
+        headers = {'User-Agent': ua}
+
         # generate query url
         query_url = f'https://api.census.gov/data/{self.year}/acs/acs5'
 
-        r = requests.get(query_url, params=params)
+        r = requests.get(query_url, params=params, headers=headers)
         r.raise_for_status()
 
         o = r.json()

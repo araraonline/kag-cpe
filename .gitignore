@@ -7,7 +7,6 @@ data/**
 !data/**/
 !data/**/.gitkeep
 !data/kaggle/cpe-data.zip
-!data/kaggle/**/*
 
 *.db.bak
 *.db.dat

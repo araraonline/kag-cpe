@@ -5,17 +5,16 @@ The tasks present here are required for the creation of tasks in the
 main dodo.py file.
 """
 
-import doit
 import doit.tools
 
-from cpe_help import Department
+from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
-from cpe_help.util.file import maybe_mkdir
-from cpe_help.util.path import DATA_DIR
 
 
+DATA_DIR = util.path.DATA_DIR
 BASE_DIRECTORIES = [
     DATA_DIR / 'kaggle',
+
     DATA_DIR / 'input',
     DATA_DIR / 'input' / 'department',
 
@@ -32,7 +31,7 @@ def _create_base_directories():
     Create base data directories
     """
     for dir in BASE_DIRECTORIES:
-        maybe_mkdir(dir)
+        util.file.maybe_mkdir(dir)
 
 
 def task_create_base_directories():
@@ -42,19 +41,6 @@ def task_create_base_directories():
     return {
         'targets': BASE_DIRECTORIES,
         'actions': [_create_base_directories],
-        'uptodate': [True],
-    }
-
-
-@doit.create_after('create_base_directories')
-def task_create_tiger_directories():
-    """
-    Create TIGER's directories
-    """
-    tiger = get_tiger()
-    return {
-        'targets': tiger.directories,
-        'actions': [tiger.create_directories],
         'uptodate': [True],
     }
 
@@ -72,3 +58,16 @@ def task_create_department_directories():
             'actions': [dept.create_directories],
             'uptodate': [True],
         }
+
+
+@doit.create_after('create_base_directories')
+def task_create_tiger_directories():
+    """
+    Create TIGER's directories
+    """
+    tiger = get_tiger()
+    return {
+        'targets': tiger.directories,
+        'actions': [tiger.create_directories],
+        'uptodate': [True],
+    }

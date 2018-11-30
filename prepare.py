@@ -1,8 +1,7 @@
 """
-Preparation tasks for doit
+General preparation tasks for doit
 
-The tasks present here are required for the creation of tasks in the
-main dodo.py file.
+Run this before the main dodo.py file.
 """
 
 import doit

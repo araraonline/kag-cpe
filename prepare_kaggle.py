@@ -1,8 +1,9 @@
 """
-Preparation tasks for doit
+Preparation tasks for inputs coming from Kaggle
 
-The tasks present here are required for the creation of tasks in the
-main dodo.py file.
+See also:
+
+prepare.py
 """
 
 import shutil

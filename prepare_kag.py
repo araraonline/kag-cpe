@@ -62,7 +62,7 @@ class KaggleDepartment():
         self.name = name
 
     def __repr__(self):
-        return f'InputDepartment(name={self.name!r})'
+        return f'KaggleDepartment(name={self.name!r})'
 
     def spread_inputs(self):
         """
@@ -114,7 +114,7 @@ def task_create_base_directories():
 
 
 @doit.create_after('create_base_directories')
-def spread_kaggle_inputs():
+def task_spread_kaggle_inputs():
     """
     Spread Kaggle files into the input directory
     """
@@ -125,13 +125,12 @@ def spread_kaggle_inputs():
         }
 
 
-@doit.create_after('create_base_directories')
+@doit.create_after('spread_kaggle_inputs')
 def task_create_department_directories():
     """
     Create departments' directories
     """
-    depts = Department.list()
-    for dept in depts:
+    for dept in Department.list():
         yield {
             'name': dept.name,
             'targets': dept.directories,

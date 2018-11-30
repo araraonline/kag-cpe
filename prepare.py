@@ -13,6 +13,8 @@ from cpe_help.tiger import get_tiger
 
 DATA_DIR = util.path.DATA_DIR
 BASE_DIRECTORIES = [
+    # TODO: think about these
+
     DATA_DIR / 'kaggle',
 
     DATA_DIR / 'input',

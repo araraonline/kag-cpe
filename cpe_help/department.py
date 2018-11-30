@@ -27,7 +27,7 @@ from cpe_help.util.io import (
 from cpe_help.util.configuration import get_acs_variables
 from cpe_help.util.file import maybe_mkdir, maybe_rmfile
 from cpe_help.util.interpolation import weighted_areas
-from cpe_help.util.path import DATA_DIR
+from cpe_help.util.path import DATA_DIR, INPUT_DIR
 
 
 class InputError(Exception):
@@ -706,13 +706,19 @@ class DepartmentCollection():
         return DATA_DIR / 'department'
 
     @property
+    def input_path(self):
+        return INPUT_DIR / 'department'
+
+    @property
     def list_of_states_path(self):
         return self.path / 'list_of_states.json'
 
     # util
 
     def list(self):
-        names = [x.name for x in self.path.iterdir() if x.is_dir()]
+        # use the input directory only, as this is a dependency for
+        # creating the other directories at prepare.py
+        names = [x.name for x in self.input_path.iterdir() if x.is_dir()]
         return [Department(name) for name in sorted(names)]
 
     # doit actions

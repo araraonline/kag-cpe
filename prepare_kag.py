@@ -30,6 +30,7 @@ BASE_DIRECTORIES = [
 ]
 
 KAGGLE_DIR = DATA_DIR / 'kaggle'
+CPE_DATA_ZIP = KAGGLE_DIR / 'cpe-data.zip'
 CPE_DATA_DIR = KAGGLE_DIR / 'cpe-data'
 
 
@@ -115,6 +116,14 @@ def task_create_base_directories():
 
 
 @doit.create_after('create_base_directories')
+def task_unzip_kaggle_inputs():
+    """
+    Unzip the Kaggle inputs file
+    """
+    return util.TaskHelper.unzip(CPE_DATA_ZIP, CPE_DATA_DIR)
+
+
+@doit.create_after('unzip_kaggle_inputs')
 def task_spread_kaggle_inputs():
     """
     Spread Kaggle files into the input directory

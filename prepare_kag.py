@@ -5,7 +5,9 @@ The tasks present here are required for the creation of tasks in the
 main dodo.py file.
 """
 
-import doit.tools
+import shutil
+
+import doit
 
 from cpe_help import Department, util
 from cpe_help.tiger import get_tiger
@@ -62,8 +64,24 @@ class KaggleDepartment():
     def __repr__(self):
         return f'InputDepartment(name={self.name!r})'
 
-    def to_department(self):
-        return Department(self.name)
+    def spread_inputs(self):
+        """
+        Spread my files to the department input directory
+
+        ACS data is being retrieved programatically, so, I will ignore
+        them.
+        """
+        dst = Department(self.name)
+
+        # copy shapefiles
+        src_shapefile = self.shp_path
+        dst_shapefile = dst.spatial_input_dir
+        util.file.maybe_rmtree(dst_shapefile)
+        shutil.copytree(src_shapefile, dst_shapefile)
+
+        # copy tabular files
+        for file in self.other_files:
+            shutil.copy(file, dst.tabular_input_dir)
 
     @classmethod
     def from_path(cls, path):

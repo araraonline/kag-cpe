@@ -27,6 +27,54 @@ BASE_DIRECTORIES = [
     DATA_DIR / 'tiger',
 ]
 
+KAGGLE_DIR = DATA_DIR / 'kaggle'
+CPE_DATA_DIR = KAGGLE_DIR / 'cpe-data'
+
+
+class KaggleDepartment():
+    """
+    I represent a Department that came directly from Kaggle data
+    """
+
+    @property
+    def path(self):
+        return CPE_DATA_DIR / f'Dept_{self.name}'
+
+    @property
+    def acs_path(self):
+        return self.path / f'{self.name}_ACS_data'
+
+    @property
+    def shp_path(self):
+        return self.path / f'{self.name}_Shapefiles'
+
+    @property
+    def acs_files(self):
+        return list(self.acs_path.glob(f'**/*_with_ann.csv'))
+
+    @property
+    def other_files(self):
+        return [x for x in self.path.iterdir() if x.is_file()]
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f'InputDepartment(name={self.name!r})'
+
+    def to_department(self):
+        return Department(self.name)
+
+    @classmethod
+    def from_path(cls, path):
+        return cls(path.name[5:])
+
+    @classmethod
+    def list(cls):
+        return [cls.from_path(x)
+                for x in CPE_DATA_DIR.iterdir()
+                if x.is_dir()]
+
 
 def _create_base_directories():
     """
@@ -45,6 +93,14 @@ def task_create_base_directories():
         'actions': [_create_base_directories],
         'uptodate': [True],
     }
+
+
+@doit.create_after('create_base_directories')
+def spread_kaggle_inputs():
+    """
+    Spread Kaggle files into the input directory
+    """
+    raise NotImplementedError
 
 
 @doit.create_after('create_base_directories')

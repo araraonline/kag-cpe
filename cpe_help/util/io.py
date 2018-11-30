@@ -10,7 +10,7 @@ import geopandas
 
 from cpe_help import util
 from cpe_help.util.compression import make_zipfile
-from cpe_help.util.files import maybe_rmfile
+from cpe_help.util.file import maybe_rmfile
 
 
 def save_json(obj, filename):

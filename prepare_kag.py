@@ -73,6 +73,8 @@ class KaggleDepartment():
         """
         dst = Department(self.name)
 
+        # TODO: create subdirectories
+
         # copy shapefiles
         src_shapefile = self.shp_path
         dst_shapefile = dst.spatial_input_dir

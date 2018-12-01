@@ -84,6 +84,7 @@ class Department():
             self.acs_output_dir,
             self.other_output_dir,
             self.sanity_check_dir,
+            self.sc_figures_dir,
         ]
 
     @property
@@ -149,6 +150,10 @@ class Department():
     @property
     def sc_html_path(self):
         return self.output_dir / 'sanity_check.html'
+
+    @property
+    def sc_figures_dir(self):
+        return self.sanity_check_dir / 'figures'
 
     # ACS outputs
 

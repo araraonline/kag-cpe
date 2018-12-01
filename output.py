@@ -77,3 +77,19 @@ def task_process_department_files():
                 'actions': [file.process],
                 'clean': True,
             }
+
+
+# sanity check
+
+def task_generate_sc_markdown():
+    """
+    Generate sanity check md files for each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [],
+            'targets': [dept.sc_markdown_path],
+            'actions': [dept.generate_sc_markdown],
+            'clean': [dept.remove_sc_markdown],
+        }

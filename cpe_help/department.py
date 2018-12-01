@@ -8,6 +8,7 @@ import abc
 import collections
 from importlib import import_module
 
+import jinja2
 import pandas
 import pandas as pd
 import us
@@ -82,6 +83,7 @@ class Department():
             self.output_dir,
             self.acs_output_dir,
             self.other_output_dir,
+            self.sanity_check_dir,
         ]
 
     @property
@@ -135,6 +137,14 @@ class Department():
     @property
     def police_precincts_path(self):
         return self.processed_dir / 'police_precincts.geojson'
+
+    @property
+    def sanity_check_dir(self):
+        return self.output_dir / '_sanity_check'
+
+    @property
+    def sc_markdown_path(self):
+        return self.sanity_check_dir / 'report.md'
 
     # ACS outputs
 
@@ -604,6 +614,53 @@ class Department():
 
     def remove_city_stats(self):
         maybe_rmfile(self.city_stats_path)
+
+    def generate_sc_markdown(self):
+        """
+        Generate sanity check report in markdown
+        """
+
+        def list_files(directory):
+            """list all files under a directory tree"""
+            import os
+            import pathlib
+
+            return [pathlib.Path(parent) / file
+                    for parent, _, files in os.walk(directory)
+                    for file in files]
+
+        name = self.name
+        klass = type(self).__name__
+        inferred_city = self.city
+        inferred_state = self.state.name
+        base_dir = util.path.DATA_DIR
+        input_files = [f.relative_to(base_dir)
+                       for f in list_files(self.input_dir)]
+        output_files = [f.relative_to(base_dir)
+                        for f in list_files(self.output_dir)]
+
+        # load template
+        template_path = util.path.TEMPLATES_DIR / 'sanity_check.md'
+        with open(template_path, mode='r') as f:
+            source = f.read()
+            template = jinja2.Template(source)
+
+        # generate text
+        result = template.render(
+            name=name,
+            klass=klass,
+            inferred_city=inferred_city,
+            inferred_state=inferred_state,
+            base_dir=base_dir,
+            input_files=input_files,
+            output_files=output_files,
+        )
+
+        with open(self.sc_markdown_path, mode='w') as f:
+            f.write(result)
+
+    def remove_sc_markdown(self):
+        maybe_rmfile(self.sc_markdown_path)
 
     # input
 

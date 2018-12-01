@@ -146,6 +146,10 @@ class Department():
     def sc_markdown_path(self):
         return self.sanity_check_dir / 'report.md'
 
+    @property
+    def sc_html_path(self):
+        return self.output_dir / 'sanity_check.html'
+
     # ACS outputs
 
     @property

@@ -93,3 +93,19 @@ def task_generate_sc_markdown():
             'actions': [dept.generate_sc_markdown],
             'clean': [dept.remove_sc_markdown],
         }
+
+
+def task_generate_sc_html():
+    """
+    Generate sanity check html files for each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [dept.sc_markdown_path],
+            'targets': [dept.sc_html_path],
+            'actions': [
+                'pandoc -f markdown -t html -o %(targets)s %(dependencies)s',
+            ],
+            'clean': True,
+        }

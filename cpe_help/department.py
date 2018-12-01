@@ -9,6 +9,9 @@ import collections
 from importlib import import_module
 
 import jinja2
+import matplotlib.lines
+import matplotlib.patches
+import matplotlib.pyplot
 import pandas
 import pandas as pd
 import us
@@ -154,6 +157,26 @@ class Department():
     @property
     def sc_figures_dir(self):
         return self.sanity_check_dir / 'figures'
+
+    @property
+    def sc_figure1_path(self):
+        return self.sc_figures_dir / 'figure1.png'
+
+    @property
+    def sc_figure2_path(self):
+        return self.sc_figures_dir / 'figure2.png'
+
+    @property
+    def sc_figure3_path(self):
+        return self.sc_figures_dir / 'figure3.png'
+
+    @property
+    def sc_figure4_path(self):
+        return self.sc_figures_dir / 'figure4.png'
+
+    @property
+    def sc_figure5_path(self):
+        return self.sc_figures_dir / 'figure5.png'
 
     # ACS outputs
 
@@ -670,6 +693,272 @@ class Department():
 
     def remove_sc_markdown(self):
         maybe_rmfile(self.sc_markdown_path)
+
+    def generate_sc_figure1(self):
+        """
+        Plot city and police precincts overlay
+        """
+        city = self.load_city_metadata()
+        precincts = self.load_police_precincts()
+
+        # set up common projection
+        proj = util.crs.equal_area_from_geodf(city)
+        city = city.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # imports
+        Line2D = matplotlib.lines.Line2D
+        Patch = matplotlib.patches.Patch
+
+        # plot
+        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+
+        city.plot(ax=ax, color='green', alpha=0.5)
+        precincts.plot(ax=ax, color='none', edgecolor='black', alpha=0.75)
+
+        legend_handles = [
+            Patch(facecolor='green', alpha=0.5, label='City'),
+            Line2D([0], [0], color='black', alpha=0.75,
+                   lw=1, label='Precinct boundaries')
+        ]
+        ax.legend(handles=legend_handles, loc='lower right')
+
+        ax.set_aspect('equal')
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("City and police precincts")
+
+        matplotlib.pyplot.savefig(
+            self.sc_figure1_path,
+            bbox_inches='tight',
+            dpi='figure',
+        )
+
+        # matplotlib keeps unclosed figures in the memory
+        matplotlib.pyplot.close(fig)
+
+    def generate_sc_figure2(self):
+        """
+        Plot police precincts over census tracts
+        """
+        tracts = self.load_census_tracts()
+        precincts = self.load_police_precincts()
+
+        # set up common projection
+        proj = util.crs.equal_area_from_geodf(tracts)
+        tracts = tracts.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # plot
+        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+
+        tracts.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
+        precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
+
+        Patch = matplotlib.patches.Patch
+        legend_handles = [
+            Patch(facecolor='green', alpha=0.5, label='Census tracts'),
+            Patch(facecolor='blue', alpha=0.5, label='Police precincts'),
+        ]
+        ax.legend(handles=legend_handles, loc='lower right')
+
+        ax.set_aspect('equal')
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Police precincts over census tracts")
+
+        matplotlib.pyplot.savefig(
+            self.sc_figure2_path,
+            bbox_inches='tight',
+            dpi='figure',
+        )
+
+        matplotlib.pyplot.close(fig)
+
+    def generate_sc_figure3(self):
+        """
+        Plot police precincts over block groups
+        """
+        bgs = self.load_block_groups()
+        precincts = self.load_police_precincts()
+
+        # set up common projection
+        proj = util.crs.equal_area_from_geodf(bgs)
+        bgs = bgs.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # plot
+        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+
+        bgs.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
+        precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
+
+        Patch = matplotlib.patches.Patch
+        legend_handles = [
+            Patch(facecolor='green', alpha=0.5, label='Block groups'),
+            Patch(facecolor='blue', alpha=0.5, label='Police precincts'),
+        ]
+        ax.legend(handles=legend_handles, loc='lower right')
+
+        ax.set_aspect('equal')
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Police precincts over block groups")
+
+        matplotlib.pyplot.savefig(
+            self.sc_figure3_path,
+            bbox_inches='tight',
+            dpi='figure',
+        )
+
+        matplotlib.pyplot.close(fig)
+
+    def generate_sc_figure4(self):
+        """
+        Plot police precincts over block groups (zoomed in)
+        """
+        bgs = self.load_block_groups()
+        precincts = self.load_police_precincts()
+
+        # set up common projection
+        proj = util.crs.equal_area_from_geodf(bgs)
+        bgs = bgs.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # get bounds
+        fig, ax = matplotlib.pyplot.subplots()
+        precincts.plot(ax=ax)
+        bounds = ax.axis()
+        matplotlib.pyplot.close(fig)
+
+        # plot
+        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+
+        bgs.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
+        precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
+
+        Patch = matplotlib.patches.Patch
+        legend_handles = [
+            Patch(facecolor='green', alpha=0.5, label='Block groups'),
+            Patch(facecolor='blue', alpha=0.5, label='Police precincts'),
+        ]
+        ax.legend(handles=legend_handles, loc='lower right')
+
+        ax.set_aspect('equal')
+        ax.axis(bounds)
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Police precincts over block groups (zoomed in)")
+
+        matplotlib.pyplot.savefig(
+            self.sc_figure4_path,
+            bbox_inches='tight',
+            dpi='figure',
+        )
+
+        matplotlib.pyplot.close(fig)
+
+    def generate_sc_figure5(self):
+        """
+        Plot population density at different levels
+        """
+        # load raw dataframes
+        tracts = self.load_census_tracts()
+        bgs = self.load_block_groups()
+        precincts = self.load_police_precincts()
+
+        # set up equal-area projection
+        proj = util.crs.equal_area_from_geodf(precincts)
+        tracts = tracts.to_crs(proj)
+        bgs = bgs.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # restrict areas to intersection (slow)
+        _area = precincts.unary_union
+        tracts = tracts[tracts.intersects(_area)]
+        bgs = bgs[bgs.intersects(_area)]
+
+        # calculate densities
+        tracts['POPULATION_DENSITY'] = tracts['TOTAL_POPULATION'] / tracts.area
+        bgs['POPULATION_DENSITY'] = bgs['TOTAL_POPULATION'] / bgs.area
+        precincts['POPULATION_DENSITY'] = (
+                precincts['TOTAL_POPULATION'] / precincts.area)
+
+        # get bounds
+        fig, ax = matplotlib.pyplot.subplots()
+        precincts.plot(ax=ax)
+        bounds = ax.axis()
+        matplotlib.pyplot.close(fig)
+
+        # plot
+        fig, axes = matplotlib.pyplot.subplots(
+            nrows=2,
+            ncols=2,
+            figsize=(12, 12),
+        )
+        axes[1][1].remove()
+
+        # plot (by block group)
+        ax = axes[0][0]
+        bgs.plot(
+            ax=ax,
+            column='POPULATION_DENSITY',
+            cmap='Blues',
+            scheme='fisher_jenks',
+            k=3,
+            edgecolor=(0, 0, 0, 0.5),
+            legend=True,
+            legend_kwds={'loc': 'lower right'},
+        )
+        ax.set_aspect('equal')
+        ax.axis(bounds)
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Population density over block groups (/mi^2)")
+
+        # plot (by census tract)
+        ax = axes[0][1]
+        tracts.plot(
+            ax=ax,
+            column='POPULATION_DENSITY',
+            cmap='Blues',
+            scheme='fisher_jenks',
+            k=3,
+            edgecolor=(0, 0, 0, 0.5),
+            legend=True,
+            legend_kwds={'loc': 'lower right'},
+        )
+        ax.set_aspect('equal')
+        ax.axis(bounds)
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Population density over census tracts (/mi^2)")
+
+        # plot (by police precinct)
+        ax = axes[1][0]
+        precincts.plot(
+            ax=ax,
+            column='POPULATION_DENSITY',
+            cmap='Blues',
+            scheme='fisher_jenks',
+            k=3,
+            edgecolor=(0, 0, 0, 0.5),
+            legend=True,
+            legend_kwds={'loc': 'lower right'},
+        )
+        ax.set_aspect('equal')
+        ax.set_xlabel('Distance from center (mi)')
+        ax.set_ylabel('Distance from center (mi)')
+        ax.set_title("Population density over police precincts (/mi^2)")
+
+        # save
+        matplotlib.pyplot.savefig(
+            self.sc_figure5_path,
+            bbox_inches='tight',
+            dpi='figure',
+        )
+
+        matplotlib.pyplot.close(fig)
 
     # input
 

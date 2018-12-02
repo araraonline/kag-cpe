@@ -100,7 +100,7 @@ def task_generate_sc_html():
     Generate sanity check html files for each department
     """
     for dept in Department.list():
-        command = (f"pandoc -f markdown -t html"
+        command = (f"pandoc --self-contained"
                    f" -o {dept.sc_html_path}"
                    f" {dept.sc_markdown_path}")
 

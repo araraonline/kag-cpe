@@ -1,4 +1,6 @@
-# Sanity check for department {{ name }}
+---
+title: 'Sanity check for department {{ name }}'
+---
 
 *this file was generated automatically by the CPE Helper package*
 

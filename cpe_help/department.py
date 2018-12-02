@@ -8,6 +8,7 @@ import abc
 import collections
 from importlib import import_module
 
+import fiona
 import jinja2
 import matplotlib.lines
 import matplotlib.patches
@@ -661,15 +662,27 @@ class Department():
                     for parent, _, files in os.walk(directory)
                     for file in files]
 
+        # base
         name = self.name
         klass = type(self).__name__
         inferred_city = self.city
         inferred_state = self.state.name
         base_dir = util.path.DATA_DIR
+
+        # files
         input_files = [f.relative_to(base_dir)
                        for f in list_files(self.input_dir)]
         output_files = [f.relative_to(base_dir)
                         for f in list_files(self.output_dir)]
+
+        # input shapefile
+        input_shp_location = self.spatial_input_dir
+        input_shp_layers = fiona.listlayers(str(input_shp_location))
+        input_shp = util.io.load_shp(input_shp_location)
+        input_shp_crs = input_shp.crs
+        input_shp_columns = sorted(set(input_shp.columns) - {'geometry'})
+
+        # output shapefile can be in various formats, I will jump it
 
         # load template
         template_path = util.path.TEMPLATES_DIR / 'sanity_check.md'
@@ -687,6 +700,9 @@ class Department():
             base_dir=base_dir,
             input_files=input_files,
             output_files=output_files,
+            shp_crs=input_shp_crs,
+            shp_layers=input_shp_layers,
+            shp_columns=input_shp_columns,
         )
 
         with open(self.sc_markdown_path, mode='w') as f:

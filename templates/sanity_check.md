@@ -11,6 +11,15 @@ title: 'Sanity check for department {{ name }}'
 - Inferred city: {{ inferred_city }}
 - Inferred state: {{ inferred_state }}
 
+### Shapefile
+
+CRS: `{{ shp_crs }}`
+Layers: `{{ shp_layers }}`
+Variables:
+{% for var in shp_columns %}
+- `{{ var }}`
+{%- endfor %}
+
 ### Inputs
 
 *with respect to {{ base_dir }}*

@@ -404,7 +404,9 @@ class Department():
 
         # we want to avoid statistical entities
         # ref: https://www.census.gov/geo/reference/funcstat.html
-        places = places[places['FUNCSTAT'] == 'A']
+        # the 'F' is left here for Indianopolis
+        # ref: https://en.wikipedia.org/wiki/Indianapolis#Demographics
+        places = places[places['FUNCSTAT'].isin(['A', 'F'])]
 
         # speeding things up
         places = places[places.intersects(police.unary_union)]

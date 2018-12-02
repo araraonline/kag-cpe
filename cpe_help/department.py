@@ -679,6 +679,7 @@ class Department():
 
         # generate text
         result = template.render(
+            dept=self,
             name=name,
             klass=klass,
             inferred_city=inferred_city,

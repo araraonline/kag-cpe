@@ -19,7 +19,6 @@ import us
 # TODO clean imports
 
 from cpe_help import ACS, TIGER, util
-from cpe_help.util.configuration import get_acs_variables
 
 
 class InputError(Exception):
@@ -476,7 +475,7 @@ class Department():
         acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
-        variables = get_acs_variables()
+        variables = util.configuration.get_acs_variables()
 
         # must make 1 request per county
         frames = []
@@ -503,7 +502,7 @@ class Department():
         acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
-        variables = get_acs_variables()
+        variables = util.configuration.get_acs_variables()
 
         # must make 1 request per county
         frames = []

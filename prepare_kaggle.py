@@ -10,7 +10,11 @@ import shutil
 
 import doit
 
-from cpe_help import Department, TIGER, util
+from cpe_help import (
+    Department,
+    TIGER,
+    util,
+)
 
 
 DATA_DIR = util.path.DATA_DIR

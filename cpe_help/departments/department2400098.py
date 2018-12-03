@@ -96,7 +96,7 @@ class VehicleStops(DepartmentFile):
 
     def _save_processed(self, df):
         # convert Timestamp column to str
-        _config = util.configuration.get_configuration()
+        _config = util.get_configuration()
         _dt_format = _config['Output']['DateAndTimeFormat']
         df['INCIDENT_DATE'] = df['INCIDENT_DATE'].dt.strftime(_dt_format)
 

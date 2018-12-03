@@ -126,6 +126,6 @@ def _get_dt_format():
     """
     Return the datetime format that should be used in the outputs
     """
-    config = util.configuration.get_configuration()
+    config = util.get_configuration()
     format = config['Output']['DateAndTimeFormat']
     return format

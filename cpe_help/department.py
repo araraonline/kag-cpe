@@ -385,8 +385,8 @@ class Department():
         union = shape1.union(shape2)
 
         # determine counties with plausible intersection
-        counties = counties.set_index('COUNTYFP')
         tol = precincts.area.min() * 1e-6
+        counties = counties.set_index('COUNTYFP')
         intersection = counties.intersection(union).area
         intersecting = intersection[intersection > tol].index.tolist()
 

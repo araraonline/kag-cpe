@@ -4,11 +4,11 @@ Module for testing the ACS class
 
 import pytest
 
-from cpe_help.acs import get_acs
+from cpe_help import ACS
 
 
 def test_simple_query():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["NAME", "B01001_002E", "B01001_026E"]
     geography = 'county'
@@ -21,7 +21,7 @@ def test_simple_query():
 
 
 def test_big_query():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["B01001_002E"] * 50
     geography = 'county'
@@ -33,7 +33,7 @@ def test_big_query():
 
 
 def test_simple_data():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["NAME", "B01001_002E", "B01001_026E"]
     geography = 'county'
@@ -47,7 +47,7 @@ def test_simple_data():
 
 
 def test_big_data():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["B01001_002E"] * 50 + ['NAME']
     geography = 'county'
@@ -59,7 +59,7 @@ def test_big_data():
 
 
 def test_hierarchic_inside():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["NAME", "B01001_002E", "B01001_026E"]
     geography = 'tract'
@@ -72,7 +72,7 @@ def test_hierarchic_inside():
 
 
 def test_simple_data_dictvariables():
-    acs = get_acs()
+    acs = ACS()
 
     variables = {
         'NAME': 'Geography Name',
@@ -90,7 +90,7 @@ def test_simple_data_dictvariables():
 
 
 def test_dtypes():
-    acs = get_acs()
+    acs = ACS()
 
     variables = ["NAME", "B01001_002E", "B01001_026E"]
     geography = 'county'
@@ -113,7 +113,7 @@ def test_null_variables():
     # desired level, the Census returns nulls, and the ACS class should
     # generate a warning.
 
-    acs = get_acs()
+    acs = ACS()
 
     variables = {
         'B01001_001E': 'VARIABLE_OKAY',

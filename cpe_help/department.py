@@ -18,8 +18,7 @@ import us
 
 # TODO clean imports
 
-from cpe_help import TIGER, util
-from cpe_help.acs import get_acs
+from cpe_help import ACS, TIGER, util
 from cpe_help.util.configuration import get_acs_variables
 
 
@@ -474,7 +473,7 @@ class Department():
         Relevant census tracts are those inside counties that compose
         this department.
         """
-        acs = get_acs()
+        acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
         variables = get_acs_variables()
@@ -501,7 +500,7 @@ class Department():
         Relevant block groups are those inside counties that compose
         this department.
         """
-        acs = get_acs()
+        acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
         variables = get_acs_variables()

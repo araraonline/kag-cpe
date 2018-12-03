@@ -169,19 +169,19 @@ class ACS(object):
         --------
         To retrieve the total population in the USA:
 
-        >>> acs = get_acs()
+        >>> acs = ACS()
         >>> variables = ['B01001_001E']
         >>> df = acs.data(variables)
 
         Same case, but renaming 'B01001_001E' to 'Total Population':
 
-        >>> acs = get_acs()
+        >>> acs = ACS()
         >>> variables = {'B01001_001E': 'Total Population'}
         >>> df = acs.data(variables)
 
         Retrieve variable for all tracts inside Autauga County, Alabama:
 
-        >>> acs = get_acs()
+        >>> acs = ACS()
         >>> variables = ['B01001_001E']
         >>> geography = 'tract'
         >>> inside = 'state:01 county:001'

@@ -1,4 +1,4 @@
-from cpe_help.acs import get_acs
+from cpe_help.acs import ACS
 from cpe_help.department import (
     Department,
     DepartmentCollection,

@@ -11,9 +11,6 @@ https://www.census.gov/geo/maps-data/data/tiger.html
 
 from cpe_help import util
 from cpe_help.util.download import download
-from cpe_help.util.file import maybe_mkdir
-from cpe_help.util.io import load_zipshp
-from cpe_help.util.path import DATA_DIR
 
 
 class TIGER():
@@ -23,7 +20,7 @@ class TIGER():
 
     @property
     def path(self):
-        return DATA_DIR / 'tiger' / f'{self.year}'
+        return util.path.DATA_DIR / 'tiger' / f'{self.year}'
 
     @property
     def directories(self):
@@ -82,7 +79,7 @@ class TIGER():
         Create the directories where files will be saved
         """
         for dir in self.directories:
-            maybe_mkdir(dir)
+            util.files.maybe_mkdir(dir)
 
     def download_state_boundaries(self):
         """
@@ -144,7 +141,7 @@ class TIGER():
         -------
         geopandas.GeoDataFrame
         """
-        return load_zipshp(self.state_boundaries_path)
+        return util.io.load_zipshp(self.state_boundaries_path)
 
     def load_county_boundaries(self):
         """
@@ -154,7 +151,7 @@ class TIGER():
         -------
         geopandas.GeoDataFrame
         """
-        return load_zipshp(self.county_boundaries_path)
+        return util.io.load_zipshp(self.county_boundaries_path)
 
     def load_tract_boundaries(self, state):
         """
@@ -169,7 +166,7 @@ class TIGER():
         -------
         geopandas.GeoDataFrame
         """
-        return load_zipshp(self.tract_boundaries_path(state))
+        return util.io.load_zipshp(self.tract_boundaries_path(state))
 
     def load_bg_boundaries(self, state):
         """
@@ -184,7 +181,7 @@ class TIGER():
         -------
         geopandas.GeoDataFrame
         """
-        return load_zipshp(self.bg_boundaries_path(state))
+        return util.io.load_zipshp(self.bg_boundaries_path(state))
 
     def load_place_boundaries(self, state):
         """
@@ -201,4 +198,4 @@ class TIGER():
         -------
         geopandas.GeoDataFrame
         """
-        return load_zipshp(self.place_boundaries_path(state))
+        return util.io.load_zipshp(self.place_boundaries_path(state))

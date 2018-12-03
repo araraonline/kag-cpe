@@ -6,8 +6,11 @@ Run this before the main dodo.py file.
 
 import doit
 
-from cpe_help import Department, util
-from cpe_help.tiger import get_tiger
+from cpe_help import (
+    Department,
+    TIGER,
+    util,
+)
 
 
 DATA_DIR = util.path.DATA_DIR
@@ -65,7 +68,7 @@ def task_create_tiger_directories():
     """
     Create TIGER's directories
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     return {
         'targets': tiger.directories,
         'actions': [tiger.create_directories],

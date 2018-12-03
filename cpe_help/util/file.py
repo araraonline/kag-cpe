@@ -3,7 +3,17 @@ Utilities for creating/removing files and directories
 """
 
 import os
+import pathlib
 import shutil
+
+
+def list_files(directory):
+    """
+    List all files under a directory tree
+    """
+    return [pathlib.Path(parent) / file
+            for parent, _, files in os.walk(directory)
+            for file in files]
 
 
 def maybe_mkdir(path):

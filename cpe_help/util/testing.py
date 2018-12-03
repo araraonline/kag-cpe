@@ -1,6 +1,6 @@
 import numpy
 import geopandas
-from pandas.util.testing import assert_frame_equal
+import pandas.util.testing
 
 
 def assert_geoframe_almost_equal(left, right):
@@ -29,7 +29,7 @@ def assert_geoframe_almost_equal(left, right):
     assert (sym_diff.area < tol).all()
 
     # pandas already accepts close equality of floats
-    assert_frame_equal(
+    pandas.util.testing.assert_frame_equal(
         left.drop('geometry', axis=1),
         right.drop('geometry', axis=1),
     )

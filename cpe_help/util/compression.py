@@ -5,10 +5,7 @@ Tools for dealing with file compression
 import pathlib
 import shutil
 
-from cpe_help.util.file import (
-    maybe_rmfile,
-    maybe_rmtree,
-)
+from cpe_help import util
 
 
 def make_zipfile(filename, root_dir):
@@ -29,7 +26,7 @@ def make_zipfile(filename, root_dir):
     None
     """
     path = pathlib.Path(filename)
-    maybe_rmfile(path)
+    util.file.maybe_rmfile(path)
     shutil.make_archive(path.with_suffix(''), 'zip', root_dir)
 
 
@@ -51,5 +48,5 @@ def extract_zipfile(filename, extract_dir):
     -------
     None
     """
-    maybe_rmtree(extract_dir)
+    util.file.maybe_rmtree(extract_dir)
     shutil.unpack_archive(filename, extract_dir, 'zip')

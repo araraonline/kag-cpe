@@ -1,6 +1,6 @@
-from setuptools import setup, find_packages
+import setuptools
 
-setup(
+setuptools.setup(
     name='cpe_help',
-    packages=find_packages(),
+    packages=setuptools.find_packages(),
 )

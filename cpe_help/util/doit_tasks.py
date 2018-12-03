@@ -2,6 +2,8 @@
 Task creators for doit
 """
 
+from cpe_help import util
+
 
 class TaskHelper(object):
     """
@@ -33,10 +35,9 @@ class TaskHelper(object):
         dict
             The task to be performed.
         """
-        from cpe_help.util.download import download
         task = {
             'targets': [out],
-            'actions': [(download, (url, out))],
+            'actions': [(util.network.download, (url, out))],
             'uptodate': [not overwrite],
         }
         task.update(kwargs)
@@ -67,13 +68,11 @@ class TaskHelper(object):
         will only be rerun when the whole output directory goes missing
         (not its contents).
         """
-        from cpe_help.util.compression import extract_zipfile
-        from cpe_help.util.file import maybe_rmtree
         task = {
             'file_dep': [file],
             'targets': [dir],
-            'actions': [(extract_zipfile, (file, dir))],
-            'clean': [(maybe_rmtree, (dir,))],
+            'actions': [(util.compression.extract_zipfile, (file, dir))],
+            'clean': [(util.file.maybe_rmtree, (dir,))],
         }
         task.update(kwargs)
         return task

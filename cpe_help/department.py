@@ -6,7 +6,7 @@ Probably will become the main file of the project.
 
 import abc
 import collections
-from importlib import import_module
+import importlib
 
 import fiona
 import jinja2
@@ -14,25 +14,11 @@ import matplotlib.lines
 import matplotlib.patches
 import matplotlib.pyplot
 import pandas
-import pandas as pd
 import us
 
-# TODO clean imports
-
 from cpe_help import util
-from cpe_help.acs import get_acs
-from cpe_help.tiger import get_tiger
-from cpe_help.util import crs
-from cpe_help.util.io import (
-    load_json,
-    load_zipshp,
-    save_json,
-    save_zipshp,
-)
-from cpe_help.util.configuration import get_acs_variables
-from cpe_help.util.file import maybe_mkdir, maybe_rmfile
-from cpe_help.util.interpolation import weighted_areas
-from cpe_help.util.path import DATA_DIR, INPUT_DIR
+from cpe_help.acs import ACS
+from cpe_help.tiger import TIGER
 
 
 class InputError(Exception):
@@ -48,7 +34,7 @@ class Department():
 
     @property
     def path(self):
-        return DATA_DIR / 'department' / self.name
+        return util.path.DATA_DIR / 'department' / self.name
 
     @property
     def input_dir(self):
@@ -230,7 +216,7 @@ class Department():
 
         try:
             # instantiate specific subclass
-            mod = import_module(module_name)
+            mod = importlib.import_module(module_name)
             klass = getattr(mod, class_name)
             return super().__new__(klass)
         except ModuleNotFoundError:
@@ -283,7 +269,7 @@ class Department():
             A 1-lined GeoDataFrame whose only entry corresponds to the
             requested data.
         """
-        tiger = get_tiger()
+        tiger = TIGER()
         places = tiger.load_place_boundaries(self.state.fips)
         places = places[places['NAME'] == self.city]
         assert places.shape[0] == 1
@@ -360,7 +346,7 @@ class Department():
         Create the directories where files will be saved
         """
         for dir in self.directories:
-            maybe_mkdir(dir)
+            util.file.maybe_mkdir(dir)
 
     def preprocess_shapefile(self):
         """
@@ -379,18 +365,18 @@ class Department():
         if not raw.crs:
             msg = f"Department {self.name} has no projection defined"
             raise InputError(msg)
-        pre = raw.to_crs(crs.DEFAULT)
+        pre = raw.to_crs(util.crs.DEFAULT)
 
         self.save_preprocessed_shapefile(pre)
 
     def remove_preprocessed_shapefile(self):
-        maybe_rmfile(self.preprocessed_shapefile_path)
+        util.file.maybe_rmfile(self.preprocessed_shapefile_path)
 
     def guess_state(self):
         """
         Guess the state this department is in
         """
-        states = get_tiger().load_state_boundaries()
+        states = TIGER().load_state_boundaries()
         precincts = self.load_preprocessed_shapefile()
 
         # set up equal area projection
@@ -406,14 +392,14 @@ class Department():
         self.save_guessed_state(state)
 
     def remove_guessed_state(self):
-        maybe_rmfile(self.guessed_state_path)
+        util.file.maybe_rmfile(self.guessed_state_path)
 
     def guess_counties(self):
         """
         Guess the counties that make part of this city and department
         """
         city = self.load_city_metadata()
-        counties = get_tiger().load_county_boundaries()
+        counties = TIGER().load_county_boundaries()
         precincts = self.load_preprocessed_shapefile()
 
         # speed things up
@@ -446,13 +432,13 @@ class Department():
         self.save_guessed_counties(intersecting)
 
     def remove_guessed_counties(self):
-        maybe_rmfile(self.guessed_counties_path)
+        util.file.maybe_rmfile(self.guessed_counties_path)
 
     def guess_city(self):
         """
         Guess the city this department is in
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         places = tiger.load_place_boundaries(self.state.fips)
         police = self.load_preprocessed_shapefile()
@@ -467,7 +453,7 @@ class Department():
         # speeding things up
         places = places[places.intersects(police.unary_union)]
 
-        proj = crs.equal_area_from_geodf(places)
+        proj = util.crs.equal_area_from_geodf(places)
         places = places.to_crs(proj)
         police = police.to_crs(proj)
 
@@ -477,7 +463,7 @@ class Department():
         self.save_guessed_city(city_name)
 
     def remove_guessed_city(self):
-        maybe_rmfile(self.guessed_city_path)
+        util.file.maybe_rmfile(self.guessed_city_path)
 
     def download_tract_values(self):
         """
@@ -486,10 +472,10 @@ class Department():
         Relevant census tracts are those inside counties that compose
         this department.
         """
-        acs = get_acs()
+        acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
-        variables = get_acs_variables()
+        variables = util.configuration.get_acs_variables()
 
         # must make 1 request per county
         frames = []
@@ -500,11 +486,11 @@ class Department():
                 inside='state:{} county:{}'.format(state, county),
             )
             frames.append(df)
-        frame = pd.concat(frames)
+        frame = pandas.concat(frames)
         self.save_tract_values(frame)
 
     def remove_tract_values(self):
-        maybe_rmfile(self.tract_values_path)
+        util.file.maybe_rmfile(self.tract_values_path)
 
     def download_bg_values(self):
         """
@@ -513,10 +499,10 @@ class Department():
         Relevant block groups are those inside counties that compose
         this department.
         """
-        acs = get_acs()
+        acs = ACS()
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
-        variables = get_acs_variables()
+        variables = util.configuration.get_acs_variables()
 
         # must make 1 request per county
         frames = []
@@ -527,18 +513,18 @@ class Department():
                 inside='state:{} county:{}'.format(state, county),
             )
             frames.append(df)
-        frame = pd.concat(frames)
+        frame = pandas.concat(frames)
         self.save_bg_values(frame)
 
     def remove_bg_values(self):
-        maybe_rmfile(self.bg_values_path)
+        util.file.maybe_rmfile(self.bg_values_path)
 
     def process_census_tracts(self):
         """
         Merge census tract values with geography (for intersecting
         counties)
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
@@ -572,13 +558,13 @@ class Department():
         self.save_census_tracts(joined)
 
     def remove_census_tracts(self):
-        maybe_rmfile(self.census_tracts_path)
+        util.file.maybe_rmfile(self.census_tracts_path)
 
     def process_block_groups(self):
         """
         Merge block group values with geography (intersecting counties)
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
@@ -612,7 +598,7 @@ class Department():
         self.save_block_groups(joined)
 
     def remove_block_groups(self):
-        maybe_rmfile(self.block_groups_path)
+        util.file.maybe_rmfile(self.block_groups_path)
 
     def process_police_precincts(self):
         """
@@ -624,12 +610,12 @@ class Department():
         """
         police = self.load_preprocessed_shapefile()
         bgs = self.load_block_groups()
-        new_police = weighted_areas(bgs, police.geometry)
+        new_police = util.interpolation.weighted_areas(bgs, police.geometry)
         joined = police.join(new_police.drop('geometry', axis=1))
         self.save_police_precincts(joined)
 
     def remove_police_precincts(self):
-        maybe_rmfile(self.police_precincts_path)
+        util.file.maybe_rmfile(self.police_precincts_path)
 
     def generate_city_stats(self):
         """
@@ -646,21 +632,12 @@ class Department():
         self.save_city_stats(stats)
 
     def remove_city_stats(self):
-        maybe_rmfile(self.city_stats_path)
+        util.file.maybe_rmfile(self.city_stats_path)
 
     def generate_sc_markdown(self):
         """
         Generate sanity check report in markdown
         """
-
-        def list_files(directory):
-            """list all files under a directory tree"""
-            import os
-            import pathlib
-
-            return [pathlib.Path(parent) / file
-                    for parent, _, files in os.walk(directory)
-                    for file in files]
 
         # base
         name = self.name
@@ -671,9 +648,9 @@ class Department():
 
         # files
         input_files = [f.relative_to(base_dir)
-                       for f in list_files(self.input_dir)]
+                       for f in util.file.list_files(self.input_dir)]
         output_files = [f.relative_to(base_dir)
-                        for f in list_files(self.output_dir)]
+                        for f in util.file.list_files(self.output_dir)]
 
         # input shapefile
         input_shp_location = self.spatial_input_dir
@@ -709,7 +686,7 @@ class Department():
             f.write(result)
 
     def remove_sc_markdown(self):
-        maybe_rmfile(self.sc_markdown_path)
+        util.file.maybe_rmfile(self.sc_markdown_path)
 
     def generate_sc_figure1(self):
         """
@@ -723,7 +700,6 @@ class Department():
         city = city.to_crs(proj)
         precincts = precincts.to_crs(proj)
 
-        # imports
         Line2D = matplotlib.lines.Line2D
         Patch = matplotlib.patches.Patch
 
@@ -984,22 +960,22 @@ class Department():
         return util.io.load_shp(path)
 
     def load_preprocessed_shapefile(self):
-        return load_zipshp(self.preprocessed_shapefile_path)
+        return util.io.load_zipshp(self.preprocessed_shapefile_path)
 
     def load_guessed_state(self):
-        return load_json(self.guessed_state_path)
+        return util.io.load_json(self.guessed_state_path)
 
     def load_guessed_counties(self):
-        return load_json(self.guessed_counties_path)
+        return util.io.load_json(self.guessed_counties_path)
 
     def load_guessed_city(self):
-        return load_json(self.guessed_city_path)
+        return util.io.load_json(self.guessed_city_path)
 
     def load_tract_values(self):
-        return pd.read_pickle(self.tract_values_path)
+        return pandas.read_pickle(self.tract_values_path)
 
     def load_bg_values(self):
-        return pd.read_pickle(self.bg_values_path)
+        return pandas.read_pickle(self.bg_values_path)
 
     def load_block_groups(self):
         return util.io.load_geojson(self.block_groups_path)
@@ -1018,16 +994,16 @@ class Department():
     # output
 
     def save_preprocessed_shapefile(self, df):
-        save_zipshp(df, self.preprocessed_shapefile_path)
+        util.io.save_zipshp(df, self.preprocessed_shapefile_path)
 
     def save_guessed_state(self, geoid):
-        save_json(geoid, self.guessed_state_path)
+        util.io.save_json(geoid, self.guessed_state_path)
 
     def save_guessed_counties(self, lst):
-        save_json(lst, self.guessed_counties_path)
+        util.io.save_json(lst, self.guessed_counties_path)
 
     def save_guessed_city(self, city_name):
-        save_json(city_name, self.guessed_city_path)
+        util.io.save_json(city_name, self.guessed_city_path)
 
     def save_tract_values(self, df):
         df.to_pickle(self.tract_values_path)
@@ -1090,11 +1066,11 @@ class DepartmentCollection():
     """
     @property
     def path(self):
-        return DATA_DIR / 'department'
+        return util.path.DATA_DIR / 'department'
 
     @property
     def input_path(self):
-        return INPUT_DIR / 'department'
+        return util.path.INPUT_DIR / 'department'
 
     @property
     def list_of_states_path(self):
@@ -1125,15 +1101,15 @@ class DepartmentCollection():
         """
         Remove the list of states
         """
-        maybe_rmfile(self.list_of_states_path)
+        util.file.maybe_rmfile(self.list_of_states_path)
 
     # input/output
 
     def load_list_of_states(self):
-        return load_json(self.list_of_states_path)
+        return util.io.load_json(self.list_of_states_path)
 
     def save_list_of_states(self, lst):
-        save_json(lst, self.list_of_states_path)
+        util.io.save_json(lst, self.list_of_states_path)
 
 
 def list_states():

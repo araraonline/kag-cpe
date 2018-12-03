@@ -1,11 +1,11 @@
 import configparser
 
-from cpe_help.util.path import CONFIG_PATH
+from cpe_help import util
 
 
 def get_configuration():
     config = configparser.RawConfigParser()
-    config.read(CONFIG_PATH)
+    config.read(util.path.CONFIG_PATH)
     return config
 
 

@@ -78,7 +78,7 @@ class TIGER():
         Create the directories where files will be saved
         """
         for dir in self.directories:
-            util.files.maybe_mkdir(dir)
+            util.file.maybe_mkdir(dir)
 
     def download_state_boundaries(self):
         """

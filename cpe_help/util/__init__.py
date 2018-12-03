@@ -3,11 +3,11 @@ from cpe_help.util import (
     compression,
     configuration,
     crs,
-    download,
     file,
     interpolation,
     io,
     misc,
+    network,
     path,
     testing,
 )

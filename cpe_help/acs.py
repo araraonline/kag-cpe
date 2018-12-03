@@ -3,8 +3,7 @@ import warnings
 import pandas
 import requests
 
-from cpe_help.util.configuration import get_configuration
-from cpe_help.util.misc import grouper
+from cpe_help import util
 
 
 # ACS variables that should not be converted to numbers
@@ -99,7 +98,7 @@ class ACS(object):
             params['key'] = self.key
 
         # generate headers
-        ua = get_configuration()['Downloads']['UserAgent']
+        ua = util.get_configuration()['Downloads']['UserAgent']
         headers = {'User-Agent': ua}
 
         # generate query url
@@ -188,7 +187,7 @@ class ACS(object):
 
         dframes = []
         # split variables into chunks of 50
-        for chunk in grouper(query_vars, 50):
+        for chunk in util.misc.grouper(query_vars, 50):
             json_result = self._query(chunk, geography, inside)
 
             # generate DataFrame from chunk result
@@ -226,7 +225,7 @@ def get_acs():
     """
     Return a default ACS instance (based on configuration)
     """
-    config = get_configuration()
+    config = util.get_configuration()
     key = config['Census']['Key']
     year = config['Census'].getint('Year')
     return ACS(year, key)

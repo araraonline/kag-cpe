@@ -20,18 +20,29 @@ class ACS(object):
     Note that only the 5 year estimates will be available through this
     class.
     """
-    def __init__(self, year, key):
+    def __init__(self, year=None, key=None):
         """
         Initialize a new ACS object
 
         Parameters
         ----------
-        year : int
+        year : None or int, default None
             The last year to retrieve data from. For example, if
             year=2015, retrieve data from 2011-2015.
-        key : str
-            A key used to make requests for the data.
+
+            If None, use the year specified in the configuration file.
+        key : None or str, default None
+            A key used to make requests for the data. If None, use the
+            key specified in the configuration file.
         """
+        # retrieve default values from configuration
+        if year is None or key is None:
+            config = util.get_configuration()
+            if year is None:
+                year = config['Census'].getint('Year')
+            if key is None:
+                key = config['Census']['Key']
+
         self.year = year
         self.key = key
 
@@ -219,13 +230,3 @@ class ACS(object):
             result = result.rename(columns=rename_vars)
 
         return result
-
-
-def get_acs():
-    """
-    Return a default ACS instance (based on configuration)
-    """
-    config = util.get_configuration()
-    key = config['Census']['Key']
-    year = config['Census'].getint('Year')
-    return ACS(year, key)

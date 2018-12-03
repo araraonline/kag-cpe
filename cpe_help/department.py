@@ -347,19 +347,20 @@ class Department():
         """
         Guess the state this department is in
         """
-        tiger = get_tiger()
-        states = tiger.load_state_boundaries()
+        states = get_tiger().load_state_boundaries()
+        precincts = self.load_preprocessed_shapefile()
+
+        # set up equal area projection
+        proj = util.crs.equal_area_from_geodf(precincts)
+        states = states.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # determine state with biggest intersection
         states = states.set_index('GEOID')
+        intersection = states.intersection(precincts.unary_union).area
+        state = intersection.idxmax()
 
-        shape = self.load_preprocessed_shapefile()
-        shape = shape.to_crs(states.crs)
-        union = shape.unary_union
-
-        intersecting = [ix for ix, geom in states.geometry.iteritems()
-                        if union.intersects(geom)]
-        assert len(intersecting) == 1
-
-        self.save_guessed_state(intersecting[0])
+        self.save_guessed_state(state)
 
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)
@@ -368,25 +369,37 @@ class Department():
         """
         Guess the counties that make part of this city and department
         """
-        tiger = get_tiger()
-        counties = tiger.load_county_boundaries()
-        counties = counties.set_index('COUNTYFP')
+        city = self.load_city_metadata()
+        counties = get_tiger().load_county_boundaries()
+        precincts = self.load_preprocessed_shapefile()
 
-        # load city boundaries
-        shape1 = self.load_city_metadata()
-        shape1 = shape1.to_crs(counties.crs)
-        shape1 = shape1.unary_union
+        # speed things up
+        city = city.to_crs(counties.crs)
+        precincts = precincts.to_crs(counties.crs)
 
-        # load department boundaries
-        shape2 = self.load_preprocessed_shapefile()
-        shape2 = shape2.to_crs(counties.crs)
-        shape2 = shape2.unary_union
-
-        # unite city and department
+        shape1 = city.geometry.iloc[0]
+        shape2 = precincts.unary_union
         union = shape1.union(shape2)
 
-        intersecting = [ix for ix, geom in counties.geometry.iteritems()
-                        if union.intersects(geom)]
+        counties = counties[counties.intersects(union)]
+
+        # set up equal area projection
+        proj = util.crs.equal_area_from_geodf(city)
+        city = city.to_crs(proj)
+        counties = counties.to_crs(proj)
+        precincts = precincts.to_crs(proj)
+
+        # calculate union of city and precincts
+        shape1 = city.geometry.iloc[0]
+        shape2 = precincts.unary_union
+        union = shape1.union(shape2)
+
+        # determine counties with plausible intersection
+        tol = precincts.area.min() * 1e-6
+        counties = counties.set_index('COUNTYFP')
+        intersection = counties.intersection(union).area
+        intersecting = intersection[intersection > tol].index.tolist()
+
         self.save_guessed_counties(intersecting)
 
     def remove_guessed_counties(self):

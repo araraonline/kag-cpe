@@ -19,9 +19,8 @@ import us
 
 # TODO clean imports
 
-from cpe_help import util
+from cpe_help import TIGER, util
 from cpe_help.acs import get_acs
-from cpe_help.tiger import get_tiger
 from cpe_help.util import crs
 from cpe_help.util.io import (
     load_json,
@@ -283,7 +282,7 @@ class Department():
             A 1-lined GeoDataFrame whose only entry corresponds to the
             requested data.
         """
-        tiger = get_tiger()
+        tiger = TIGER()
         places = tiger.load_place_boundaries(self.state.fips)
         places = places[places['NAME'] == self.city]
         assert places.shape[0] == 1
@@ -390,7 +389,7 @@ class Department():
         """
         Guess the state this department is in
         """
-        states = get_tiger().load_state_boundaries()
+        states = TIGER().load_state_boundaries()
         precincts = self.load_preprocessed_shapefile()
 
         # set up equal area projection
@@ -413,7 +412,7 @@ class Department():
         Guess the counties that make part of this city and department
         """
         city = self.load_city_metadata()
-        counties = get_tiger().load_county_boundaries()
+        counties = TIGER().load_county_boundaries()
         precincts = self.load_preprocessed_shapefile()
 
         # speed things up
@@ -452,7 +451,7 @@ class Department():
         """
         Guess the city this department is in
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         places = tiger.load_place_boundaries(self.state.fips)
         police = self.load_preprocessed_shapefile()
@@ -538,7 +537,7 @@ class Department():
         Merge census tract values with geography (for intersecting
         counties)
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()
@@ -578,7 +577,7 @@ class Department():
         """
         Merge block group values with geography (intersecting counties)
         """
-        tiger = get_tiger()
+        tiger = TIGER()
 
         state = self.load_guessed_state()
         counties = self.load_guessed_counties()

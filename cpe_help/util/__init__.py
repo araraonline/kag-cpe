@@ -7,7 +7,7 @@ __all__ = [
     'configuration',
     'crs',
     'download',
-    'files',
+    'file',
     'interpolation',
     'io',
     'misc',

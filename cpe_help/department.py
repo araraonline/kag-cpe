@@ -373,6 +373,16 @@ class Department():
         counties = get_tiger().load_county_boundaries()
         precincts = self.load_preprocessed_shapefile()
 
+        # speed things up
+        city = city.to_crs(counties.crs)
+        precincts = precincts.to_crs(counties.crs)
+
+        shape1 = city.geometry.iloc[0]
+        shape2 = precincts.unary_union
+        union = shape1.union(shape2)
+
+        counties = counties[counties.intersects(union)]
+
         # set up equal area projection
         proj = util.crs.equal_area_from_geodf(city)
         city = city.to_crs(proj)

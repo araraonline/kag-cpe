@@ -13,15 +13,15 @@ from cpe_help import (
     Department,
     DepartmentCollection,
     list_states,
+    TIGER,
 )
-from cpe_help.tiger import get_tiger
 
 
 def task_download_state_boundaries():
     """
     Download state boundaries from the ACS website
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     file = tiger.state_boundaries_path
     return {
         'targets': [file],
@@ -34,7 +34,7 @@ def task_download_county_boundaries():
     """
     Download county boundaries from the TIGER shapefiles
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     file = tiger.county_boundaries_path
     return {
         'targets': [file],
@@ -47,7 +47,7 @@ def task_guess_states():
     """
     Guess the state for each department
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     for dept in Department.list():
         yield {
             'name': dept.name,
@@ -165,7 +165,7 @@ def task_download_tract_boundaries():
     """
     Download census tract boundaries for each state
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     for state in list_states():
         yield {
             'name': state,
@@ -180,7 +180,7 @@ def task_download_bg_boundaries():
     """
     Download block group boundaries for each relevant state
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     for state in list_states():
         yield {
             'name': state,
@@ -195,7 +195,7 @@ def task_download_place_boundaries():
     """
     Download place boundaries for each relevant state
     """
-    tiger = get_tiger()
+    tiger = TIGER()
     for state in list_states():
         yield {
             'name': state,

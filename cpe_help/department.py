@@ -700,7 +700,6 @@ class Department():
         city = city.to_crs(proj)
         precincts = precincts.to_crs(proj)
 
-        # imports
         Line2D = matplotlib.lines.Line2D
         Patch = matplotlib.patches.Patch
 

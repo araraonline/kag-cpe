@@ -68,13 +68,11 @@ class TaskHelper(object):
         will only be rerun when the whole output directory goes missing
         (not its contents).
         """
-        from cpe_help.util.compression import extract_zipfile
-        from cpe_help.util.file import maybe_rmtree
         task = {
             'file_dep': [file],
             'targets': [dir],
-            'actions': [(extract_zipfile, (file, dir))],
-            'clean': [(maybe_rmtree, (dir,))],
+            'actions': [(util.compression.extract_zipfile, (file, dir))],
+            'clean': [(util.file.maybe_rmtree, (dir,))],
         }
         task.update(kwargs)
         return task

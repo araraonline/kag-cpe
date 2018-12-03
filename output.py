@@ -77,3 +77,131 @@ def task_process_department_files():
                 'actions': [file.process],
                 'clean': True,
             }
+
+
+# sanity check
+
+def task_generate_sc_markdown():
+    """
+    Generate sanity check md files for each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [],
+            'targets': [dept.sc_markdown_path],
+            'actions': [dept.generate_sc_markdown],
+            'clean': [dept.remove_sc_markdown],
+        }
+
+
+def task_generate_sc_html():
+    """
+    Generate sanity check html files for each department
+    """
+    for dept in Department.list():
+        command = (f"pandoc --self-contained"
+                   f" -o {dept.sc_html_path}"
+                   f" {dept.sc_markdown_path}")
+
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.sc_figure1_path,
+                dept.sc_figure2_path,
+                dept.sc_figure3_path,
+                dept.sc_figure4_path,
+                dept.sc_figure5_path,
+                dept.sc_markdown_path,
+            ],
+            'targets': [dept.sc_html_path],
+            'actions': [command],
+            'clean': True,
+        }
+
+
+def task_generate_sc_figure1():
+    """
+    Generate figure #1 for the sanity check of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_city_path,
+                dept.police_precincts_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.sc_figure1_path],
+            'actions': [dept.generate_sc_figure1],
+            'clean': True,
+        }
+
+
+def task_generate_sc_figure2():
+    """
+    Generate figure #2 for the sanity check of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.census_tracts_path,
+                dept.police_precincts_path,
+            ],
+            'targets': [dept.sc_figure2_path],
+            'actions': [dept.generate_sc_figure2],
+            'clean': True,
+        }
+
+
+def task_generate_sc_figure3():
+    """
+    Generate figure #3 for the sanity check of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.block_groups_path,
+                dept.police_precincts_path,
+            ],
+            'targets': [dept.sc_figure3_path],
+            'actions': [dept.generate_sc_figure3],
+            'clean': True,
+        }
+
+
+def task_generate_sc_figure4():
+    """
+    Generate figure #4 for the sanity check of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.block_groups_path,
+                dept.police_precincts_path,
+            ],
+            'targets': [dept.sc_figure4_path],
+            'actions': [dept.generate_sc_figure4],
+            'clean': True,
+        }
+
+
+def task_generate_sc_figure5():
+    """
+    Generate figure #5 for the sanity check of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.census_tracts_path,
+                dept.block_groups_path,
+                dept.police_precincts_path,
+            ],
+            'targets': [dept.sc_figure5_path],
+            'actions': [dept.generate_sc_figure5],
+            'clean': True,
+        }

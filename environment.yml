@@ -11,10 +11,12 @@ dependencies:
   - geopandas=0.4.*
   - httpie==0.9.*
   - ipython=7.0.*
+  - jinja2=2.10.*
   - jupyter=1.0.*
   - matplotlib=3.0.*
   - numpy=1.15.*
   - pandas=0.23.*
+  - pandoc=2.4.*
   - pyproj=1.9.*
   - pytest==3.9.*
   - python=3.7

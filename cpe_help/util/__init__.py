@@ -16,3 +16,4 @@ __all__ = [
 ]
 
 from cpe_help.util.doit_tasks import TaskHelper
+from cpe_help.util.configuration import get_configuration

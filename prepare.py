@@ -21,6 +21,8 @@ def task_create_department_directories():
     for dept in Department.list():
         yield {
             'name': dept.name,
+            # just to make sure
+            'file_dep': [util.path.CONFIG_PATH],
             'targets': dept.directories,
             'actions': [dept.create_directories],
             'uptodate': [True],
@@ -33,6 +35,7 @@ def task_create_tiger_directories():
     """
     tiger = TIGER()
     return {
+        'file_dep': [util.path.CONFIG_PATH],
         'targets': tiger.directories,
         'actions': [tiger.create_directories],
         'uptodate': [True],

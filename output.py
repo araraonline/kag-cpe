@@ -5,7 +5,7 @@ This should not be run directly. Instead, all tasks here are imported at
 the main dodo.py file and will be run there.
 """
 
-from cpe_help import Department
+from cpe_help import Department, util
 
 
 def task_output_city():
@@ -72,7 +72,8 @@ def task_process_department_files():
         for file_name, file in dept.files.items():
             yield {
                 'name': f'{dept}:{file_name}',
-                'file_dep': [file.raw_path] + file.dependencies,
+                'file_dep': file.dependencies +
+                        [file.raw_path, util.path.CONFIG_PATH],
                 'targets': [file.processed_path],
                 'actions': [file.process],
                 'clean': True,
@@ -92,6 +93,7 @@ def task_generate_sc_markdown():
             'targets': [dept.sc_markdown_path],
             'actions': [dept.generate_sc_markdown],
             'clean': True,
+            'uptodate': [False],
         }
 
 

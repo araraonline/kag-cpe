@@ -14,6 +14,7 @@ from cpe_help import (
     DepartmentCollection,
     list_states,
     TIGER,
+    util,
 )
 
 
@@ -24,6 +25,7 @@ def task_download_state_boundaries():
     tiger = TIGER()
     file = tiger.state_boundaries_path
     return {
+        'file_dep': [util.path.CONFIG_PATH],
         'targets': [file],
         'actions': [tiger.download_state_boundaries],
         'uptodate': [True],
@@ -37,6 +39,7 @@ def task_download_county_boundaries():
     tiger = TIGER()
     file = tiger.county_boundaries_path
     return {
+        'file_dep': [util.path.CONFIG_PATH],
         'targets': [file],
         'actions': [tiger.download_county_boundaries],
         'uptodate': [doit.tools.run_once],
@@ -137,6 +140,7 @@ def task_download_tract_values():
             'file_dep': [
                 dept.guessed_state_path,
                 dept.guessed_counties_path,
+                util.path.CONFIG_PATH,
             ],
             'targets': [dept.tract_values_path],
             'actions': [dept.download_tract_values],
@@ -151,6 +155,7 @@ def task_download_bg_values():
             'file_dep': [
                 dept.guessed_state_path,
                 dept.guessed_counties_path,
+                util.path.CONFIG_PATH,
             ],
             'targets': [dept.bg_values_path],
             'actions': [dept.download_bg_values],
@@ -167,6 +172,7 @@ def task_download_tract_boundaries():
     for state in list_states():
         yield {
             'name': state,
+            'file_dep': [util.path.CONFIG_PATH],
             'actions': [(tiger.download_tract_boundaries, (state,))],
             'targets': [tiger.tract_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
@@ -182,6 +188,7 @@ def task_download_bg_boundaries():
     for state in list_states():
         yield {
             'name': state,
+            'file_dep': [util.path.CONFIG_PATH],
             'actions': [(tiger.download_bg_boundaries, (state,))],
             'targets': [tiger.bg_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],
@@ -197,6 +204,7 @@ def task_download_place_boundaries():
     for state in list_states():
         yield {
             'name': state,
+            'file_dep': [util.path.CONFIG_PATH],
             'actions': [(tiger.download_place_boundaries, (state,))],
             'targets': [tiger.place_boundaries_path(state)],
             'uptodate': [doit.tools.run_once],

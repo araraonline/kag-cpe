@@ -369,25 +369,27 @@ class Department():
         """
         Guess the counties that make part of this city and department
         """
-        tiger = get_tiger()
-        counties = tiger.load_county_boundaries()
-        counties = counties.set_index('COUNTYFP')
+        city = self.load_city_metadata()
+        counties = get_tiger().load_county_boundaries()
+        precincts = self.load_preprocessed_shapefile()
 
-        # load city boundaries
-        shape1 = self.load_city_metadata()
-        shape1 = shape1.to_crs(counties.crs)
-        shape1 = shape1.unary_union
+        # set up equal area projection
+        proj = util.crs.equal_area_from_geodf(city)
+        city = city.to_crs(proj)
+        counties = counties.to_crs(proj)
+        precincts = precincts.to_crs(proj)
 
-        # load department boundaries
-        shape2 = self.load_preprocessed_shapefile()
-        shape2 = shape2.to_crs(counties.crs)
-        shape2 = shape2.unary_union
-
-        # unite city and department
+        # calculate union of city and precincts
+        shape1 = city.geometry.iloc[0]
+        shape2 = precincts.unary_union
         union = shape1.union(shape2)
 
-        intersecting = [ix for ix, geom in counties.geometry.iteritems()
-                        if union.intersects(geom)]
+        # determine counties with plausible intersection
+        counties = counties.set_index('COUNTYFP')
+        tol = precincts.area.min() * 1e-6
+        intersection = counties.intersection(union).area
+        intersecting = intersection[intersection > tol].index.tolist()
+
         self.save_guessed_counties(intersecting)
 
     def remove_guessed_counties(self):

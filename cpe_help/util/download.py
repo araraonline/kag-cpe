@@ -1,7 +1,6 @@
 import subprocess
 
-from cpe_help.util.configuration import get_configuration
-from cpe_help.util.file import maybe_rmfile
+from cpe_help import util
 
 
 def download(url, out):
@@ -23,7 +22,7 @@ def download(url, out):
     """
     out = str(out)
     # delete file if it already exists
-    maybe_rmfile(out)
+    util.file.maybe_rmfile(out)
     _download(url, out)
 
 
@@ -36,7 +35,7 @@ def _download(url, out):
     url : str
     out : str or Path
     """
-    ua = get_configuration()['Downloads']['UserAgent']
+    ua = util.get_configuration()['Downloads']['UserAgent']
     subprocess.run([
         'http',
         '--ignore-stdin',

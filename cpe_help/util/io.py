@@ -9,8 +9,6 @@ import tempfile
 import geopandas
 
 from cpe_help import util
-from cpe_help.util.compression import make_zipfile
-from cpe_help.util.file import maybe_rmfile
 
 
 def save_json(obj, filename):
@@ -93,7 +91,7 @@ def save_geojson(df, path):
     format = _get_dt_format()
     df[cols] = df[cols].apply(lambda c: c.dt.strftime(format))
 
-    maybe_rmfile(path)
+    util.file.maybe_rmfile(path)
     df.to_file(str(path), driver='GeoJSON')
 
 
@@ -121,7 +119,7 @@ def save_zipshp(df, path):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpname = (pathlib.Path(tmpdir) / name).with_suffix('.shp')
         df.to_file(str(tmpname))
-        make_zipfile(path, tmpdir)
+        util.compression.make_zipfile(path, tmpdir)
 
 
 def _get_dt_format():

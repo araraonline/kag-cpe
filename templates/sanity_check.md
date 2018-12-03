@@ -13,8 +13,8 @@ title: 'Sanity check for department {{ name }}'
 
 ### Shapefile
 
-CRS: `{{ shp_crs }}`
-Layers: `{{ shp_layers }}`
+CRS: `{{ shp_crs }}`  
+Layers: `{{ shp_layers }}`  
 Variables:
 {% for var in shp_columns %}
 - `{{ var }}`

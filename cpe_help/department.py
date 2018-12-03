@@ -347,13 +347,13 @@ class Department():
         """
         Guess the state this department is in
         """
-        precincts = self.load_preprocessed_shapefile()
         states = get_tiger().load_state_boundaries()
+        precincts = self.load_preprocessed_shapefile()
 
         # set up equal area projection
         proj = util.crs.equal_area_from_geodf(precincts)
-        precincts = precincts.to_crs(proj)
         states = states.to_crs(proj)
+        precincts = precincts.to_crs(proj)
 
         # determine state with biggest intersection
         states = states.set_index('GEOID')

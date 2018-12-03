@@ -641,15 +641,6 @@ class Department():
         Generate sanity check report in markdown
         """
 
-        def list_files(directory):
-            """list all files under a directory tree"""
-            import os
-            import pathlib
-
-            return [pathlib.Path(parent) / file
-                    for parent, _, files in os.walk(directory)
-                    for file in files]
-
         # base
         name = self.name
         klass = type(self).__name__
@@ -659,9 +650,9 @@ class Department():
 
         # files
         input_files = [f.relative_to(base_dir)
-                       for f in list_files(self.input_dir)]
+                       for f in util.file.list_files(self.input_dir)]
         output_files = [f.relative_to(base_dir)
-                        for f in list_files(self.output_dir)]
+                        for f in util.file.list_files(self.output_dir)]
 
         # input shapefile
         input_shp_location = self.spatial_input_dir

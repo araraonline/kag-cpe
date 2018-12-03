@@ -19,6 +19,8 @@ def test_save_geojson_with_bool():
         geometry=[Point(0, 0)],
     )
     with tempfile.NamedTemporaryFile(suffix='.json') as fp:
+        # reusing the filename may fail on Windows
+        # https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile
         tmp = fp.name
         util.io.save_geojson(df, tmp)
         result = util.io.load_geojson(tmp)
@@ -38,6 +40,8 @@ def test_save_geojson_with_datetime():
         geometry=[Point(0, 0)],
     )
     with tempfile.NamedTemporaryFile(suffix='.json') as fp:
+        # reusing the filename may fail on Windows
+        # https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile
         tmp = fp.name
         util.io.save_geojson(df, tmp)
         result = util.io.load_geojson(tmp)

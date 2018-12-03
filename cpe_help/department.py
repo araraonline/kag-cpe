@@ -347,19 +347,20 @@ class Department():
         """
         Guess the state this department is in
         """
-        tiger = get_tiger()
-        states = tiger.load_state_boundaries()
+        precincts = self.load_preprocessed_shapefile()
+        states = get_tiger().load_state_boundaries()
+
+        # set up equal area projection
+        proj = util.crs.equal_area_from_geodf(precincts)
+        precincts = precincts.to_crs(proj)
+        states = states.to_crs(proj)
+
+        # determine state with biggest intersection
         states = states.set_index('GEOID')
+        intersection = states.intersection(precincts.unary_union).area
+        state = intersection.idxmax()
 
-        shape = self.load_preprocessed_shapefile()
-        shape = shape.to_crs(states.crs)
-        union = shape.unary_union
-
-        intersecting = [ix for ix, geom in states.geometry.iteritems()
-                        if union.intersects(geom)]
-        assert len(intersecting) == 1
-
-        self.save_guessed_state(intersecting[0])
+        self.save_guessed_state(state)
 
     def remove_guessed_state(self):
         maybe_rmfile(self.guessed_state_path)

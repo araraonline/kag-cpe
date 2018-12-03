@@ -16,9 +16,11 @@ import matplotlib.pyplot
 import pandas
 import us
 
-# TODO clean imports
-
-from cpe_help import ACS, TIGER, util
+from cpe_help import (
+    ACS,
+    TIGER,
+    util,
+)
 
 
 class InputError(Exception):

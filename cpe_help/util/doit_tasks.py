@@ -2,6 +2,8 @@
 Task creators for doit
 """
 
+from cpe_help import util
+
 
 class TaskHelper(object):
     """
@@ -33,10 +35,9 @@ class TaskHelper(object):
         dict
             The task to be performed.
         """
-        from cpe_help.util.download import download
         task = {
             'targets': [out],
-            'actions': [(download, (url, out))],
+            'actions': [(util.network.download, (url, out))],
             'uptodate': [not overwrite],
         }
         task.update(kwargs)

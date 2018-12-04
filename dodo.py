@@ -205,14 +205,14 @@ def task_download_place_boundaries():
 
 def task_process_city():
     """
-    Merge city statistics to city geometry
+    Generate city statistics
     """
     for dept in Department.list():
         yield {
             'name': dept.name,
             'file_dep': [
+                dept.block_groups_path,
                 dept.guessed_city_path,
-                dept.city_stats_path,
             ],
             'task_dep': ['download_place_boundaries'],
             'targets': [dept.city_path],

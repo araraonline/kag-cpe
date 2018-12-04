@@ -168,6 +168,10 @@ class Department():
     # ACS outputs
 
     @property
+    def city_output(self):
+        return self.acs_output_dir / 'city.geojson'
+
+    @property
     def census_tracts_output(self):
         return self.acs_output_dir / 'census_tracts.geojson'
 
@@ -178,10 +182,6 @@ class Department():
     @property
     def police_precincts_output(self):
         return self.acs_output_dir / 'police_precincts.geojson'
-
-    @property
-    def city_output(self):
-        return self.acs_output_dir / 'city.geojson'
 
     # department-specific files
 
@@ -935,6 +935,9 @@ class Department():
     def load_guessed_city(self):
         return util.io.load_json(self.guessed_city_path)
 
+    def load_city(self):
+        return util.io.load_geojson(self.city_path)
+
     def load_tract_values(self):
         return pandas.read_pickle(self.tract_values_path)
 
@@ -950,9 +953,6 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
-    def load_city(self):
-        return util.io.load_geojson(self.city_path)
-
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -966,6 +966,9 @@ class Department():
 
     def save_guessed_city(self, city_name):
         util.io.save_json(city_name, self.guessed_city_path)
+
+    def save_city(self, df):
+        util.io.save_geojson(df, self.city_path)
 
     def save_tract_values(self, df):
         df.to_pickle(self.tract_values_path)
@@ -981,9 +984,6 @@ class Department():
 
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
-
-    def save_city(self, df):
-        util.io.save_geojson(df, self.city_path)
 
 
 class DepartmentFile(abc.ABC):

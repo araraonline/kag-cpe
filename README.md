@@ -1,9 +1,9 @@
 # Data Science for Good
 
-This is a personal repository to come up with solutions for [this challenge][1]
+This is a personal repository to come up with solutions for [this challenge][1].
 
-As it is public, feel free to steal little bits.
+Explanation: <https://www.kaggle.com/araraonline/cpe-helper>
 
-My email: <andre0lra@gmail.com>
+Contact: <andre0lra@gmail.com>
 
 [1]: https://www.kaggle.com/center-for-policing-equity/data-science-for-good/

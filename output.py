@@ -8,15 +8,15 @@ the main dodo.py file and will be run there.
 from cpe_help import Department
 
 
-def task_output_city_stats():
+def task_output_city():
     """
     Output city stats for each department
     """
     for dept in Department.list():
         yield {
             'name': dept.name,
-            'file_dep': [dept.city_stats_path],
-            'targets': [dept.city_stats_output],
+            'file_dep': [dept.city_path],
+            'targets': [dept.city_output],
             'actions': ['cp %(dependencies)s %(targets)s'],
             'clean': True,
         }

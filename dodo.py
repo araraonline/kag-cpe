@@ -203,6 +203,24 @@ def task_download_place_boundaries():
         }
 
 
+def task_process_city():
+    """
+    Generate statistics for the city of each department
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.block_groups_path,
+                dept.guessed_city_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.city_path],
+            'actions': [dept.process_city],
+            'clean': True,
+        }
+
+
 def task_process_census_tracts():
     """
     Merge census tract values with census tract boundaries
@@ -254,24 +272,6 @@ def task_process_police_precincts():
             ],
             'targets': [dept.police_precincts_path],
             'actions': [dept.process_police_precincts],
-            'clean': True,
-        }
-
-
-def task_generate_city_stats():
-    """
-    Generate statistics for the city of each department
-    """
-    for dept in Department.list():
-        yield {
-            'name': dept.name,
-            'file_dep': [
-                dept.guessed_city_path,
-                dept.block_groups_path,
-            ],
-            'task_dep': ['download_place_boundaries'],
-            'targets': [dept.city_stats_path],
-            'actions': [dept.generate_city_stats],
             'clean': True,
         }
 

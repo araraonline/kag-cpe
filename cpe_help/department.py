@@ -114,8 +114,8 @@ class Department():
         return self.raw_dir / 'bg_values.pkl'
 
     @property
-    def city_stats_path(self):
-        return self.processed_dir / 'city_stats.json'
+    def city_path(self):
+        return self.processed_dir / 'city.geojson'
 
     @property
     def census_tracts_path(self):
@@ -168,8 +168,8 @@ class Department():
     # ACS outputs
 
     @property
-    def city_stats_output(self):
-        return self.acs_output_dir / 'city_stats.json'
+    def city_output(self):
+        return self.acs_output_dir / 'city.geojson'
 
     @property
     def census_tracts_output(self):
@@ -501,6 +501,23 @@ class Department():
         frame = pandas.concat(frames)
         self.save_bg_values(frame)
 
+    def process_city(self):
+        """
+        Generate statistics for my city
+
+        The statistics are extracted from the BGs that intersect with
+        the city.
+
+        See also
+        --------
+        Department.process_police_precincts
+        """
+        city = self.load_city_metadata()
+        bgs = self.load_block_groups()
+        new_city = util.interpolation.weighted_areas(bgs, city.geometry)
+        joined = city.join(new_city.drop('geometry', axis=1))
+        self.save_city(joined)
+
     def process_census_tracts(self):
         """
         Merge census tract values with geography (for intersecting
@@ -589,20 +606,6 @@ class Department():
         new_police = util.interpolation.weighted_areas(bgs, police.geometry)
         joined = police.join(new_police.drop('geometry', axis=1))
         self.save_police_precincts(joined)
-
-    def generate_city_stats(self):
-        """
-        Generate statistics for my city
-
-        The statistics are extracted from the BGs that intersect with
-        the city, in a method called areal interpolation.
-        """
-        city = self.load_city_metadata()
-        bgs = self.load_block_groups()
-        stats = util.interpolation.weighted_areas(bgs, city.geometry)
-        # use stats as a Series without geometry
-        stats = stats.iloc[0].drop('geometry')
-        self.save_city_stats(stats)
 
     def generate_sc_markdown(self):
         """
@@ -935,6 +938,9 @@ class Department():
     def load_guessed_city(self):
         return util.io.load_json(self.guessed_city_path)
 
+    def load_city(self):
+        return util.io.load_geojson(self.city_path)
+
     def load_tract_values(self):
         return pandas.read_pickle(self.tract_values_path)
 
@@ -950,11 +956,6 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
-    def load_city_stats(self):
-        obj = util.io.load_json(self.city_stats_path)
-        ser = pandas.Series(obj)
-        return ser
-
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -968,6 +969,9 @@ class Department():
 
     def save_guessed_city(self, city_name):
         util.io.save_json(city_name, self.guessed_city_path)
+
+    def save_city(self, df):
+        util.io.save_geojson(df, self.city_path)
 
     def save_tract_values(self, df):
         df.to_pickle(self.tract_values_path)
@@ -983,10 +987,6 @@ class Department():
 
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
-
-    def save_city_stats(self, ser):
-        obj = ser.to_dict()
-        util.io.save_json(obj, self.city_stats_path)
 
 
 class DepartmentFile(abc.ABC):

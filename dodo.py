@@ -120,12 +120,10 @@ def task_preprocess_shapefiles():
     for dept in Department.list():
         yield {
             'name': dept.name,
-            # TODO: arrange dependencies
-            # TODO: remove uptodate
+            'file_dep': list(dept.spatial_input_dir.iterdir()),
             'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
             'clean': [dept.remove_preprocessed_shapefile],
-            'uptodate': [True],
         }
 
 

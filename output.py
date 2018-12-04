@@ -91,7 +91,7 @@ def task_generate_sc_markdown():
             'file_dep': [],
             'targets': [dept.sc_markdown_path],
             'actions': [dept.generate_sc_markdown],
-            'clean': [dept.remove_sc_markdown],
+            'clean': True,
         }
 
 

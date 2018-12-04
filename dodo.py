@@ -57,7 +57,7 @@ def task_guess_states():
             ],
             'targets': [dept.guessed_state_path],
             'actions': [dept.guess_state],
-            'clean': [dept.remove_guessed_state],
+            'clean': True,
         }
 
 
@@ -81,7 +81,7 @@ def task_guess_counties():
             ],
             'targets': [dept.guessed_counties_path],
             'actions': [dept.guess_counties],
-            'clean': [dept.remove_guessed_counties],
+            'clean': True,
         }
 
 
@@ -99,7 +99,7 @@ def task_guess_cities():
             'task_dep': ['download_place_boundaries'],
             'targets': [dept.guessed_city_path],
             'actions': [dept.guess_city],
-            'clean': [dept.remove_guessed_city],
+            'clean': True,
         }
 
 
@@ -112,7 +112,7 @@ def task_create_list_of_states():
         'file_dep': [dept.guessed_state_path for dept in Department.list()],
         'targets': [dept_coll.list_of_states_path],
         'actions': [dept_coll.create_list_of_states],
-        'clean': [dept_coll.remove_list_of_states],
+        'clean': True,
     }
 
 
@@ -123,7 +123,7 @@ def task_preprocess_shapefiles():
             'file_dep': list(dept.spatial_input_dir.iterdir()),
             'targets': [dept.preprocessed_shapefile_path],
             'actions': [dept.preprocess_shapefile],
-            'clean': [dept.remove_preprocessed_shapefile],
+            'clean': True,
         }
 
 
@@ -140,7 +140,7 @@ def task_download_tract_values():
             ],
             'targets': [dept.tract_values_path],
             'actions': [dept.download_tract_values],
-            'clean': [dept.remove_tract_values],
+            'clean': True,
         }
 
 
@@ -154,7 +154,7 @@ def task_download_bg_values():
             ],
             'targets': [dept.bg_values_path],
             'actions': [dept.download_bg_values],
-            'clean': [dept.remove_bg_values],
+            'clean': True,
         }
 
 
@@ -218,7 +218,7 @@ def task_process_census_tracts():
             'task_dep': ['download_tract_boundaries'],
             'targets': [dept.census_tracts_path],
             'actions': [dept.process_census_tracts],
-            'clean': [dept.remove_census_tracts],
+            'clean': True,
         }
 
 
@@ -237,7 +237,7 @@ def task_process_block_groups():
             'task_dep': ['download_bg_boundaries'],
             'targets': [dept.block_groups_path],
             'actions': [dept.process_block_groups],
-            'clean': [dept.remove_block_groups],
+            'clean': True,
         }
 
 
@@ -254,7 +254,7 @@ def task_process_police_precincts():
             ],
             'targets': [dept.police_precincts_path],
             'actions': [dept.process_police_precincts],
-            'clean': [dept.remove_police_precincts],
+            'clean': True,
         }
 
 
@@ -272,7 +272,7 @@ def task_generate_city_stats():
             'task_dep': ['download_place_boundaries'],
             'targets': [dept.city_stats_path],
             'actions': [dept.generate_city_stats],
-            'clean': [dept.remove_city_stats],
+            'clean': True,
         }
 
 

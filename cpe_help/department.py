@@ -369,9 +369,6 @@ class Department():
 
         self.save_preprocessed_shapefile(pre)
 
-    def remove_preprocessed_shapefile(self):
-        util.file.maybe_rmfile(self.preprocessed_shapefile_path)
-
     def guess_state(self):
         """
         Guess the state this department is in
@@ -390,9 +387,6 @@ class Department():
         state = intersection.idxmax()
 
         self.save_guessed_state(state)
-
-    def remove_guessed_state(self):
-        util.file.maybe_rmfile(self.guessed_state_path)
 
     def guess_counties(self):
         """
@@ -431,9 +425,6 @@ class Department():
 
         self.save_guessed_counties(intersecting)
 
-    def remove_guessed_counties(self):
-        util.file.maybe_rmfile(self.guessed_counties_path)
-
     def guess_city(self):
         """
         Guess the city this department is in
@@ -462,9 +453,6 @@ class Department():
 
         self.save_guessed_city(city_name)
 
-    def remove_guessed_city(self):
-        util.file.maybe_rmfile(self.guessed_city_path)
-
     def download_tract_values(self):
         """
         Download ACS values for relevant census tracts
@@ -489,9 +477,6 @@ class Department():
         frame = pandas.concat(frames)
         self.save_tract_values(frame)
 
-    def remove_tract_values(self):
-        util.file.maybe_rmfile(self.tract_values_path)
-
     def download_bg_values(self):
         """
         Download ACS values for relevant block groups
@@ -515,9 +500,6 @@ class Department():
             frames.append(df)
         frame = pandas.concat(frames)
         self.save_bg_values(frame)
-
-    def remove_bg_values(self):
-        util.file.maybe_rmfile(self.bg_values_path)
 
     def process_census_tracts(self):
         """
@@ -557,9 +539,6 @@ class Department():
 
         self.save_census_tracts(joined)
 
-    def remove_census_tracts(self):
-        util.file.maybe_rmfile(self.census_tracts_path)
-
     def process_block_groups(self):
         """
         Merge block group values with geography (intersecting counties)
@@ -597,9 +576,6 @@ class Department():
 
         self.save_block_groups(joined)
 
-    def remove_block_groups(self):
-        util.file.maybe_rmfile(self.block_groups_path)
-
     def process_police_precincts(self):
         """
         Generate police precincts file
@@ -614,9 +590,6 @@ class Department():
         joined = police.join(new_police.drop('geometry', axis=1))
         self.save_police_precincts(joined)
 
-    def remove_police_precincts(self):
-        util.file.maybe_rmfile(self.police_precincts_path)
-
     def generate_city_stats(self):
         """
         Generate statistics for my city
@@ -630,9 +603,6 @@ class Department():
         # use stats as a Series without geometry
         stats = stats.iloc[0].drop('geometry')
         self.save_city_stats(stats)
-
-    def remove_city_stats(self):
-        util.file.maybe_rmfile(self.city_stats_path)
 
     def generate_sc_markdown(self):
         """
@@ -681,9 +651,6 @@ class Department():
 
         with open(self.sc_markdown_path, mode='w') as f:
             f.write(result)
-
-    def remove_sc_markdown(self):
-        util.file.maybe_rmfile(self.sc_markdown_path)
 
     def generate_sc_figure1(self):
         """
@@ -1093,12 +1060,6 @@ class DepartmentCollection():
         states = set(states)
         states = sorted(states)
         self.save_list_of_states(states)
-
-    def remove_list_of_states(self):
-        """
-        Remove the list of states
-        """
-        util.file.maybe_rmfile(self.list_of_states_path)
 
     # input/output
 

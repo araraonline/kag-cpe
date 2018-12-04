@@ -18,21 +18,6 @@ from cpe_help import (
 
 
 DATA_DIR = util.path.DATA_DIR
-BASE_DIRECTORIES = [
-    # TODO: think about these
-
-    DATA_DIR / 'kaggle',
-
-    DATA_DIR / 'input',
-    DATA_DIR / 'input' / 'department',
-
-    DATA_DIR / 'output',
-    DATA_DIR / 'output' / 'department',
-
-    DATA_DIR / 'department',
-    DATA_DIR / 'tiger',
-]
-
 KAGGLE_DIR = DATA_DIR / 'kaggle'
 CPE_DATA_ZIP = KAGGLE_DIR / 'cpe-data.zip'
 CPE_DATA_DIR = KAGGLE_DIR / 'cpe-data'
@@ -100,26 +85,6 @@ class KaggleDepartment():
                 if x.is_dir()]
 
 
-def _create_base_directories():
-    """
-    Create base data directories
-    """
-    for dir in BASE_DIRECTORIES:
-        util.file.maybe_mkdir(dir)
-
-
-def task_create_base_directories():
-    """
-    Create base data directories
-    """
-    return {
-        'targets': BASE_DIRECTORIES,
-        'actions': [_create_base_directories],
-        'uptodate': [True],
-    }
-
-
-@doit.create_after('create_base_directories')
 def task_unzip_kaggle_inputs():
     """
     Unzip the Kaggle inputs file
@@ -153,7 +118,6 @@ def task_create_department_directories():
         }
 
 
-@doit.create_after('create_base_directories')
 def task_create_tiger_directories():
     """
     Create TIGER's directories

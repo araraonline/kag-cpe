@@ -8,7 +8,10 @@ import geopandas as gpd
 import numpy as np
 import pytest
 from pandas.util.testing import assert_frame_equal
+from shapely.geometry import Point, Polygon
 
+from cpe_help.util import crs
+from cpe_help.util.interpolation import weighted_areas
 from cpe_help.util.testing import assert_geoframe_almost_equal
 
 
@@ -18,9 +21,6 @@ class TestWeightedAreas():
     """
 
     def setup_method(self):
-        from shapely.geometry import Point, Polygon
-        from cpe_help.util.interpolation import weighted_areas
-
         sq1 = Polygon([(0, 0), (0, 2), (2, 2), (2, 0)])
         sq2 = Polygon([(2, 0), (2, 2), (4, 2), (4, 0)])
         self.source = gpd.GeoDataFrame(geometry=[sq1, sq2])
@@ -251,9 +251,6 @@ class TestWeightedAreasNoIgnoreCRS():
     """
 
     def setup_method(self):
-        from shapely.geometry import Polygon
-        from cpe_help.util import crs
-        from cpe_help.util.interpolation import weighted_areas
 
         self.crs1 = crs.EPSG4326
         self.crs2 = crs.from_esri(102739)  # equal area
@@ -358,10 +355,6 @@ class TestWeightedAreasIgnoreCRS():
     """
 
     def setup_method(self):
-        from shapely.geometry import Polygon
-        from cpe_help.util import crs
-        from cpe_help.util.interpolation import weighted_areas
-
         self.crs1 = crs.EPSG4326
         self.crs2 = crs.from_esri(102739)  # equal area
 

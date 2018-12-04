@@ -18,8 +18,6 @@ class TestWeightedAreas():
     """
 
     def setup_method(self):
-        # TODO: check fixtures
-        # https://docs.pytest.org/en/latest/fixture.html#fixture-finalization-executing-teardown-code
         from shapely.geometry import Point, Polygon
         from cpe_help.util.interpolation import weighted_areas
 
@@ -253,8 +251,6 @@ class TestWeightedAreasNoIgnoreCRS():
     """
 
     def setup_method(self):
-        # TODO: check fixtures
-        # https://docs.pytest.org/en/latest/fixture.html#fixture-finalization-executing-teardown-code
         from shapely.geometry import Polygon
         from cpe_help.util import crs
         from cpe_help.util.interpolation import weighted_areas
@@ -362,8 +358,6 @@ class TestWeightedAreasIgnoreCRS():
     """
 
     def setup_method(self):
-        # TODO: check fixtures
-        # https://docs.pytest.org/en/latest/fixture.html#fixture-finalization-executing-teardown-code
         from shapely.geometry import Polygon
         from cpe_help.util import crs
         from cpe_help.util.interpolation import weighted_areas

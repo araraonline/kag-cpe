@@ -187,6 +187,10 @@ class Department():
     def police_precincts_output(self):
         return self.acs_output_dir / 'police_precincts.geojson'
 
+    @property
+    def city_output(self):
+        return self.acs_output_dir / 'city.geojson'
+
     # department-specific files
 
     @property

@@ -64,6 +64,20 @@ def task_output_police_precincts():
         }
 
 
+def task_city():
+    """
+    Output statistics for each department city
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [dept.city_path],
+            'targets': [dept.city_output],
+            'actions': ['cp %(dependencies)s %(targets)s'],
+            'clean': True,
+        }
+
+
 def task_process_department_files():
     """
     Preprocess individual files for departments

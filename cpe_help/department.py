@@ -505,6 +505,9 @@ class Department():
         """
         Generate statistics for my city
 
+        The statistics are extracted from the BGs that intersect with
+        the city.
+
         See also
         --------
         Department.process_police_precincts

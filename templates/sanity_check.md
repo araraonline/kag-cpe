@@ -42,13 +42,13 @@ Attributes:
 
 The city area and precincts area must be close.
 
-![City and police precincts]({{ dept.sc_figure1_path }})\
+<img src="{{ dept.sc_figure1_path }}" style="max-width: 10in; max-height: 10in;" />
 
 ### Police precincts over census tracts
 
 The census tracts area must cover the precincts area.
 
-![Police precincts over census tracts]({{ dept.sc_figure2_path }})\
+<img src="{{ dept.sc_figure2_path }}" style="max-width: 10in; max-height: 10in;" />
 
 ### Police precincts over block groups
 
@@ -56,7 +56,7 @@ The block groups area must cover the precincts area.
 
 Also notice that block groups are more granular than census tracts.
 
-![Police precincts over block groups]({{ dept.sc_figure3_path }})\
+<img src="{{ dept.sc_figure3_path }}" style="max-width: 10in; max-height: 10in;" />
 
 ### Police precincts over block groups (zoomed in)
 
@@ -64,7 +64,7 @@ The areal interpolation method works best when the source polygons
 (block groups) are small compared to the target polygons (police
 precincts)
 
-![Police precincts over block groups (zoomed in)]({{ dept.sc_figure4_path }})\
+<img src="{{ dept.sc_figure4_path }}" style="max-width: 10in; max-height: 10in;" />
 
 ### Population density at various levels
 
@@ -72,4 +72,4 @@ The density should stay roughly the same at different levels.
 
 The only level generated here was police precincts.
 
-![Population density at various levels]({{ dept.sc_figure5_path }})\
+<img src="{{ dept.sc_figure5_path }}" style="max-width: 10in; max-height: 10in;" />

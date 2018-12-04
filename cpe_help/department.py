@@ -701,7 +701,7 @@ class Department():
         Patch = matplotlib.patches.Patch
 
         # plot
-        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+        fig, ax = matplotlib.pyplot.subplots(figsize=(10, 10))
 
         city.plot(ax=ax, color='green', alpha=0.5)
         precincts.plot(ax=ax, color='none', edgecolor='black', alpha=0.75)
@@ -740,7 +740,7 @@ class Department():
         precincts = precincts.to_crs(proj)
 
         # plot
-        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+        fig, ax = matplotlib.pyplot.subplots(figsize=(10, 10))
 
         tracts.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
         precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
@@ -778,7 +778,7 @@ class Department():
         precincts = precincts.to_crs(proj)
 
         # plot
-        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+        fig, ax = matplotlib.pyplot.subplots(figsize=(10, 10))
 
         bgs.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
         precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
@@ -822,7 +822,7 @@ class Department():
         matplotlib.pyplot.close(fig)
 
         # plot
-        fig, ax = matplotlib.pyplot.subplots(figsize=(12, 12))
+        fig, ax = matplotlib.pyplot.subplots(figsize=(10, 10))
 
         bgs.plot(ax=ax, color='green', edgecolor='white', alpha=0.5)
         precincts.plot(ax=ax, color='blue', edgecolor='black', alpha=0.5)
@@ -884,7 +884,7 @@ class Department():
         fig, axes = matplotlib.pyplot.subplots(
             nrows=2,
             ncols=2,
-            figsize=(12, 12),
+            figsize=(10, 10),
         )
         axes[1][1].remove()
 

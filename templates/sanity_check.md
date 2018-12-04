@@ -68,8 +68,6 @@ precincts)
 
 ### Population density at various levels
 
-The density should stay roughly the same at different levels.
-
-The only level generated here was police precincts.
+The densities should stay roughly the same at different levels.
 
 <img src="{{ dept.sc_figure5_path }}" style="max-width: 10in; max-height: 10in;" />

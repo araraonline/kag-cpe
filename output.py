@@ -64,7 +64,7 @@ def task_output_police_precincts():
         }
 
 
-def task_city():
+def task_output_city():
     """
     Output statistics for each department city
     """

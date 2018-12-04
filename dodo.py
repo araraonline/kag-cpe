@@ -203,6 +203,24 @@ def task_download_place_boundaries():
         }
 
 
+def task_process_city():
+    """
+    Merge city statistics to city geometry
+    """
+    for dept in Department.list():
+        yield {
+            'name': dept.name,
+            'file_dep': [
+                dept.guessed_city_path,
+                dept.city_stats_path,
+            ],
+            'task_dep': ['download_place_boundaries'],
+            'targets': [dept.city_path],
+            'actions': [dept.process_city],
+            'clean': True,
+        }
+
+
 def task_process_census_tracts():
     """
     Merge census tract values with census tract boundaries

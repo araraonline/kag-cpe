@@ -15,9 +15,9 @@ title: 'Sanity check for department {{ name }}'
 
 CRS: `{{ shp_crs }}`  
 Layers: `{{ shp_layers }}`  
-Variables:
-{% for var in shp_columns %}
-- `{{ var }}`
+Attributes:
+{% for attr in shp_attributes %}
+- `{{ attr }}`
 {%- endfor %}
 
 ### Inputs

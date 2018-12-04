@@ -118,6 +118,10 @@ class Department():
         return self.processed_dir / 'city_stats.json'
 
     @property
+    def city_path(self):
+        return self.processed_dir / 'city.geojson'
+
+    @property
     def census_tracts_path(self):
         return self.processed_dir / 'census_tracts.geojson'
 
@@ -500,6 +504,20 @@ class Department():
             frames.append(df)
         frame = pandas.concat(frames)
         self.save_bg_values(frame)
+
+    def process_city(self):
+        """
+        Generate statistics for my city
+
+        See also
+        --------
+        Department.process_police_precincts
+        """
+        city = self.load_city_metadata()
+        bgs = self.load_block_groups()
+        new_city = util.interpolation.weighted_areas(bgs, city.geometry)
+        joined = city.join(new_city.drop('geometry', axis=1))
+        self.save_city(joined)
 
     def process_census_tracts(self):
         """
@@ -950,6 +968,9 @@ class Department():
     def load_police_precincts(self):
         return util.io.load_geojson(self.police_precincts_path)
 
+    def load_city(self):
+        return util.io.load_geojson(self.city_path)
+
     def load_city_stats(self):
         obj = util.io.load_json(self.city_stats_path)
         ser = pandas.Series(obj)
@@ -983,6 +1004,9 @@ class Department():
 
     def save_police_precincts(self, df):
         util.io.save_geojson(df, self.police_precincts_path)
+
+    def save_city(self, df):
+        util.io.save_geojson(df, self.city_path)
 
     def save_city_stats(self, ser):
         obj = ser.to_dict()

@@ -276,24 +276,6 @@ def task_process_police_precincts():
         }
 
 
-def task_generate_city_stats():
-    """
-    Generate statistics for the city of each department
-    """
-    for dept in Department.list():
-        yield {
-            'name': dept.name,
-            'file_dep': [
-                dept.guessed_city_path,
-                dept.block_groups_path,
-            ],
-            'task_dep': ['download_place_boundaries'],
-            'targets': [dept.city_stats_path],
-            'actions': [dept.generate_city_stats],
-            'clean': True,
-        }
-
-
 # import tasks from output.py
 # leave me at the end of this file
 from output import *

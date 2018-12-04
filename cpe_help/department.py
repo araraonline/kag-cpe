@@ -114,10 +114,6 @@ class Department():
         return self.raw_dir / 'bg_values.pkl'
 
     @property
-    def city_stats_path(self):
-        return self.processed_dir / 'city_stats.json'
-
-    @property
     def city_path(self):
         return self.processed_dir / 'city.geojson'
 
@@ -170,10 +166,6 @@ class Department():
         return self.sc_figures_dir / 'figure5.png'
 
     # ACS outputs
-
-    @property
-    def city_stats_output(self):
-        return self.acs_output_dir / 'city_stats.json'
 
     @property
     def census_tracts_output(self):
@@ -612,20 +604,6 @@ class Department():
         joined = police.join(new_police.drop('geometry', axis=1))
         self.save_police_precincts(joined)
 
-    def generate_city_stats(self):
-        """
-        Generate statistics for my city
-
-        The statistics are extracted from the BGs that intersect with
-        the city, in a method called areal interpolation.
-        """
-        city = self.load_city_metadata()
-        bgs = self.load_block_groups()
-        stats = util.interpolation.weighted_areas(bgs, city.geometry)
-        # use stats as a Series without geometry
-        stats = stats.iloc[0].drop('geometry')
-        self.save_city_stats(stats)
-
     def generate_sc_markdown(self):
         """
         Generate sanity check report in markdown
@@ -975,11 +953,6 @@ class Department():
     def load_city(self):
         return util.io.load_geojson(self.city_path)
 
-    def load_city_stats(self):
-        obj = util.io.load_json(self.city_stats_path)
-        ser = pandas.Series(obj)
-        return ser
-
     # output
 
     def save_preprocessed_shapefile(self, df):
@@ -1011,10 +984,6 @@ class Department():
 
     def save_city(self, df):
         util.io.save_geojson(df, self.city_path)
-
-    def save_city_stats(self, ser):
-        obj = ser.to_dict()
-        util.io.save_json(obj, self.city_stats_path)
 
 
 class DepartmentFile(abc.ABC):

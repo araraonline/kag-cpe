@@ -205,7 +205,7 @@ def task_download_place_boundaries():
 
 def task_process_city():
     """
-    Generate city statistics
+    Generate statistics for the city of each department
     """
     for dept in Department.list():
         yield {

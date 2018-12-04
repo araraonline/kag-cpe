@@ -814,7 +814,7 @@ class Department():
         precincts = self.load_police_precincts()
 
         # set up common projection
-        proj = util.crs.equal_area_from_geodf(bgs)
+        proj = util.crs.equal_area_from_geodf(precincts)
         bgs = bgs.to_crs(proj)
         precincts = precincts.to_crs(proj)
 

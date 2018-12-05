@@ -10,6 +10,8 @@ jobs:
     displayName: Update conda
   - script: conda env create --file environment.yml
     displayName: Create conda environment
+  - script: conda list --name cpe-kaggle
+    displayName: Conda list
 
 - job: 'macOS'
   pool:
@@ -20,3 +22,5 @@ jobs:
     displayName: Update conda
   - script: conda env create --file environment.yml
     displayName: Create conda environment
+  - script: conda list --name cpe-kaggle
+    displayName: Conda list

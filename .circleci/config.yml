@@ -22,4 +22,5 @@ jobs:
           command: |
               source activate cpe-kaggle
               pytest cpe_help/tests/
+      - run: conda list --name cpe-kaggle
       - run: du -hs /opt/conda/envs/*

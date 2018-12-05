@@ -1,7 +1,7 @@
 name: cpe-kaggle
 channels:
-  - defaults
   - conda-forge
+  - defaults
 dependencies:
   - contextily==0.99.*
   - doit==0.31.*

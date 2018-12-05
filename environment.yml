@@ -2,10 +2,10 @@ name: cpe-kaggle
 channels:
   - defaults
 dependencies:
+  - descartes
   - doit==0.31.*
   - fiona=1.7.*
   - flake8==3.6.*
-  - geopandas=0.4.*
   - ipython=7.0.*
   - jinja2=2.10.*
   - jupyter=1.0.*
@@ -14,15 +14,19 @@ dependencies:
   - pandas=0.23.*
   - pandoc=2.*
   - pyproj=1.9.*
+  - pysal
   - pytest==3.9.*
   - python=3.7
   - requests==2.20.*
+  - rtree
+  - six
   - scikit-learn=0.20.*
   - scipy=1.1.*
   - seaborn==0.9.*
   - shapely=1.6.*
   - statsmodels=0.9.*
   - pip:
+    - geopandas==0.4.*
     - httpie==0.9.*
     - us==1.0.*
 

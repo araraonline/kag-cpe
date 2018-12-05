@@ -12,6 +12,14 @@ jobs:
     displayName: Create conda environment
   - script: conda list --name cpe-kaggle
     displayName: Conda list
+  - script: |
+      call activate cpe-kaggle
+      python -c "import fiona; print(fiona.__version__)"
+    displayName: Import fiona
+  - script: |
+      call activate cpe-kaggle
+      python -c "import fion; print(fion.__version__)"
+    displayName: Import fion
 
 - job: 'macOS'
   pool:

@@ -12,6 +12,11 @@ jobs:
     displayName: Create conda environment
   - script: conda list --name cpe-kaggle
     displayName: Conda list
+  - script: |
+      activate cpe-kaggle
+      doit -f prepare_kaggle.py
+      doit
+    displayName: Run pipeline
 
 - job: 'macOS'
   pool:
@@ -24,3 +29,8 @@ jobs:
     displayName: Create conda environment
   - script: conda list --name cpe-kaggle
     displayName: Conda list
+  - script: |
+      source activate cpe-kaggle
+      doit -f prepare_kaggle.py
+      doit
+    displayName: Run pipeline

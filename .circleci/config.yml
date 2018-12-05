@@ -23,4 +23,10 @@ jobs:
               source activate cpe-kaggle
               pytest cpe_help/tests/
       - run: conda list --name cpe-kaggle
+      - run:
+          name: run pipeline
+          command: |
+              source activate cpe-kaggle
+              doit -f prepare_kaggle.py
+              doit
       - run: du -hs /opt/conda/envs/*

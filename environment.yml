@@ -2,7 +2,6 @@ name: cpe-kaggle
 channels:
   - defaults
 dependencies:
-  - contextily==0.99.*
   - doit==0.31.*
   - fiona=1.7.*
   - flake8==3.6.*

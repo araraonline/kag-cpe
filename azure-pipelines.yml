@@ -10,6 +10,9 @@ jobs:
     displayName: Update conda
   - script: conda env create --file environment.yml
     displayName: Create conda environment
+  - script: |
+      activate kaggle-cpe
+      python -c 'import fiona'
 
 - job: 'macOS'
   pool:
@@ -20,3 +23,6 @@ jobs:
     displayName: Update conda
   - script: conda env create --file environment.yml
     displayName: Create conda environment
+  - script: |
+      source activate kaggle-cpe
+      python -c 'import fiona'
